@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT layersa (imagelayer+)>
+<!ELEMENT imagelayer (markinglayer+)>
+<!ATTLIST imagelayer imagename CDATA #REQUIRED>
+<!ELEMENT markinglayer (color?,  opacity? , size?, shape? , thickness? , coordinates?)>
+<!ATTLIST markinglayer markingname CDATA #REQUIRED>
+<!ELEMENT color (#PCDATA)>
+<!ELEMENT coordinates (singlecoordinate+)>
+<!ELEMENT singlecoordinate (#PCDATA)>
+<!ELEMENT shape (#PCDATA)>
+<!ELEMENT size (#PCDATA)>
+<!ELEMENT thickness (#PCDATA)>
+<!ELEMENT opacity (#PCDATA)>

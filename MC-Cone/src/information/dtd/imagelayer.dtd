@@ -1,0 +1,13 @@
+<!DOCTYPE Layers
+[
+<!ELEMENT layers (imagelayer*)>
+<!ELEMENT imagelayer (imagename, markinglayer*)>
+<!ATTLIST imagelayer imagepath CDATA #REQUIRED>
+<!ELEMENT imagename (#PCDATA)>
+<!ELEMENT markinglayer (color, coordinates?, shape)>
+<!ATTLIST markinglayer markingname CDATA #REQUIRED>
+<!ELEMENT color (#PCDATA)>
+<!ELEMENT coordinates (singlecoordinate+)>
+<!ELEMENT singlecoordinate (#PCDATA)>
+<!ELEMENT shape (#PCDATA)>
+]>
