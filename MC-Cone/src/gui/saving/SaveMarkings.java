@@ -8,21 +8,17 @@ import information.ID;
 import information.ImageLayer;
 import information.LayersOfPath;
 import information.MarkingLayer;
-
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import operators.CheckBoxIcon;
 import operators.XMLreadManager;
 import operators.XMLwriteManager;
