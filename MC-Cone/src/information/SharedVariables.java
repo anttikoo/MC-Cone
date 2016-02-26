@@ -26,7 +26,7 @@ public class SharedVariables {
 	public static final String heightDown = "HEIGHT_DOWN";
 	public static boolean useStrickSearch=false;
 	public static boolean canUserSelectGridRectangles=false;
-	public static final String version = "0.1b";
+	public static final String version = "0.9";
 	
 	
 
