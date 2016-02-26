@@ -28,9 +28,7 @@ public class SharedVariables {
 	public static boolean canUserSelectGridRectangles=false;
 	public static final String version = "0.9";
 	
-	
-
-	
+		
 	/**
 	 * Checks if is use strick search.
 	 *
