@@ -1,5 +1,6 @@
 package gui.saving;
 
+import gui.Color_schema;
 import gui.GUI;
 import gui.ShadyMessageDialog;
 import gui.file.FileManager;
@@ -9,13 +10,20 @@ import information.LayersOfPath;
 import information.MarkingLayer;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import operators.CheckBoxIcon;
 import operators.XMLreadManager;
 import operators.XMLwriteManager;
 
@@ -34,6 +42,9 @@ public class SaveMarkings extends SaverDialog{
 	
 	/** The names of ImageLayers for file selection. */
 	private ArrayList<String> imageLayersNamesForFileSelection;
+
+	/** The save image check box. */
+	private JCheckBox overwriteFileJCheckBox;
 
 	/**
 	 * Instantiates a new object of SaveMarkings.
@@ -119,7 +130,23 @@ public class SaveMarkings extends SaverDialog{
 	 * @see gui.saving.SaverDialog#initBrowsingPanelWithLabel()
 	 */
 	protected JPanel initBrowsingPanelWithLabel() throws Exception{
-		return initBrowsingPanel(this.savingType, "Browse file for all");
+		JPanel browsingJPanel = initBrowsingPanel(this.savingType, "Browse file for all");
+		
+		// CheckBox
+		Icon checkBoxIcon=new CheckBoxIcon();
+		overwriteFileJCheckBox = new JCheckBox(checkBoxIcon);
+	
+		overwriteFileJCheckBox.setSelected(false);
+		overwriteFileJCheckBox.setBackground(Color_schema.dark_35);
+		overwriteFileJCheckBox.setMaximumSize(new Dimension(25,25));
+		overwriteFileJCheckBox.setPreferredSize(new Dimension(25,25));
+		overwriteFileJCheckBox.setMinimumSize(new Dimension(25,25));
+		
+		JLabel overwriteLabel = new JLabel("Overwrite content of File(s)") ;
+		browsingJPanel.add(Box.createRigidArea(new Dimension(10,0)));
+		browsingJPanel.add(overwriteFileJCheckBox);
+		browsingJPanel.add(overwriteLabel);
+		return browsingJPanel;
 	}
 
 
@@ -258,14 +285,14 @@ public class SaveMarkings extends SaverDialog{
 	
 									}
 									if(!madeSave){ // not found the proper LayersOfPath for the ImageLayer -> create new
-										LayersOfPath newLOP = new LayersOfPath(imp.getProperFilePathForSaving(), imp.getFileValidity());
+										LayersOfPath newLOP = new LayersOfPath(imp.getProperFilePathForSaving(), imp.getFileValidity(), this.overwriteFileJCheckBox.isSelected());
 										newLOP.addImageLayer(newIlayer);
 										layerOfPathList.add(newLOP);
 									}
 								}
 								else{ // empty
 									// create new LayersOfPath object
-									LayersOfPath newLOP = new LayersOfPath(imp.getProperFilePathForSaving(), imp.getFileValidity());
+									LayersOfPath newLOP = new LayersOfPath(imp.getProperFilePathForSaving(), imp.getFileValidity(),this.overwriteFileJCheckBox.isSelected());
 									newLOP.addImageLayer(newIlayer);
 									layerOfPathList.add(newLOP);
 	

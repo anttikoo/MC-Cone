@@ -48,6 +48,7 @@ public class SaverDialog extends JDialog{
 /** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -8428423977175251157L;
 
+/** The Constant LOGGER. */
 final static Logger LOGGER = Logger.getLogger("MCCLogger");
 
 /** The GUI. */

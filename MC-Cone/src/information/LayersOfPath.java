@@ -1,6 +1,7 @@
 package information;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * The Class LayersOfPath. Contains list of ImageLayers and file path where the data of ImageLayers are saved. 
@@ -16,16 +17,28 @@ public class LayersOfPath {
 	/** The file state. */
 	private int fileState;
 	
+	/** The overwrite file. */
+	private boolean overwriteFile=false;
+	
+	/** The Constant LOGGER. */
+	final static Logger LOGGER = Logger.getLogger("MCCLogger");
+	
 	/**
 	 * Instantiates a new LayersOfPath
 	 *
 	 * @param path the path
 	 * @param state the state
 	 */
-	public LayersOfPath(String path, int state){
-		this.setXmlpath(path);
-		this.imageLayerList=new ArrayList<ImageLayer>();
-		this.fileState=state;
+	public LayersOfPath(String path, int state, boolean overwrite){
+		try {
+			this.setXmlpath(path);
+			this.imageLayerList=new ArrayList<ImageLayer>();
+			this.fileState=state;
+			this.setOverwriteFile(overwrite);
+		} catch (Exception e) {
+			LOGGER.severe("Error in initialing Layers Of Path");
+			e.printStackTrace();
+		}
 		
 	}
 
@@ -66,12 +79,32 @@ public class LayersOfPath {
 	}
 
 	/**
+	 * Checks if is overwrite file.
+	 *
+	 * @return true, if is overwrite file
+	 * @throws Exception the exception
+	 */
+	public boolean overwriteFile() throws Exception {
+		return overwriteFile;
+	}
+
+	/**
 	 * Sets the list of ImageLayers.
 	 *
 	 * @param imageLayerList the new list of ImageLayers
 	 */
 	public void setImageLayerList(ArrayList<ImageLayer> imageLayerList) {
 		this.imageLayerList = imageLayerList;
+	}
+
+	/**
+	 * Sets the overwrite file.
+	 *
+	 * @param overwriteFile the new overwrite file
+	 * @throws Exception the exception
+	 */
+	public void setOverwriteFile(boolean overwriteFile) throws Exception {
+		this.overwriteFile = overwriteFile;
 	}
 
 	/**

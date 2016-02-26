@@ -467,7 +467,8 @@ public class XMLwriteManager {
 
 
 				// file already exists and it is right format -> update this file
-				if(f.exists() && layersOfPath.getFileState() == ID.FILE_OK ){ // file exist and it is writable+valid
+				// file exist and it is writable+valid and not selected to overwrite
+				if(f.exists() && layersOfPath.getFileState() == ID.FILE_OK && !layersOfPath.overwriteFile()){ 
 					initInput(this.layersOfPath.getXmlpath());
 					initOutput();
 					readAndWrite(); // saves as stream to byteStream
