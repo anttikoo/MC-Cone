@@ -443,6 +443,10 @@ public class LayerVisualManager {
 		return (int)(relativeY*d);
 	}
 	
+	/**
+	 * Creates list of BufferedImages from resource image files presenting MC-Cone icon. The are different sized.
+	 * @return List of BufferedImages
+	 */
 	public ArrayList<BufferedImage> createImageListFromIconFiles(){
 		try {
 			ArrayList<BufferedImage> imageList =new ArrayList<BufferedImage>();

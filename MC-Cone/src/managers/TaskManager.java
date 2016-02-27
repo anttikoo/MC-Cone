@@ -148,7 +148,7 @@ public class TaskManager {
 	}
 	
 	/**
-	 * Creates list of BufferedImages from iconfiles of resource.
+	 * Creates list of BufferedImages from icon files of resource.
 	 * @return List of BufferedImages
 	 */
 	public ArrayList<BufferedImage> createImageListFromIconFiles(){
