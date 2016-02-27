@@ -637,7 +637,9 @@ public class GUI extends JFrame{
 	 * @throws Exception the exception
 	 */
 	public void changeSelectedImageLayerUpOrDown(int directionID) throws Exception{
-		setSelectedImageLayerAndImage(this.taskManager.getSelectedImageLayerAtUpOrDown(directionID),ID.IMAGELAYER_CHANGE_IMAGELAYER);
+		int index = this.taskManager.getSelectedImageLayerAtUpOrDown(directionID);
+		if(index>0)
+			setSelectedImageLayerAndImage(index,ID.IMAGELAYER_CHANGE_IMAGELAYER);
 	}
 	
 	/**
