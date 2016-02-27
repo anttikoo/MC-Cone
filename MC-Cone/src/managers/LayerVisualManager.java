@@ -11,12 +11,15 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
+import javax.swing.ImageIcon;
+
 import org.imgscalr.Scalr;
 import gui.file.Utils;
 import information.GridProperties;
@@ -438,6 +441,35 @@ public class LayerVisualManager {
 
 			double d= this.imagePanelDimension.getHeight()/this.relativeViewRectangle.getHeight();
 		return (int)(relativeY*d);
+	}
+	
+	public ArrayList<BufferedImage> createImageListFromIconFiles(){
+		try {
+			ArrayList<BufferedImage> imageList =new ArrayList<BufferedImage>();
+			ArrayList<String> iconFileList=new ArrayList<String>();
+			for( int i=16;i<=512;i*=2){
+				String iconfileName = "/images/icon_"+i+"x"+i+".png";
+				iconFileList.add(iconfileName);
+			}
+			Iterator<String> fileNameIterator = iconFileList.iterator();
+			while(fileNameIterator.hasNext()){
+				String singleFileName = fileNameIterator.next();
+				
+				
+				BufferedImage image = ImageIO.read(this.getClass().getResourceAsStream(singleFileName));
+				imageList.add(image);
+			}
+			
+			return imageList;
+		} catch (IOException e) {
+			LOGGER.severe("Error in creating icons for MC-Cone");
+			e.printStackTrace();
+			return null;
+		}
+		
+		
+		
+		
 	}
 
 	/**

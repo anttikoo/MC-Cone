@@ -25,6 +25,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -36,6 +37,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.BorderFactory;
@@ -769,6 +771,8 @@ public class GUI extends JFrame{
 			e.printStackTrace();
 		}
 	}
+	
+	
 
 	/**
 	 * Creates new MarkingLayer to under ImageLayer by given ID. Creates also a new MarkingPanel and refreshes the ImageLayerInfos. 
@@ -995,6 +999,8 @@ public class GUI extends JFrame{
 
 
 	}
+	
+	
 	
 	/**
 	 * Returns ImageLayer by given ID.
@@ -1729,9 +1735,16 @@ public class GUI extends JFrame{
 			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			this.setTitle("MC-Cone - Manual Cell Counter");
 
-			// set icon
-			ImageIcon img = getImageIcon( "/images/MCcone_Small.png");
-			this.setIconImage(img.getImage());
+			// set icon. First try to import from resource multiple icons and if not success then insert single image.
+			ArrayList<BufferedImage> imageList =this.taskManager.createImageListFromIconFiles();
+			if(imageList != null && imageList.size()>0){
+				this.setIconImages(imageList);
+			}
+			else{
+				ImageIcon img = getImageIcon( "/images/MCcone_Small.png");
+				this.setIconImage(img.getImage());
+			}
+			
 			
 		} catch (Exception e) {
 			LOGGER.severe("Error in setting GUI properties and listeners: " +e.getMessage());

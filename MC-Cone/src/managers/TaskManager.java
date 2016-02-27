@@ -146,6 +146,14 @@ public class TaskManager {
 		else
 			return null;
 	}
+	
+	/**
+	 * Creates list of BufferedImages from iconfiles of resource.
+	 * @return List of BufferedImages
+	 */
+	public ArrayList<BufferedImage> createImageListFromIconFiles(){
+		return this.layerVisualManager.createImageListFromIconFiles();
+	}
 
 	/**
 	 * Creates the new MarkingLayer.
