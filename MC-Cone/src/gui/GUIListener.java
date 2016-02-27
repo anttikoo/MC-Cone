@@ -5,6 +5,7 @@ import gui.panels.ImagePanel;
 import information.ID;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -246,8 +248,10 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
+							if(!hasMarkingTitleFocus()){
 							// change selected ImageLayer one up
 							gui.changeSelectedImageLayerUpOrDown(ID.MOVE_UP);
+							}
 						} catch (Exception e1) {
 							LOGGER.severe("Error in moving selected ImageLayer");
 							e1.printStackTrace();
@@ -265,8 +269,10 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							// change selected ImageLayer one down
-							gui.changeSelectedImageLayerUpOrDown(ID.MOVE_DOWN);
+							if(!hasMarkingTitleFocus()){
+								// change selected ImageLayer one down
+								gui.changeSelectedImageLayerUpOrDown(ID.MOVE_DOWN);
+							}
 						} catch (Exception e1) {
 							LOGGER.severe("Error in moving selected ImageLayer");
 							e1.printStackTrace();
@@ -284,8 +290,10 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							// change selected MarkingLayer one up
-							gui.changeSelectedMarkingLayerUpOrDown(ID.MOVE_UP);
+							if(!hasMarkingTitleFocus()){
+								// change selected MarkingLayer one up
+								gui.changeSelectedMarkingLayerUpOrDown(ID.MOVE_UP);
+							}
 						} catch (Exception e1) {
 							LOGGER.severe("Error in changing MarkingLayer!");
 							e1.printStackTrace();
@@ -303,9 +311,10 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							// change selected MarkingLayer one down
-
-							gui.changeSelectedMarkingLayerUpOrDown(ID.MOVE_DOWN);
+							if(!hasMarkingTitleFocus()){
+								// change selected MarkingLayer one down						
+								gui.changeSelectedMarkingLayerUpOrDown(ID.MOVE_DOWN);
+							}
 						} catch (Exception e1) {
 							LOGGER.severe("Error in changing MarkingLayer!");
 							e1.printStackTrace();
@@ -323,9 +332,10 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							// change selected MarkingLayer one up
-
-							gui.moveSelectedMarkingLayer(ID.MOVE_UP);
+							if(!hasMarkingTitleFocus()){
+								// change selected MarkingLayer one up
+								gui.moveSelectedMarkingLayer(ID.MOVE_UP);
+							}
 						} catch (Exception e1) {
 							LOGGER.severe("Error in changing selected MarkingLayer!");
 							e1.printStackTrace();
@@ -343,9 +353,10 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							// change selected MarkingLayer one down
-
-							gui.moveSelectedMarkingLayer(ID.MOVE_DOWN);
+							if(!hasMarkingTitleFocus()){
+								// change selected MarkingLayer one down
+								gui.moveSelectedMarkingLayer(ID.MOVE_DOWN);
+							}
 						} catch (Exception e1) {
 							LOGGER.severe("Error in changing MarkingLayer!");
 							e1.printStackTrace();
@@ -747,6 +758,19 @@ public class GUIListener extends MouseInputAdapter {
 	public Point getPreviousDraggingPoint() throws Exception {
 		return previousDraggingPoint;
 	}
+	
+	/**
+	 * Checks for has marking title focus.
+	 *
+	 * @return true, if JTextfield has focus
+	 */
+	private boolean hasMarkingTitleFocus(){
+		Component focusComponent = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+		if(focusComponent != null && focusComponent instanceof JTextField){
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Inits the highlight timer.
@@ -1047,7 +1071,8 @@ public class GUIListener extends MouseInputAdapter {
 			}
 
 	}
-
+	
+	
 	/**
 	 * Paints the circle and square for precounting if fits fully to imagePanel.
 	 *

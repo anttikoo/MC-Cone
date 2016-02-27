@@ -366,6 +366,7 @@ private JButton selectedImageLayerJButton;
 										((SingleMarkingPanel)((JButton)e.getSource()).getParent()).markingTitleJTextField.requestFocus();
 										Font fontUsed= ((SingleMarkingPanel)((JButton)e.getSource()).getParent()).markingTitleJTextField.getFont();
 										((SingleMarkingPanel)((JButton)e.getSource()).getParent()).markingTitleJTextField.setFont(new Font(fontUsed.getName(),Font.ITALIC,fontUsed.getSize()));
+										((SingleMarkingPanel)((JButton)e.getSource()).getParent()).markingTitleJTextField.selectAll();
 									} catch (Exception ex) {
 										LOGGER.severe("Error in editing marking properties" +e.getClass().toString() + " : " +ex.getMessage());
 										ex.printStackTrace();
