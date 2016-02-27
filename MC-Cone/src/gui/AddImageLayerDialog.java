@@ -90,6 +90,8 @@ public class AddImageLayerDialog extends JDialog{
 	/** The shady message dialog. Shows messages */
 	private ShadyMessageDialog shadyMessageDialog=null;
 	
+
+	
 	/**
 	 * Class constructor for only creating new ImageLayers and importing markings
 	 * @param frame Owner JFrame
@@ -137,6 +139,7 @@ public class AddImageLayerDialog extends JDialog{
 
 			super(frame, true);
 			try{
+				
 				this.typeOfDialog=ID.MANAGE_IMAGE_LAYERS;
 				this.dialogImageLayerList =   makeCopyOfList(iList);
 				this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -369,7 +372,7 @@ public class AddImageLayerDialog extends JDialog{
 	private void continueUpdatingImageLayers(){
 		try {
 			this.setVisible(false);
-			this.gui.setImageLayerList(this.dialogImageLayerList);
+			this.gui.setImageLayerList(this.dialogImageLayerList, true);
 			this.dispose();
 		} catch (Exception e) {
 			LOGGER.severe("ERROR in hiding dialog and updating ImageLayers!");
@@ -1142,7 +1145,7 @@ private JPanel initImageViewPanel(){
 	 */
 	private void updateImageList(){
 		try {
-			//boolean foundMarkingLayer=false;
+			
 			// remove all components
 			if(imageScrollPanel.getComponentCount()>0)
 				imageScrollPanel.removeAll();

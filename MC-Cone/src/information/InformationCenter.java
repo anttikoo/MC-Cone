@@ -66,7 +66,7 @@ public class InformationCenter {
 		try {
 			setUpFreeShapes();
 			setUpFreeColors();
-			this.setImageLayerList(new ArrayList<ImageLayer>());
+			this.setImageLayerList(new ArrayList<ImageLayer>(),false);
 			this.setSelectedImageLayer(null);
 			this.setVisibleMarkingLayerList(new ArrayList<MarkingLayer>());
 			this.presentFolder= System.getProperty("user.home"); // may not work in some windows ?
@@ -96,9 +96,11 @@ public class InformationCenter {
 
 	/**
 	 * Adds List of ImageLayer objects to InformationCenter.imageLayerList
+	 *
 	 * @param layers Arraylist of ImageLayers that are added
+	 * @param isUpdate the is update
 	 */
-	public void addImageLayers(ArrayList<ImageLayer> layers){
+	public void addImageLayers(ArrayList<ImageLayer> layers, boolean isUpdate){
 		try {
 			if(layers != null && layers.size()>0){
 
@@ -107,14 +109,12 @@ public class InformationCenter {
 					ImageLayer im = (ImageLayer)iterator.next();
 					addSingleImageLayer(im); // add single ImageLayer to list
 				}
-				createFirstMarkingLayerToImageLayers();
+				if(!isUpdate) // add default MarkingLayer only if is not update
+					createFirstMarkingLayerToImageLayers();
 				//check if selectedImageLayer is null -> set first ImageLayer as selected
 				setProperSelectedImageLayer();
 				setProperSelectedMarkingLayer();
 				updateVisibleMarkingLayerList();
-				
-				
-
 
 			}
 		} catch (Exception e) {
@@ -1029,7 +1029,7 @@ public class InformationCenter {
 	 * If null parameter is given: creates new empty list
 	 * @param iLayerList ArrayList containing the ImageLayer objects
 	 */
-	public void setImageLayerList(ArrayList<ImageLayer> iLayerList)  {
+	public void setImageLayerList(ArrayList<ImageLayer> iLayerList, boolean isUpdate)  {
 		try {
 			if(iLayerList != null && iLayerList.size()>0){
 				ImageLayer sil= getSelectedImageLayer();
@@ -1046,7 +1046,7 @@ public class InformationCenter {
 				this.selectedImageLayer=null;
 				this.selectedMarkingLayer=null;
 				this.visibleMarkingLayerList = new ArrayList<MarkingLayer>();
-				addImageLayers(iLayerList); // add list by checking also the correctness of layers (the have positive layerIDs)
+				addImageLayers(iLayerList, isUpdate); // add list by checking also the correctness of layers (the have positive layerIDs)
 
 				sil=getImageLayerByID(selectesdILayerID);
 				if(sil != null)

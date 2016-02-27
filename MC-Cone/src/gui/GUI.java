@@ -2199,10 +2199,11 @@ public class GUI extends JFrame{
 	 * Replaces the array of ImageLayer s in InformationCenter with new list. After updating the list: the GUI is updated.
 	 *
 	 * @param iLayerList Array of ImageLayer s.
+	 * @param isUpdate the is update
 	 * @throws Exception the exception
 	 */
-	public void setImageLayerList(ArrayList<ImageLayer> iLayerList) throws Exception{
-		this.taskManager.setImageLayerList(iLayerList); // replaces the existing ImageLayerList with new one finally in InformationCenter
+	public void setImageLayerList(ArrayList<ImageLayer> iLayerList, boolean isUpdate) throws Exception{
+		this.taskManager.setImageLayerList(iLayerList, isUpdate); // replaces the existing ImageLayerList with new one finally in InformationCenter
 
 		//updates the selected Layers and Refreshes GUI components and image
 		refreshLayersAndGUI();

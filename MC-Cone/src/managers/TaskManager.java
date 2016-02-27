@@ -80,7 +80,7 @@ public class TaskManager {
 	 * @throws Exception the exception
 	 */
 	public void addImageLayers(ArrayList<ImageLayer> layers)  throws Exception{
-		this.informationCenter.addImageLayers(layers);
+		this.informationCenter.addImageLayers(layers,false);
 		setPresentImageDimensionFromImageLayerList(layers);
 		this.informationCenter.updatePresentImageDimensionOfMarkingPanels();
 
@@ -705,10 +705,11 @@ public class TaskManager {
 	 * Sets the list of ImageLayers.
 	 *
 	 * @param layers the new list of ImageLayers
+	 * @param isUpdate the is update
 	 * @throws Exception the exception
 	 */
-	public void setImageLayerList(ArrayList<ImageLayer> layers) throws Exception{
-		this.informationCenter.setImageLayerList(layers);
+	public void setImageLayerList(ArrayList<ImageLayer> layers, boolean isUpdate) throws Exception{
+		this.informationCenter.setImageLayerList(layers, isUpdate);
 		setPresentImageDimensionFromImageLayerList(layers);
 		this.informationCenter.updatePresentImageDimensionOfMarkingPanels();
 
