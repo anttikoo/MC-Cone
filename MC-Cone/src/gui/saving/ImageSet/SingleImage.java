@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.util.logging.Logger;
 
 import javax.swing.JComponent;
@@ -99,7 +100,7 @@ public class SingleImage extends JComponent implements MouseListener{
 			Scalr.Method processingQuality = Scalr.Method.ULTRA_QUALITY;
 
 			// get new image scaled to Dimension of ImagePanel
-			return Scalr.resize(this.originalImage, processingQuality, scalingMode, destinationDimension.width, destinationDimension.height, null);
+			return Scalr.resize(this.originalImage, processingQuality, scalingMode, destinationDimension.width, destinationDimension.height, (BufferedImageOp)null);
 		}
 		return null;
 	}

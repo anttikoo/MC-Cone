@@ -8,18 +8,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ImagingOpException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
-import javax.swing.ImageIcon;
-
 import org.imgscalr.Scalr;
 import gui.file.Utils;
 import information.GridProperties;
@@ -501,7 +499,7 @@ public class LayerVisualManager {
 				return new PositionedImage(null);
 
 			// crop the image
-			BufferedImage 	processedImage = Scalr.crop(this.originalImage, tempRelativeViewRectangle.x, tempRelativeViewRectangle.y, imageDimension.width, imageDimension.height, null);
+			BufferedImage 	processedImage = Scalr.crop(this.originalImage, tempRelativeViewRectangle.x, tempRelativeViewRectangle.y, imageDimension.width, imageDimension.height, (BufferedImageOp)null);
 			
 
 			return scaleToImagePanel(processedImage, tempRelativeViewRectangle);
@@ -719,8 +717,8 @@ public class LayerVisualManager {
 				return new PositionedImage(null);
 
 			// crop the image
-			processedImage = Scalr.crop(this.originalImage, tempRelativeViewRectangle.x, tempRelativeViewRectangle.y, imageDimension.width, imageDimension.height, null);
-
+			processedImage = Scalr.crop(this.originalImage, tempRelativeViewRectangle.x, tempRelativeViewRectangle.y, imageDimension.width, imageDimension.height, (BufferedImageOp)null);
+			
 			// scale to ImagePanel
 			return scaleToImagePanel(processedImage, tempRelativeViewRectangle);
 
@@ -751,7 +749,7 @@ public class LayerVisualManager {
 			Scalr.Method processingQuality = Scalr.Method.ULTRA_QUALITY;
 
 			// get new image scaled to Dimension of ImagePanel
-			scaledImage= Scalr.resize(this.originalImage, processingQuality, scalingMode, this.imagePanelDimension.width, this.imagePanelDimension.height, null);
+			scaledImage= Scalr.resize(this.originalImage, processingQuality, scalingMode, this.imagePanelDimension.width, this.imagePanelDimension.height, (BufferedImageOp)null);
 
 			if(scaledImage != null){
 				// calculate the initial dimension of relativeViewRectangle where topleft corner coordinate is (0,0)
@@ -866,7 +864,7 @@ public class LayerVisualManager {
 
 
 			// get new image scaled to Dimension of ImagePanel
-			scaledImage= Scalr.resize(processedImage, processingQuality, scalingMode, this.imagePanelDimension.width, this.imagePanelDimension.height, null);
+			scaledImage= Scalr.resize(processedImage, processingQuality, scalingMode, this.imagePanelDimension.width, this.imagePanelDimension.height, (BufferedImageOp)null);
 
 			if(scaledImage != null){
 				// save the used tempRelativeView as relativeViewRectangle
