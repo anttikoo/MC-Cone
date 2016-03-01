@@ -462,6 +462,7 @@ public class XMLwriteManager {
 		try {
 			this.layersOfPath =layersOfPathIn;
 			this.unsavedMarkingLayers=new ArrayList<Integer>();
+			this.successfullySavedMarkingLayers.clear();
 			if(this.layersOfPath != null && this.layersOfPath.getXmlpath() != null){
 				File f= new File(this.layersOfPath.getXmlpath());
 

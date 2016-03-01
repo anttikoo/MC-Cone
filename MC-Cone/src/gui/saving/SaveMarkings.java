@@ -314,6 +314,7 @@ public class SaveMarkings extends SaverDialog{
 					if(xmlWriteManager == null){
 						xmlWriteManager=new XMLwriteManager();
 					}
+					// start writing and collect IDs of successfully saved MarkingLayers
 					if(xmlWriteManager.startWritingProcess(lop)){
 						successFullysavedLayers.addAll(xmlWriteManager.getSuccessfullySavedMarkingLayers());
 						updateImageLayerXMLpath(lop, xmlWriteManager.getSuccessfullySavedMarkingLayers());
@@ -363,10 +364,10 @@ public class SaveMarkings extends SaverDialog{
 		Iterator<ImageLayer> iIterator = this.imageLayerList.iterator();
 		while(iIterator.hasNext()){
 			ImageLayer iLayer=iIterator.next();
-			for (Iterator<Integer> iterator = successfullysavedMarkings.iterator(); iterator.hasNext();) {
-				int mLayerID= (int) iterator.next();
+			Iterator<Integer> success_iterator = successfullysavedMarkings.iterator();
+			while (success_iterator.hasNext()) {
+				int mLayerID= (int) success_iterator.next();
 				if(iLayer.hasMarkingLayer(mLayerID)){
-
 					iLayer.setMarkingsFilePath(lop.getXmlpath());
 					break;
 				}
