@@ -2154,19 +2154,28 @@ public class GUI extends JFrame{
 			case ID.CURSOR_DEFAULT:
 				this.imagePanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
-					getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					else
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				break;
 			case ID.CURSOR_HAND:
 				
 				this.imagePanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 				if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
-					getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));			
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					else
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));			
 				break;
 			case ID.CURSOR_CROSS_HAIR:
 								
 				this.imagePanel.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 				if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
-				getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));			
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+					else	
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));			
 				break;
 				
 		}
