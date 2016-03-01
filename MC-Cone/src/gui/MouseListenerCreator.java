@@ -131,6 +131,45 @@ public class MouseListenerCreator {
 			}
 		});
 	}
+	
+	/**
+	 * Adds MouseListener to Precount JButton.
+	 *
+	 * @param button JButton, where the Listener is added.
+	 * @throws Exception the exception
+	 */
+	public static void addMouseListenerToPrecountButton(JButton button) throws Exception{
+
+		button.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			
+			}
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				if(((JButton)e.getSource()).isEnabled())
+				((JButton)e.getSource()).setBorder(BorderFactory.createLineBorder(Color_schema.button_orange_border, 2));
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				((JButton)e.getSource()).setBorder(BorderFactory.createLineBorder(Color_schema.button_grey_border, 2));
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				((JButton)e.getSource()).setForeground(Color_schema.orange_dark);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(((JButton)e.getSource()).getText().startsWith("Pick")) // when picking is not on
+				((JButton)e.getSource()).setForeground(Color_schema.white_230);
+				else
+					((JButton)e.getSource()).setForeground(Color_schema.orange_dark);
+			}
+		});
+	}
+	
+	
 
 
 

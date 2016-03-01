@@ -17,6 +17,7 @@ import information.PositionedImage;
 import information.ScreenCoordinatesOfMarkingLayer;
 import information.SharedVariables;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -1544,7 +1545,7 @@ public class GUI extends JFrame{
 				}
 			});
 		//	addMouseListenerForJButton(preCountButton);
-			MouseListenerCreator.addMouseListenerToNormalButtons(preCountButton);
+			MouseListenerCreator.addMouseListenerToPrecountButton(preCountButton);
 			
 
 			downBarPanel.add(preCountButton);
@@ -2950,16 +2951,24 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 									return;
 								}
 							}
-
+							
+							// set selected MarkingLayer visibile
+							setMarkingLayerVisibility(this.taskManager.getSelectedMarkingLayer().getLayerID(), true);
+							updateImageLayerInfos();
+							
+						
 							// start picking the cell
 							glassPane.setVisible(true);
 							this.guiListener.setCellPickingON(true);
 							glassPane.setRectangleSize(this.imagePanel.getWidth()/4);
 							this.preCountButton.setText("Cancel Picking");
+							this.preCountButton.setForeground(Color.red);
+									
+							
 						//	this.stopPreCountButton.setEnabled(false);
 							// Set cursor to circle
 						//	setCircleCursorToPanels();
-							this.preCountButton.setForeground(Color_schema.orange_dark);
+							
 
 						}
 						else{
@@ -2983,6 +2992,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 				this.guiListener.setCellPickingON(false);
 				this.preCountButton.setText("Pick A New Cell");
 				this.preCountButton.setForeground(Color_schema.white_230);
+				
 			}
 			dialog=null;
 		} catch (Exception e) {
