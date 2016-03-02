@@ -62,39 +62,12 @@ public class ShadyMessageDialog extends JDialog{
 	private JPanel dialogBackPanel;
 	
 	/** The message panel. */
-	private JPanel messagePanel;
+	protected JPanel messagePanel;
 	
 	/** The button panel. */
 	private JPanel buttonPanel;
 	
 
-	/**
-	 * Instantiates a new shady message dialog.
-	 *
-	 * @param frame the frame
-	 * @param title the title
-	 * @param message the message
-	 * @param typeOfButtons the type of buttons
-	 * @param comp the comp
-	 */
-	public ShadyMessageDialog(JFrame frame, String title, String message, int typeOfButtons, Component comp){
-		super(frame,true);
-		
-		super.setLocationRelativeTo(comp);
-		try {
-			this.setLocationRelativeTo(comp);
-			this.parentComponent = comp;
-			this.title=title;
-			this.message=message;
-			this.typeOfButtons=typeOfButtons;	
-			initDialog();
-		} catch (Exception e) {
-			LOGGER.severe("Error in initializing message dialog!");
-			e.printStackTrace();
-		}
-		
-	}
-	
 	/**
 	 * Instantiates a new shady message dialog.
 	 *
@@ -121,7 +94,183 @@ public class ShadyMessageDialog extends JDialog{
 		}
 		
 	}
+	
+	/**
+	 * Instantiates a new shady message dialog.
+	 *
+	 * @param frame the frame
+	 * @param title the title
+	 * @param message the message
+	 * @param typeOfButtons the type of buttons
+	 * @param comp the comp
+	 */
+	public ShadyMessageDialog(JFrame frame, String title, String message, int typeOfButtons, Component comp){
+		super(frame,true);
+		
+		super.setLocationRelativeTo(comp);
+		try {
+			this.setLocationRelativeTo(comp);
+			this.parentComponent = comp;
+			this.title=title;
+			this.message=message;
+			this.typeOfButtons=typeOfButtons;	
+			initDialog();
+		} catch (Exception e) {
+			LOGGER.severe("Error in initializing message dialog!");
+			e.printStackTrace();
+		}
+		
+	}
 
+	
+	
+	/**
+	 * Creates the button by given ButtonID.
+	 *
+	 * @param buttonID the button id
+	 * @return the j button
+	 * @throws Exception the exception
+	 */
+	protected JButton createButton(final int buttonID) throws Exception{
+		JButton button=new JButton(getButtonText(buttonID));
+		int maxStringWidth = button.getFontMetrics(Fonts.b15).stringWidth(getButtonText(buttonID));
+		button.setPreferredSize(new Dimension(maxStringWidth+20,30));
+		button.setMinimumSize(new Dimension(maxStringWidth+20,30));
+		button.setMaximumSize(new Dimension(maxStringWidth+20,30));
+		button.setBackground(Color_schema.dark_20);
+		button.setFont(Fonts.b15);
+
+		if(buttonID == ID.NO || buttonID == ID.CANCEL){
+			button.setForeground(Color_schema.orange_dark);
+			button.setBorder(BorderFactory.createLineBorder(Color_schema.orange_dark, 2));
+		//	addMouseListenerToCancelButtons(button);
+			MouseListenerCreator.addMouseListenerToCancelButtons(button);
+			MouseListenerCreator.addKeyListenerToButton(button, ID.BUTTON_CANCEL);
+		}
+		else{
+			MouseListenerCreator.addMouseListenerToNormalButtons(button);
+		//	addMouseListenerToNormalButtons(button);
+			if(buttonID==ID.OK)
+			MouseListenerCreator.addKeyListenerToButton(button, ID.BUTTON_ENTER);
+		}
+
+		button.setFocusable(false);
+
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					returnValue=buttonID;
+					hideDialog();
+				} catch (Exception e1) {
+					LOGGER.severe("Error in closing message dialog!");
+					e1.printStackTrace();
+				}
+			}
+		});
+
+
+		return button;
+	}
+	
+	/**
+	 * Gets the Text of JButton by given ID.
+	 *
+	 * @param id the ID
+	 * @return the button text
+	 * @throws Exception the exception
+	 */
+	protected String getButtonText(int id) throws Exception{
+		switch (id) {
+
+		case ID.CANCEL:
+			return "CANCEL";
+
+		case ID.YES:
+			return "YES";
+
+		case ID.NO:
+			return "NO";
+
+		case ID.OVERWRITE:
+			return "OVERWRITE";
+
+		case ID.APPEND:
+			return "APPEND";
+
+		default:
+			return "OK";
+		}
+	}
+	
+	/**
+	 * Gets the backPanel of dialog.
+	 *
+	 * @return the dialog back panel
+	 * @throws Exception the exception
+	 */
+	public JPanel getDialogBackPanel() throws Exception{
+		return this.dialogBackPanel;
+	}
+
+	/**
+	 * Calculates and returns the width of downButton Panel. Width depends on how many buttons there are.
+	 *
+	 * @return the down button panel width
+	 * @throws Exception the exception
+	 */
+	private int getDownButtonPanelWidth() throws Exception{
+		int width=0;
+		Component[] bComp=this.buttonPanel.getComponents();
+		for (int i = 0; i < bComp.length; i++) {
+			if(bComp[i] instanceof JButton){
+			JButton bb=(JButton)bComp[i];
+			width+=bb.getMaximumSize().width;
+			}
+			
+		}
+		return width;
+	}
+
+
+
+	/**
+	 * Gets the first button.
+	 *
+	 * @return the first button
+	 * @throws Exception the exception
+	 */
+	
+
+	public JButton getFirstButton() throws Exception{
+		Component[] buttons=this.buttonPanel.getComponents();
+		if(buttons.length>0 && buttons[0] instanceof JButton)
+			return (JButton)buttons[0];
+		else
+			return null;
+	}
+
+	/**
+	 * Gets the JPanel messagePanel.
+	 *
+	 * @return JPanel MessagePanel
+	 * @throws Exception the exception
+	 */
+	public JPanel getMessagePanel() throws Exception{
+		return this.messagePanel;
+	}
+
+	/**
+	 * Hides dialog.
+	 *
+	 * @throws Exception the exception
+	 */
+	private void hideDialog() throws Exception{
+		
+		this.setVisible(false);
+		this.dispose();
+	}
+	
 	/**
 	 * Initializes the dialog.
 	 */
@@ -150,27 +299,33 @@ public class ShadyMessageDialog extends JDialog{
 			titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 			titlePanel.setBackground(Color_schema.dark_30);
 			titleLabel = new JLabel(this.title);
-			Font fontConsolas20 = new Font("Consolas", Font.BOLD,20);
-			titleLabel.setFont(fontConsolas20);
-
+			
+			titleLabel.setFont(Fonts.b20);
+			
+			int titleWidth = titleLabel.getFontMetrics(Fonts.b20).stringWidth(titleLabel.getText());
 			titleLabel.setForeground(Color_schema.white_230);
 			titlePanel.add(Box.createRigidArea(new Dimension(20,0)));
 			titlePanel.add(titleLabel);
-
+/*
 			messagePanel = new JPanel();
 			messagePanel.setLayout(new FlowLayout(FlowLayout.CENTER,10,10));
 			messagePanel.setBackground(Color_schema.dark_30);
 			JLabel messageLabel = new JLabel(this.message);
 			Font fontConsolas18 = new Font("Consolas", Font.PLAIN,18);
-			int maxwidth =messageLabel.getFontMetrics(fontConsolas18).stringWidth(messageLabel.getText());
-			int titleWidth = titleLabel.getFontMetrics(fontConsolas20).stringWidth(titleLabel.getText());
+			int maxwidth =messageLabel.getFontMetrics(Fonts.p18).stringWidth(messageLabel.getText());
+			int titleWidth = titleLabel.getFontMetrics(Fonts.p20).stringWidth(titleLabel.getText());
 			if(titleWidth > maxwidth)
 				maxwidth = titleWidth;
 			
 			messageLabel.setFont(fontConsolas18);
 			messageLabel.setForeground(Color_schema.white_230);
 			messagePanel.add(messageLabel);
-
+*/
+			int maxwidth = initMessagePanel();
+			
+			
+			if(titleWidth > maxwidth)
+				maxwidth = titleWidth;
 			JScrollPane messageScrollPane = new JScrollPane(messagePanel);
 			messageScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			messageScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -236,15 +391,15 @@ public class ShadyMessageDialog extends JDialog{
 					break;
 				}
 			maxwidth=Math.max(maxwidth,getDownButtonPanelWidth());
-
-			dialogBackPanel.setPreferredSize(new Dimension(maxwidth+100,120));
+			dialogBackPanel.setMaximumSize(new Dimension(maxwidth+200,150));
+			dialogBackPanel.setPreferredSize(new Dimension(maxwidth+100,messagePanel.getPreferredSize().height+90));
 			titlePanel.setMinimumSize(new Dimension(maxwidth+100,50));
 			titlePanel.setMaximumSize(new Dimension((int)dialogBackPanel.getMaximumSize().getWidth(),50));
-			messagePanel.setMaximumSize(new Dimension((int)dialogBackPanel.getMaximumSize().getWidth(),50));
+		//	messagePanel.setMaximumSize(new Dimension((int)dialogBackPanel.getMaximumSize().getWidth(),60));
 			buttonPanel.setMaximumSize(new Dimension((int)dialogBackPanel.getMaximumSize().getWidth(),40));
 			buttonPanel.setMinimumSize(new Dimension(maxwidth,40));
 			buttonPanel.setPreferredSize(new Dimension(maxwidth,40));
-			messageScrollPane.setPreferredSize(new Dimension((int)dialogBackPanel.getPreferredSize().getWidth(),50));
+		//	messageScrollPane.setPreferredSize(new Dimension((int)dialogBackPanel.getPreferredSize().getWidth(),60));
 
 			dialogBackPanel.add(titlePanel, BorderLayout.PAGE_START);
 			dialogBackPanel.add(messageScrollPane, BorderLayout.CENTER);
@@ -261,72 +416,56 @@ public class ShadyMessageDialog extends JDialog{
 	}
 
 	/**
-	 * Calculates and returns the width of downButton Panel. Width depends on how many buttons there are.
+	 * Initializes the message panel.
 	 *
-	 * @return the down button panel width
+	 * @return the int
 	 * @throws Exception the exception
 	 */
-	private int getDownButtonPanelWidth() throws Exception{
-		int width=0;
-		Component[] bComp=this.buttonPanel.getComponents();
-		for (int i = 0; i < bComp.length; i++) {
-			if(bComp[i] instanceof JButton){
-			JButton bb=(JButton)bComp[i];
-			width+=bb.getMaximumSize().width;
-			}
-			
-		}
-		return width;
+	protected int initMessagePanel() throws Exception{
+		messagePanel = new JPanel();
+		messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.PAGE_AXIS));
+		messagePanel.setBackground(Color_schema.dark_30);
+		
+		JPanel messageTextPanel = new JPanel();
+		messageTextPanel.setLayout(new FlowLayout(FlowLayout.CENTER,10,5));
+		messageTextPanel.setBackground(Color_schema.dark_30);
+		JLabel messageLabel = new JLabel(this.message);
+		
+		int maxwidth =messageLabel.getFontMetrics(Fonts.p18).stringWidth(messageLabel.getText())+20;
+		
+		
+		messageLabel.setFont(Fonts.p18);
+		messageLabel.setForeground(Color_schema.white_230);
+		messageTextPanel.add(messageLabel);
+		messagePanel.add(messageTextPanel, BorderLayout.CENTER);
+		
+		return maxwidth;
 	}
 	
 	/**
-	 * Creates the button by given ButtonID.
+	 * Sets the NO-button enabled state.
 	 *
-	 * @param buttonID the button id
-	 * @return the j button
+	 * @param enabledState the new n obutton enabled state
 	 * @throws Exception the exception
 	 */
-	protected JButton createButton(final int buttonID) throws Exception{
-		JButton button=new JButton(getButtonText(buttonID));
-		int maxStringWidth = button.getFontMetrics(Fonts.b15).stringWidth(getButtonText(buttonID));
-		button.setPreferredSize(new Dimension(maxStringWidth+20,30));
-		button.setMinimumSize(new Dimension(maxStringWidth+20,30));
-		button.setMaximumSize(new Dimension(maxStringWidth+20,30));
-		button.setBackground(Color_schema.dark_20);
-		button.setFont(Fonts.b15);
-
-		if(buttonID == ID.NO || buttonID == ID.CANCEL){
-			button.setForeground(Color_schema.orange_dark);
-			button.setBorder(BorderFactory.createLineBorder(Color_schema.orange_dark, 2));
-			addMouseListenerToCancelButtons(button);
-			MouseListenerCreator.addKeyListenerToButton(button, ID.BUTTON_CANCEL);
-		}
-		else{
-			
-			addMouseListenerToNormalButtons(button);
-			if(buttonID==ID.OK)
-			MouseListenerCreator.addKeyListenerToButton(button, ID.BUTTON_ENTER);
-		}
-
-		button.setFocusable(false);
-
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					returnValue=buttonID;
-					hideDialog();
-				} catch (Exception e1) {
-					LOGGER.severe("Error in closing message dialog!");
-					e1.printStackTrace();
-				}
-			}
-		});
-
-
-		return button;
+	protected void setNObuttonEnabledState(boolean enabledState) throws Exception{
+		Component[] buttons = this.buttonPanel.getComponents();
+		
+		if(buttons != null && buttons.length>0){
+			for(int i = 0;i<buttons.length;i++){
+				Component c = buttons[i];
+				
+				if(c instanceof JButton){
+					if(((JButton)c).getText().equals("NO")){
+						((JButton)c).setEnabled(enabledState);
+						return;
+					}				
+				}			
+			}				
+		}		
 	}
 	
+
 	/**
 	 * Sets the panel position with given Rectangle.
 	 *
@@ -339,174 +478,27 @@ public class ShadyMessageDialog extends JDialog{
 	
 	}
 
-	/**
-	 * Gets the Text of JButton by given ID.
-	 *
-	 * @param id the ID
-	 * @return the button text
-	 * @throws Exception the exception
-	 */
-	protected String getButtonText(int id) throws Exception{
-		switch (id) {
-
-		case ID.CANCEL:
-			return "CANCEL";
-
-		case ID.YES:
-			return "YES";
-
-		case ID.NO:
-			return "NO";
-
-		case ID.OVERWRITE:
-			return "OVERWRITE";
-
-		case ID.APPEND:
-			return "APPEND";
-
-		default:
-			return "OK";
-		}
-	}
-
-
-
-	/**
-	 * Shows dialog.
-	 *
-	 * @return the int
-	 */
-	public int showDialog(){
-		try {
-			this.validate();
-		//	this.repaint();
-	
-		
-			this.setVisible(true);
-	
-		//	this.repaint();
-			return returnValue;
-		} catch (Exception e) {
-			LOGGER.severe("Error in showing message dialog!");
-			e.printStackTrace();
-			return -1;
-		}
-	}
-
-	/**
-	 * Hides dialog.
-	 *
-	 * @throws Exception the exception
-	 */
-	private void hideDialog() throws Exception{
-		
-		this.setVisible(false);
-		this.dispose();
-	}
-
-	/**
-	 * Gets the backPanel of dialog.
-	 *
-	 * @return the dialog back panel
-	 * @throws Exception the exception
-	 */
-	public JPanel getDialogBackPanel() throws Exception{
-		return this.dialogBackPanel;
-	}
-	
-	/**
-	 * Gets the first button.
-	 *
-	 * @return the first button
-	 * @throws Exception the exception
-	 */
-	
-
-	public JButton getFirstButton() throws Exception{
-		Component[] buttons=this.buttonPanel.getComponents();
-		if(buttons.length>0 && buttons[0] instanceof JButton)
-			return (JButton)buttons[0];
-		else
-			return null;
-	}
-
-	/**
-	 * Gets the JPanel messagePanel.
-	 *
-	 * @return JPanel MessagePanel
-	 * @throws Exception the exception
-	 */
-	public JPanel getMessagePanel() throws Exception{
-		return this.messagePanel;
-	}
-	
-
-	/**
-	 * Adds the mouse listener to normal buttons.
-	 *
-	 * @param button the button
-	 * @throws Exception the exception
-	 */
-	private void addMouseListenerToNormalButtons(JButton button) throws Exception{
-
-		button.addMouseListener(new MouseListener() {
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				if(((JButton)e.getSource()).isEnabled())
-				((JButton)e.getSource()).setBorder(BorderFactory.createLineBorder(Color_schema.button_orange_border, 2));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				((JButton)e.getSource()).setBorder(BorderFactory.createLineBorder(Color_schema.button_grey_border, 2));
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				((JButton)e.getSource()).setForeground(Color_schema.orange_dark);
-			}
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				((JButton)e.getSource()).setForeground(Color_schema.white_230);
-			}
-		});
-	}
-
 /**
- * Adds the mouse listener to cancel buttons.
+ * Shows dialog.
  *
- * @param button the button
- * @throws Exception the exception
+ * @return the int
  */
-private void addMouseListenerToCancelButtons(JButton button) throws Exception{
+public int showDialog(){
+	try {
+		this.validate();
+	//	this.repaint();
 
-		button.addMouseListener(new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				
-			}
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				if(((JButton)e.getSource()).isEnabled())
-				((JButton)e.getSource()).setBorder(BorderFactory.createLineBorder(Color_schema.button_orange_border, 2));
-			}
-			@Override
-			public void mouseExited(MouseEvent e) {
-				((JButton)e.getSource()).setBorder(BorderFactory.createLineBorder(Color_schema.orange_dark, 2));
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {
-				((JButton)e.getSource()).setForeground(Color_schema.red);
-			}
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				((JButton)e.getSource()).setForeground(Color_schema.orange_dark);
-			}
-		});
+	
+		this.setVisible(true);
+
+	//	this.repaint();
+		return returnValue;
+	} catch (Exception e) {
+		LOGGER.severe("Error in showing message dialog!");
+		e.printStackTrace();
+		return -1;
 	}
+}
 
 
 

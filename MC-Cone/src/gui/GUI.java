@@ -2944,12 +2944,27 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 					if(this.taskManager.getSelectedMarkingLayer() != null ){
 						if(this.taskManager.getSelectedImageLayer().hasMarkingLayer(this.taskManager.getSelectedMarkingLayer().getLayerID())){
 							if(this.taskManager.getSelectedMarkingLayer().getCounts()>0){
-								// show confirm dialog if selected MarkingLayer contains markings.
-								dialog = new ShadyMessageDialog(this, "Selected MarkingLayer contains markings", " Overwrite with precountings?", ID.YES_NO, this);
-								if(dialog.showDialog() == ID.NO){
-									dialog=null;
-									return;
+								
+								if(SharedVariables.getRememberAnswerPC() == ID.UNDEFINED){
+									// show confirm dialog if selected MarkingLayer contains markings.
+									dialog = new ShadyMessageDialogRemember(this, "Selected MarkingLayer contains markings", " Overwrite with precountings?", ID.YES_NO, this);
+									int returnValue = dialog.showDialog();
+									boolean rememberAnswer = ((ShadyMessageDialogRemember)dialog).getRememberAnswer();
+									if(returnValue == ID.NO){
+										dialog=null;
+										if(rememberAnswer)  // Should save answer
+											SharedVariables.setRememberAnswerPC(ID.NO);
+										return;
+									} // pressed YES
+									if(rememberAnswer) // Should save answer
+										SharedVariables.setRememberAnswerPC(ID.YES);
+									
 								}
+								else // remembering NO: no precounting made and no message of that
+									if(SharedVariables.getRememberAnswerPC() == ID.NO){
+										LOGGER.info("Not performing precounting because MarkingLayer contains already markings!");
+									 return;	
+									}
 							}
 							
 							// set selected MarkingLayer visibile

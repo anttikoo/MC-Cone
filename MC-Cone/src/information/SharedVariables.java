@@ -28,7 +28,21 @@ public class SharedVariables {
 	public static boolean canUserSelectGridRectangles=false;
 	public static final String version = "0.9";
 	
-		
+	/** The remember_answer_pc_ow. MessageBox of overwriting markings in Precounting. 
+	 * If user select box remember the selection will be saved here. */
+	public static int remember_answer_pc_ow = ID.UNDEFINED;
+
+	/**
+	 * Returns the remember_answer_pc.
+	 *
+	 * @return the remember_answer_pc_value
+	 */
+	public static int getRememberAnswerPC() {
+		return remember_answer_pc_ow;
+	}
+
+	
+
 	/**
 	 * Checks if is use strick search.
 	 *
@@ -46,6 +60,18 @@ public class SharedVariables {
 	public static void setOS(int osID){
 		operationSystem=osID;
 	}
+	
+
+	/**
+	 * Sets the remember_answer_pc.
+	 *
+	 * @param remember_answer_pc_value the new remember_answer_pc_value
+	 */
+	public static void setRememberAnswerPC(int remember_answer_pc_value) {
+		SharedVariables.remember_answer_pc_ow = remember_answer_pc_value;
+	}
+
+	
 
 	/**
 	 * Sets the transparencyIN.
