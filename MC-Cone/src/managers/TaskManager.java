@@ -653,7 +653,9 @@ public class TaskManager {
 
 		}
 		else{
+			pbd.stopPaintingAndClose();
 			LOGGER.warning("Couldn't create subimage from selection");
+			
 		}
 
 	}

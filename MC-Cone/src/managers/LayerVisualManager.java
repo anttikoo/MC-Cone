@@ -687,7 +687,7 @@ public class LayerVisualManager {
 				return null;
 			}
 		} catch (Exception e) {
-			LOGGER.severe("Error in getting subImage from");
+			LOGGER.severe("Error in getting subImage from Original Image");
 			e.printStackTrace();
 			return null;
 		}
