@@ -657,13 +657,14 @@ public class PreCounterThread implements Runnable{
 													}
 												}
 											}
-	
+											// create midpoint from selectedPoints
 											if(selectedPointsForCell != null && selectedPointsForCell.size()>0 && 
 											selectedPointsForCell.size()>=global_min_coordinate_number_in_cell &&
 											selectedPointsForCell.size()<=current_max_coordinate_number_in_cell){
 												// calculate the centroid of cells -> the final point to be saved.
 												midPoint = calculateCentroid(selectedPointsForCell);
-												this.current_finalCentroidCoordinates.add(midPoint);
+												if(!compareIsTooClose(midPoint))
+													this.current_finalCentroidCoordinates.add(midPoint);
 											}
 											weightPointList.removeAll(candidatePointList); // remove selected points
 											Collections.sort(weightPointList, new WeightPointComparator());
@@ -731,7 +732,25 @@ public class PreCounterThread implements Runnable{
 		  if(Collections.binarySearch(this.current_colorList, colorInt) >=0)
 			  return true;
 		  return false;
-	   }
+	 }
+	
+	/**
+	 * Compares is point too close to any point at pool of current coordinates.
+	 *
+	 * @param midPoint the mid point
+	 * @return true, if successful
+	 */
+	private boolean compareIsTooClose(Point midPoint){
+		Iterator<Point> coordIterator = this.current_finalCoordinates.iterator();
+		while(coordIterator.hasNext()){
+			Point p = coordIterator.next();
+			if(p.x > midPoint.x-this.current_min_cell_size/2 && p.x < midPoint.x+this.current_min_cell_size/2)
+				if(p.y > midPoint.y-this.current_min_cell_size/2 && p.y < midPoint.y+this.current_min_cell_size/2)
+					return true;					
+		}
+		return false;
+		
+	}
 
 
    /**
