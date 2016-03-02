@@ -132,6 +132,16 @@ public class TaskManager {
 	public void cleanPrecountingManager() throws Exception{
 		this.preCountThreadManager = null;
 	}
+	
+	/**
+	 * Copy selected MarkingLayer markings temporary.
+	 *
+	 * @throws Exception the exception
+	 */
+	public void copySelectedMarkingLayerMarkingsTemporary() throws Exception{
+		this.informationCenter.copySelectedMarkingLayerMarkingsTemporary();
+		
+	}
 
 	/**
 	 * Creates the image file from given File.
@@ -599,6 +609,17 @@ public class TaskManager {
 	public boolean moveSelectedMarkingLayer(int direction) throws Exception{
 		return this.informationCenter.moveSelectedMarkingLayer(direction);
 	
+	}
+	
+	/**
+	 * Paste markings to selected MarkingLayer.
+	 *
+	 * @param id the id of pasting type
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean pasteMarkingsToSelectedMarkingLayer(int id) throws Exception{
+		return this.informationCenter.pasteMarkingsToSelectedMarkingLayer(id);
 	}
 
 	/**

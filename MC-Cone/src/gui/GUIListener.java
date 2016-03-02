@@ -234,6 +234,14 @@ public class GUIListener extends MouseInputAdapter {
 				
 				// PAGE DOWN
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0,true), "page_down_pressed");
+				
+				// CTRL + C
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK), "copy_marking_layer_pressed");
+				
+				// CTRL + V
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), "paste_marking_layer_pressed");
+				
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0,true), "page_down_pressed");
 
 				ActionMap actionMap = 	(component).getActionMap();
 
@@ -364,6 +372,48 @@ public class GUIListener extends MouseInputAdapter {
 					}
 				});
 				
+				actionMap.put("copy_marking_layer_pressed", new AbstractAction() {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 9L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							if(!hasMarkingTitleFocus()){
+								// copy the selected markinglayer markings
+								gui.copySelectedMarkingLayerMarkingsTemporary();
+							}
+						} catch (Exception e1) {
+							LOGGER.severe("Error in changing MarkingLayer!");
+							e1.printStackTrace();
+						}
+					}
+				});
+				
+				actionMap.put("paste_marking_layer_pressed", new AbstractAction() {
+
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 9L;
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							if(!hasMarkingTitleFocus()){
+								// copy the selected markinglayer markings
+								gui.pasteMarkingsToSelectedMarkingLayer();
+							}
+						} catch (Exception e1) {
+							LOGGER.severe("Error in changing MarkingLayer!");
+							e1.printStackTrace();
+						}
+					}
+				});
+				
 				
 
 			} // whole window listening keys
@@ -377,7 +427,7 @@ public class GUIListener extends MouseInputAdapter {
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK), "export_images_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_DOWN_MASK), "manage_layers_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_DOWN_MASK), "add_layers_pressed");
-				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), "export_csv_pressed");
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "export_csv_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK), "export_tab_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "export_clip_pressed");		
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK |KeyEvent.CTRL_DOWN_MASK ), "show_all_markings_pressed");

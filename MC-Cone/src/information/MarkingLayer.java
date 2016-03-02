@@ -169,7 +169,53 @@ public class MarkingLayer{
 		}
 
 	}
-
+	
+	/**
+	 * Append coordinates.
+	 *
+	 * @param coordinatesToAppend the coordinates to append
+	 * @throws Exception the exception
+	 */
+	public void appendCoordinates(ArrayList<Point> coordinatesToAppend) throws Exception{
+		if(this.coordinateList != null && coordinatesToAppend != null && coordinatesToAppend.size() > 0){
+			Iterator<Point> pIterator = coordinatesToAppend.iterator();
+			while(pIterator.hasNext()){
+				coordinateList.add(pIterator.next());
+				
+			}
+			//sort and set that has made changes
+			Collections.sort(this.coordinateList, new CoordinateComparator());
+			setMadeChanges(true);
+		}
+	}
+	
+	/*
+	 * Clean coordinates. Removes coordinates that are too close.
+	 
+	private void cleanCoordinates(){
+		if(this.coordinateList != null && this.coordinateList.size() > 0){
+			Point before = null;
+		
+			Iterator<Point> pIterator = this.coordinateList.iterator();
+			while(pIterator.hasNext()){
+				Point pNow = pIterator.next();
+				if(before != null){
+					// not implemented yet!
+					
+				}
+				else{
+					before = pNow;
+				}
+				
+				
+			}
+			//sort and set that has made changes
+			Collections.sort(this.coordinateList, new CoordinateComparator());
+			setMadeChanges(true);
+		}
+		
+	}
+*/
 	/**
 	 * Clears coordinate list.
 	 *

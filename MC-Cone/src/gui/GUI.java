@@ -774,6 +774,19 @@ public class GUI extends JFrame{
 		}
 	}
 	
+	/**
+	 * Copy selected MarkingLayer markings temporary.
+	 */
+	public void copySelectedMarkingLayerMarkingsTemporary(){
+		try {
+			this.taskManager.copySelectedMarkingLayerMarkingsTemporary();
+		} catch (Exception e) {
+			LOGGER.severe("Error in copying data of MarkingLayer!");
+			e.printStackTrace();
+		}
+		
+	}
+	
 	
 
 	/**
@@ -1338,8 +1351,8 @@ public class GUI extends JFrame{
 			menu_export_results.setMnemonic(KeyEvent.VK_X);
 			
 			JMenuItem menu_item_csv_file=new JMenuItem("CSV-file");
-			menu_item_csv_file.setMnemonic(KeyEvent.VK_V);
-			menu_item_csv_file.setToolTipText("CTRL + V");
+			menu_item_csv_file.setMnemonic(KeyEvent.VK_R);
+			menu_item_csv_file.setToolTipText("CTRL + R");
 
 			JMenuItem menu_item_tab_delimited_file=new JMenuItem("Tab-delimited text file");
 			menu_item_tab_delimited_file.setMnemonic(KeyEvent.VK_T);
@@ -1789,6 +1802,19 @@ public class GUI extends JFrame{
 	}
 
 	/**
+	 * Move selected marking layer.
+	 *
+	 * @param direction the direction
+	 * @throws Exception the exception
+	 */
+	public void moveSelectedMarkingLayer(int direction) throws Exception{
+		if(this.taskManager.moveSelectedMarkingLayer(direction)){
+			updateImageLayerInfos();
+		}
+		
+	}
+
+	/**
 	 *  Starts the progress to add one ImageLayer: User gives the image and possible markings from file in new Dialog window.
 	 * ImageLayer(s) are created and when done, GUI layers, ImagePanel and ImageLayerInfo is updated
 	 *
@@ -1830,6 +1856,37 @@ public class GUI extends JFrame{
 			e.printStackTrace();
 		}
 	}
+	
+	
+	/**
+	 * Paste markings to selected MarkingLayer.
+	 */
+	public void pasteMarkingsToSelectedMarkingLayer(){
+		try {
+			MarkingLayer selectedMarkingLayer = this.taskManager.getSelectedMarkingLayer();
+			if(selectedMarkingLayer != null){
+				String name = selectedMarkingLayer.getLayerName();
+				// ask the user should the ImageLayer being deleted
+				ShadyMessageDialog dialog = new ShadyMessageDialog(this, "Paste markings", "Paste markings to "+name, ID.APPEND_OVERWRITE_CANCEL, this);
+				int returnValue = dialog.showDialog();
+				if(returnValue != ID.CANCEL){ // confirmed pasting the ImageLayer
+					if(this.taskManager.pasteMarkingsToSelectedMarkingLayer(returnValue)){
+						refreshLayersAndGUI();
+					}
+					
+					
+				}
+				
+				dialog=null;
+			}
+		} catch (Exception e) {
+			LOGGER.severe("Error in pasting data of MarkingLayer!");
+			e.printStackTrace();
+		}
+		
+	}
+
+
 
 	/**
 	 *  Checks does selected ImageLayer and visible MarkingLayers exist and after that updates GUI.
@@ -1862,8 +1919,6 @@ public class GUI extends JFrame{
 		}
 
 	}
-
-
 
 	/**
 	 * Refresh the all MarkingPanels by first removing all layer and then recreating them again. 
@@ -1909,6 +1964,8 @@ public class GUI extends JFrame{
 
 	}
 
+
+
 	/**
 	 * Hides the highlight of marking.
 	 *
@@ -1918,8 +1975,6 @@ public class GUI extends JFrame{
 		this.highlightPanel.updateHighlightPoint(null);
 
 	}
-
-
 
 	/**
 	 * Removes the ImageLayer from list of ImageLayers at informationCenter. 
@@ -2010,6 +2065,7 @@ public class GUI extends JFrame{
 		}
 	}
 
+
 	/**
 	 * Fetches and removes a MarkingPanel corresponding to given MarkingLayer ID. 
 	 * Removes first all layers and add all but MarkingPanel which corresponds to given MarkingLayer ID.
@@ -2074,7 +2130,6 @@ public class GUI extends JFrame{
 
 	}
 
-
 	/**
 	 * Removes a single marking closest to Point p. If no any marking found close enough, no any removed. 
 	 *
@@ -2121,6 +2176,8 @@ public class GUI extends JFrame{
 		}
 	}
 
+
+
 	/**
 	 *  Opens dialog for selecting which markings to save.
 	 *
@@ -2141,8 +2198,6 @@ public class GUI extends JFrame{
 		}
 
 	}
-
-
 
 	/**
 	 * Sets Cursor type when hovering over ImagePanel.
@@ -2207,6 +2262,9 @@ public class GUI extends JFrame{
 		this.imagePanel.setImage(pi);
 	}
 
+
+
+	
 	/**
 	 * Replaces the array of ImageLayer s in InformationCenter with new list. After updating the list: the GUI is updated.
 	 *
@@ -2223,24 +2281,6 @@ public class GUI extends JFrame{
 		// refresh precounting components
 		cleanPreCountingIfNecessary();
 
-	}
-
-
-
-	
-	/**
-	 * Sets the successfully made savings to MarkingLayers.
-	 *
-	 * @param mLayerIDs the ids of MarkingLayers where successfully made savings
-	 */
-	public void setSuccessfullyMadeSavings(ArrayList<Integer> mLayerIDs){
-		try {
-			this.taskManager.setSuccessfullyMadeSavings(mLayerIDs);
-		} catch (Exception e) {
-			LOGGER.severe("Error in setting successfully made savings to ImageLayers and MarkingLayers!");
-			e.printStackTrace();
-		}
-		
 	}
 
 
@@ -2512,6 +2552,21 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 
 
 	/**
+	 * Sets the successfully made savings to MarkingLayers.
+	 *
+	 * @param mLayerIDs the ids of MarkingLayers where successfully made savings
+	 */
+	public void setSuccessfullyMadeSavings(ArrayList<Integer> mLayerIDs){
+		try {
+			this.taskManager.setSuccessfullyMadeSavings(mLayerIDs);
+		} catch (Exception e) {
+			LOGGER.severe("Error in setting successfully made savings to ImageLayers and MarkingLayers!");
+			e.printStackTrace();
+		}
+		
+	}
+
+	/**
 	 *  Determines which operation system is running and sets Graphical parameters accordingly.
 	 */
 	private void setUpOSsharedVariables(){
@@ -2680,7 +2735,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Sets visibility of all MarkingLayers.
 	 *
@@ -2702,6 +2757,9 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	
 	}
 	
+	
+
+
 	/**
 	 * Sets visibility of all MarkingLayers of single ImageLayer. Not updates GUI. 
 	 *
@@ -2725,9 +2783,6 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 			}
 		}
 	}
-	
-	
-
 
 	/**
 	 * Sets Grid visible if the Grid is selected as ON.
@@ -2844,6 +2899,8 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 		refreshMarkingPanels();
 	}
 
+
+
 	/**
 	 * Opens info dialog showing information of MC-Cone.
 	 *
@@ -2856,8 +2913,6 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 		iDialog.showDialog();
 		this.guiComponentListener.setChildDialog(null);
 	}
-
-
 
 	/**
 	 * Opens a message dialog.
@@ -2876,6 +2931,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 		}
 
 	}
+
 
 	/**
 	 *  Opens web browser and web site http://www.mc-cone.com/web_tutorial.html. If Operation system doesn't allow opening web browere
@@ -2906,7 +2962,6 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	
 	}
 
-
 	/**
 	 * Starts the precounting, opens a progress bar and calculates the cell positions.
 	 *
@@ -2928,7 +2983,10 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 		this.taskManager.precountCells(imagePanelPoint, size, pbd);
 		pbd=null;
 	}
-
+	
+	
+	
+	
 	/**
 	 *  If cell picking thread is not running this method starts it. If the selected MarkingLayer contains markings, will a dialog confirm overwriting them.
 	 *  Sets glassPane visible and shows the cell selecting rectangle and round over the image.
@@ -3014,22 +3072,6 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 			LOGGER.severe("Error in starting or stopping picking cells!");
 			e.printStackTrace();
 		}
-	}
-	
-	
-	
-	
-	/**
-	 * Move selected marking layer.
-	 *
-	 * @param direction the direction
-	 * @throws Exception the exception
-	 */
-	public void moveSelectedMarkingLayer(int direction) throws Exception{
-		if(this.taskManager.moveSelectedMarkingLayer(direction)){
-			updateImageLayerInfos();
-		}
-		
 	}
 	
 

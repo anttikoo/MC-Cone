@@ -55,6 +55,9 @@ public class InformationCenter {
 	/** The single grid size list. */
 	private ArrayList<SingleGridSize> singleGridSizeList;
 	
+	/** The temporary MarkingLayer used for copying. */
+	private MarkingLayer tempMarkingLayer = null;
+	
 
 
 	/**
@@ -212,6 +215,22 @@ public class InformationCenter {
 	}
 
 	/**
+	 * Copy selected MarkingLayer markings temporary.
+	 *
+	 * @throws Exception the exception
+	 */
+	public void copySelectedMarkingLayerMarkingsTemporary() throws Exception{
+		MarkingLayer selectedMarkingLayer = getSelectedMarkingLayer();
+		if(selectedMarkingLayer != null && selectedMarkingLayer.getCoordinateList() != null && selectedMarkingLayer.getCoordinateList().size()>0){
+			this.tempMarkingLayer = selectedMarkingLayer.makeCopy();		
+		}
+		else
+			LOGGER.info("Trying copy MarkingLayer, which contains no markings!");
+			
+		
+	}
+
+	/**
 	 * Creates the first default MarkingLayer to ImageLayers.
 	 */
 	private void createFirstMarkingLayerToImageLayers(){
@@ -233,7 +252,7 @@ public class InformationCenter {
 			LOGGER.severe("Error in creating MarkingLayers ot ImageLayers: " + " :" +e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * Creates the new marking layer.
 	 *
@@ -380,7 +399,6 @@ public class InformationCenter {
 		}
 	}
 
-
 	/**
 	 * Returns the list of ImageLayers.
 	 *
@@ -390,7 +408,6 @@ public class InformationCenter {
 	public ArrayList<ImageLayer> getImageLayerList()throws Exception {
 		return imageLayerList;
 	}
-
 
 	/**
 	 * Returns the MarkingLayer.
@@ -422,6 +439,7 @@ public class InformationCenter {
 		}
 	}
 
+
 	/**
 	 * Returns the MarkingLayer by ImageLayer ID and MarkingLayer ID.
 	 *
@@ -448,6 +466,7 @@ public class InformationCenter {
 		}
 	}
 
+
 	/**
 	 * Returns the next free color that is not used lately.
 	 *
@@ -460,7 +479,6 @@ public class InformationCenter {
 			nextFreeColor=0;
 		return color;
 	}
-
 
 	/**
 	 * Returns the next free shape that is not used lately.
@@ -508,6 +526,7 @@ public class InformationCenter {
 		
 	}
 
+
 	/**
 	 * Returns the folder that is used latest.
 	 *
@@ -517,7 +536,6 @@ public class InformationCenter {
 	public String getPresentFolder()throws Exception {
 		return presentFolder;
 	}
-
 
 	/**
 	 * Returns the present image dimension.
@@ -554,6 +572,7 @@ public class InformationCenter {
 		
 	}
 
+
 	/**
 	 * Returns the selected ImageLayer.
 	 *
@@ -563,12 +582,6 @@ public class InformationCenter {
 	public ImageLayer getSelectedImageLayer() throws Exception{
 		return this.selectedImageLayer;
 	}
-	
-	
-	
-	
-	
-
 
 	/**
 	 * Returns ID of ImageLayer which is below selected ImageLayer in ImageLayerInfo and descending in list of ImageLayers.
@@ -598,7 +611,7 @@ public class InformationCenter {
 		}
 
 	}
-	
+
 	/**
 	 * Returns ID of ImageLayer which is above selected ImageLayer in ImageLayerInfo and preceding in list of ImageLayers.
 	 *
@@ -628,6 +641,12 @@ public class InformationCenter {
 
 	}
 	
+	
+	
+	
+	
+
+
 	/**
 	 * Returns the selected MarkingLayer.
 	 *
@@ -667,7 +686,7 @@ public class InformationCenter {
 		}
 
 	}
-
+	
 	/**
 	 * Returns ID of MarkingLayer which is above selected MarkingLayer in ImageLayerInfo and preceding in list of MarkingLayers.
 	 *
@@ -697,7 +716,7 @@ public class InformationCenter {
 		}
 
 	}
-
+	
 	/**
 	 * Returns the single grid size list.
 	 *
@@ -708,8 +727,9 @@ public class InformationCenter {
 		return singleGridSizeList;
 	}
 
-
-
+	public MarkingLayer getTempMarkingLayer() {
+		return tempMarkingLayer;
+	}
 
 	/**
 	 *  Gives next free layerId value and increases the value to given next time.
@@ -720,6 +740,9 @@ public class InformationCenter {
 	public int getUnReservedLayerID()throws Exception {
 		return layerID++;
 	}
+
+
+
 
 	/**
 	 * Returns the list of visible MarkingLayers.
@@ -776,7 +799,6 @@ public class InformationCenter {
 		return false;
 	}
 
-
 	/**
 	 * Checks is the given MarkingLayer in list of visible Markings.
 	 *
@@ -796,7 +818,8 @@ public class InformationCenter {
 		}
 		return false;
 	}
-	
+
+
 	/**
 	 * Returns the boolean madeChanges.
 	 *
@@ -817,7 +840,7 @@ public class InformationCenter {
 		
 		
 	}
-
+	
 	/**
 	 * Checks if is selected image layer.
 	 *
@@ -830,7 +853,7 @@ public class InformationCenter {
 			return true;
 		return false;
 	}
-	
+
 	/**
 	 * Checks if is selected MarkingLayer.
 	 *
@@ -849,8 +872,6 @@ public class InformationCenter {
 		}
 	}
 	
-	
-
 	/**
 	 * Move selected marking layer.
 	 *
@@ -885,7 +906,36 @@ public class InformationCenter {
 		return false;
 		
 	}
-
+	
+	/**
+	 * Paste markings to selected MarkingLayer.
+	 *
+	 * @param id the id of pasting type
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean pasteMarkingsToSelectedMarkingLayer(int id) throws Exception{
+		
+		MarkingLayer selectedMarkingLayer = getSelectedMarkingLayer();
+		if(selectedMarkingLayer != null && this.tempMarkingLayer != null && 
+				this.tempMarkingLayer.getCoordinateList() != null &&
+				this.tempMarkingLayer.getCoordinateList().size() > 0){
+			if(id == ID.APPEND){
+				selectedMarkingLayer.appendCoordinates(this.tempMarkingLayer.getCoordinateList());
+				return true;
+				
+			}
+			else if(id== ID.OVERWRITE){
+				selectedMarkingLayer.setCoordinateList(this.tempMarkingLayer.getCoordinateList());
+				return true;
+			}
+			
+		}
+		return false;
+		
+	}
+	
+	
 
 	/**
 	 * Removes the ImageLayer by given ID.
@@ -944,6 +994,7 @@ public class InformationCenter {
 
 		}
 	}
+
 
 	/**
 	 * Removes the MarkingLayer by given ImageLayer ID and MarkingLayer ID.
@@ -1006,8 +1057,6 @@ public class InformationCenter {
 		}
 	}
 
-
-
 	/**
 	 *  Sets all MarkingLayers to unselected.
 	 *
@@ -1023,6 +1072,8 @@ public class InformationCenter {
 		}
 	
 	}
+
+
 
 	/**
 	 * Sets new list of ImageLayers: replaces the older one after checking correctness of new ImageLayers by method addImageLayers.
@@ -1076,8 +1127,6 @@ public class InformationCenter {
 		}
 	}
 
-	
-
 	/**
 	 * Sets the name of MarkingLayer.
 	 *
@@ -1098,6 +1147,8 @@ public class InformationCenter {
 			LOGGER.severe("Error in setting MarkingLayerName " +e.getClass().toString() + " :" +e.getMessage());
 		}
 	}
+
+	
 
 	/**
 	 * Sets the visiblity of MarkingLayer by given ID.
@@ -1135,7 +1186,6 @@ public class InformationCenter {
 		this.presentFolder = presentFolder;
 	}
 
-
 	/**
 	 * Sets the present image dimension.
 	 *
@@ -1149,6 +1199,8 @@ public class InformationCenter {
 		}
 
 	}
+
+
 	/**
 	 * Sets the proper selected ImageLayer.
 	 *
@@ -1168,8 +1220,6 @@ public class InformationCenter {
 			}
 		}
 	}
-
-
 	/**
 	 * Sets the selectedMarkingLayer from selected ImageLayer. If no any markingLayers in selected ImageLayer, then set null.
 	 *
@@ -1222,6 +1272,7 @@ public class InformationCenter {
 				}
 		}
 	}
+
 
 	/**
 	 * Sets the given ImageLayer as selectedImageLayer and checks is the selectedMarkingLayerProper.
@@ -1291,7 +1342,7 @@ public class InformationCenter {
 		}
 
 	}
-	
+
 	/**
 	 * Sets the successfully made savings to MarkingLayers.
 	 *
@@ -1307,6 +1358,10 @@ public class InformationCenter {
 				
 			}
 		}	
+	}
+	
+	public void setTempMarkingLayer(MarkingLayer tempMarkingLayer) {
+		this.tempMarkingLayer = tempMarkingLayer;
 	}
 
 	/**
