@@ -282,16 +282,16 @@ private Component parentComponent=null;
 		return this.getBounds();
 	}
 
-	/**
+	/*
 	 * Returns the present folder, where saving will be made.
 	 *
 	 * @return the present folder
 	 * @throws Exception the exception
-	 */
+	 *
 	public String getPresentFolder() throws Exception{
 		return gui.getPresentFolder();
 	}
-
+*/
 	/**
 	 * Returns the saving type id (Integer). 
 	 *
@@ -720,7 +720,10 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 	 * @throws Exception the exception
 	 */
 	protected void initSelectFileDialog() throws Exception{
-		String path = gui.getPresentFolder();
+		int folderID = ID.FOLDER_IMAGES;
+		if(this.savingType == ID.SAVE_MARKINGS)
+			folderID=ID.FOLDER_XML_FILES;
+		String path = gui.getPresentFolder(folderID);
 		if(path== null)
 			path = System.getProperty("user.home");
 		this.selectFileDialog = new SelectFileDialog(this.gui, path, this.backPanel, this.savingType);
@@ -976,8 +979,8 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 	 * @param folder the new present folder
 	 * @throws Exception the exception
 	 */
-	public void setPresentFolder(String folder) throws Exception{
-		gui.setPresentFolder(folder);
+	public void setPresentFolder(String folder, int id) throws Exception{
+		gui.setPresentFolder(folder, id);
 	}
 
 	/**

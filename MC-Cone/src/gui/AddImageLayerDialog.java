@@ -1,5 +1,6 @@
 package gui;
 
+import gui.file.FileManager;
 import gui.file.ImageFilter;
 import gui.file.OpenImageFilesDialog;
 import gui.file.OpenMarkingFileDialog;
@@ -90,8 +91,12 @@ public class AddImageLayerDialog extends JDialog{
 	/** The shady message dialog. Shows messages */
 	private ShadyMessageDialog shadyMessageDialog=null;
 	
-
+	/** The present path for XML-file. */
+	private String presentXMLpath=null;
 	
+
+
+
 	/**
 	 * Class constructor for only creating new ImageLayers and importing markings
 	 * @param frame Owner JFrame
@@ -470,6 +475,8 @@ public class AddImageLayerDialog extends JDialog{
 	public Rectangle getBackPanelSize() throws Exception{
 		return this.backPanel.getBounds();
 	}
+	
+	
 
 
 
@@ -557,16 +564,26 @@ private ImageLayer getImageLayer(String path){
 	}
 }
 
-/**
+/*
  * Returns  path of previously used folder.
  *
  * @return String path of previously used folder
  * @throws Exception the exception
- */
+ 
 public String getPresentFolder()throws Exception{
 	return gui.getPresentFolder();
 }
+*/
 
+/**
+ * Returns the present XML-path.
+ *
+ * @return the present XML path
+ * @throws Exception the exception
+ */
+public String getPresentXMLpath() throws Exception{
+	return presentXMLpath;
+}
 
 
 /**
@@ -989,7 +1006,7 @@ private JPanel initImageViewPanel(){
 
 			return false;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			LOGGER.severe("Error in is image Dimension allowed!");
 			e.printStackTrace();
 			return false;
 		}
@@ -1035,10 +1052,10 @@ private JPanel initImageViewPanel(){
 	private void selectAndAddImages() throws Exception{
 		
 	//	OpenImageFilesDialog 
-		visibleDialog=new OpenImageFilesDialog(this, this.getBounds(), this.backPanel.getBounds(), gui.getPresentFolder());
+		visibleDialog=new OpenImageFilesDialog(this, this.getBounds(), this.backPanel.getBounds(), gui.getPresentFolder(ID.FOLDER_IMAGES));
 		((OpenImageFilesDialog)visibleDialog).showDialog();
-	//	visibleDialog.setVisible(true);
-		gui.setPresentFolder(((OpenImageFilesDialog)visibleDialog).getPresentFolder());
+	//	set present folder for images
+		gui.setPresentFolder(((OpenImageFilesDialog)visibleDialog).getPresentFolder(), ID.FOLDER_IMAGES);
 		File[] imagefiles = ((OpenImageFilesDialog)visibleDialog).getSelectedFiles();
 		if(imagefiles != null && imagefiles.length>0)
 		addImagesToImageLayerList(imagefiles);
@@ -1054,15 +1071,21 @@ private JPanel initImageViewPanel(){
 	 */
 	private void selectAndAddMarkings(String imageLayerPath, boolean isMarkingsForAll){
 		try {
-			visibleDialog= new OpenMarkingFileDialog(this, this.getBounds(), this.backPanel.getBounds(),imageLayerPath);
+			String usedPathForXML=imageLayerPath;
+			if(this.presentXMLpath != null && this.presentXMLpath.length()>0 )
+				usedPathForXML=this.presentXMLpath;
+			visibleDialog= new OpenMarkingFileDialog(this, this.getBounds(), this.backPanel.getBounds(), usedPathForXML);
 			visibleDialog.setVisible(true);
 
 			File[] markingFile = ((OpenMarkingFileDialog)visibleDialog).getSelectedFiles();
-			if(markingFile != null && markingFile.length==1) {// only 1 marking file is allowed
+			if(markingFile != null && markingFile.length==1) { // only 1 marking file is allowed
 				if(isMarkingsForAll)
 					addMarkingsToSelectedImageLayer(markingFile[0], null); // setting markins to all ImageLayers
 				else
 					addMarkingsToSelectedImageLayer(markingFile[0], imageLayerPath);
+				
+				// set the present markingsFolder
+				setPresentXMLpath(markingFile[0].getParent());
 			}
 			visibleDialog=null;
 		} catch (Exception e) {
@@ -1110,8 +1133,18 @@ private JPanel initImageViewPanel(){
 	 * @param folder String path of used folder
 	 * @throws Exception the exception
 	 */
-	public void setPresentFolder(String folder) throws Exception{
-		gui.setPresentFolder(folder);
+	public void setPresentFolder(String folder, int id) throws Exception{
+		gui.setPresentFolder(folder, id);
+	}
+	
+	/**
+	 * Sets the present xm lpath.
+	 *
+	 * @param presentXMLpath the new present xm lpath
+	 * @throws Exception the exception
+	 */
+	public void setPresentXMLpath(String presentXMLpath) throws Exception{
+		this.presentXMLpath = presentXMLpath;
 	}
 
 

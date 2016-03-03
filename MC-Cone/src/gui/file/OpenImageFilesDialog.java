@@ -47,7 +47,7 @@ public class OpenImageFilesDialog extends OpenFileDialog{
 	/* (non-Javadoc)
 	 * @see gui.file.OpenFileDialog#setUpFilechooserSettings()
 	 */
-	protected void setUpFilechooserSettings(){
+	protected void setUpFilechooserSettings() throws Exception{
 
 		fileChooser.setMultiSelectionEnabled(true); // multiselection is allowed
 		fileChooser.setFileFilter(new ImageFilter()); // Image filter in package gui.file

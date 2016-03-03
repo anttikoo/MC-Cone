@@ -34,8 +34,11 @@ public class InformationCenter {
 	 * <-> GUI panels and layers of images and markings. */
 	private int layerID = 1; 
 	
-	/** The present folder. */
+	/** The present folder for images. */
 	private String presentFolder;
+	
+	/** The present folder for XML-files. */
+	private String presentFolderXML;
 	
 	/** The shape list. */
 	private int[] shapeList;
@@ -528,14 +531,31 @@ public class InformationCenter {
 
 
 	/**
-	 * Returns the folder that is used latest.
+	 * Returns the folder that is used latest in opening images of for saving XML-file.
 	 *
+	 * @param id the id
 	 * @return the present folder
 	 * @throws Exception the exception
 	 */
-	public String getPresentFolder()throws Exception {
-		return presentFolder;
+	public String getPresentFolder(int id)throws Exception {
+		
+		switch (id) {
+		case ID.FOLDER_IMAGES:
+			if(this.presentFolder != null && this.presentFolder.length()>0)
+				return this.presentFolder;
+			break;
+		case ID.FOLDER_XML_FILES:
+			if(this.presentFolderXML != null && this.presentFolderXML.length()>0)
+				return this.presentFolderXML;
+			break;
+		default:
+			return System.getProperty("user.home");
+		}
+		return System.getProperty("user.home");
 	}
+	
+
+	
 
 	/**
 	 * Returns the present image dimension.
@@ -545,6 +565,7 @@ public class InformationCenter {
 	public Dimension getPresentImageDimension() {
 		return presentImageDimension;
 	}
+
 
 	/**
 	 * Returns the previous marking layer.
@@ -571,7 +592,6 @@ public class InformationCenter {
 		return null;
 		
 	}
-
 
 	/**
 	 * Returns the selected ImageLayer.
@@ -611,6 +631,12 @@ public class InformationCenter {
 		}
 
 	}
+	
+	
+	
+	
+	
+
 
 	/**
 	 * Returns ID of ImageLayer which is above selected ImageLayer in ImageLayerInfo and preceding in list of ImageLayers.
@@ -641,12 +667,6 @@ public class InformationCenter {
 
 	}
 	
-	
-	
-	
-	
-
-
 	/**
 	 * Returns the selected MarkingLayer.
 	 *
@@ -716,7 +736,7 @@ public class InformationCenter {
 		}
 
 	}
-	
+
 	/**
 	 * Returns the single grid size list.
 	 *
@@ -731,6 +751,9 @@ public class InformationCenter {
 		return tempMarkingLayer;
 	}
 
+
+
+
 	/**
 	 *  Gives next free layerId value and increases the value to given next time.
 	 *
@@ -740,9 +763,6 @@ public class InformationCenter {
 	public int getUnReservedLayerID()throws Exception {
 		return layerID++;
 	}
-
-
-
 
 	/**
 	 * Returns the list of visible MarkingLayers.
@@ -799,6 +819,7 @@ public class InformationCenter {
 		return false;
 	}
 
+
 	/**
 	 * Checks is the given MarkingLayer in list of visible Markings.
 	 *
@@ -818,8 +839,7 @@ public class InformationCenter {
 		}
 		return false;
 	}
-
-
+	
 	/**
 	 * Returns the boolean madeChanges.
 	 *
@@ -840,7 +860,7 @@ public class InformationCenter {
 		
 		
 	}
-	
+
 	/**
 	 * Checks if is selected image layer.
 	 *
@@ -853,7 +873,7 @@ public class InformationCenter {
 			return true;
 		return false;
 	}
-
+	
 	/**
 	 * Checks if is selected MarkingLayer.
 	 *
@@ -907,6 +927,8 @@ public class InformationCenter {
 		
 	}
 	
+	
+
 	/**
 	 * Paste markings to selected MarkingLayer.
 	 *
@@ -934,8 +956,7 @@ public class InformationCenter {
 		return false;
 		
 	}
-	
-	
+
 
 	/**
 	 * Removes the ImageLayer by given ID.
@@ -994,7 +1015,6 @@ public class InformationCenter {
 
 		}
 	}
-
 
 	/**
 	 * Removes the MarkingLayer by given ImageLayer ID and MarkingLayer ID.
@@ -1057,6 +1077,8 @@ public class InformationCenter {
 		}
 	}
 
+
+
 	/**
 	 *  Sets all MarkingLayers to unselected.
 	 *
@@ -1072,8 +1094,6 @@ public class InformationCenter {
 		}
 	
 	}
-
-
 
 	/**
 	 * Sets new list of ImageLayers: replaces the older one after checking correctness of new ImageLayers by method addImageLayers.
@@ -1127,6 +1147,8 @@ public class InformationCenter {
 		}
 	}
 
+	
+
 	/**
 	 * Sets the name of MarkingLayer.
 	 *
@@ -1147,8 +1169,6 @@ public class InformationCenter {
 			LOGGER.severe("Error in setting MarkingLayerName " +e.getClass().toString() + " :" +e.getMessage());
 		}
 	}
-
-	
 
 	/**
 	 * Sets the visiblity of MarkingLayer by given ID.
@@ -1181,10 +1201,23 @@ public class InformationCenter {
 	 * Sets the present folder that is used latest.
 	 *
 	 * @param presentFolder the new present folder
+	 * @param id the id for type of folder ID.IMAGES or ID.XML
 	 */
-	public void setPresentFolder(String presentFolder) {
-		this.presentFolder = presentFolder;
+	public void setPresentFolder(String presentFolderIn, int id) throws Exception {
+		if(presentFolderIn != null && presentFolderIn.length()>0)
+		switch (id) {
+		case ID.FOLDER_IMAGES:
+			this.presentFolder=presentFolderIn;
+			break;
+		case ID.FOLDER_XML_FILES:
+			this.presentFolderXML=presentFolderIn;
+			break;
+		default:
+			// do nothing;
+			break;
+		}
 	}
+
 
 	/**
 	 * Sets the present image dimension.
@@ -1220,6 +1253,7 @@ public class InformationCenter {
 			}
 		}
 	}
+
 	/**
 	 * Sets the selectedMarkingLayer from selected ImageLayer. If no any markingLayers in selected ImageLayer, then set null.
 	 *
@@ -1273,7 +1307,6 @@ public class InformationCenter {
 		}
 	}
 
-
 	/**
 	 * Sets the given ImageLayer as selectedImageLayer and checks is the selectedMarkingLayerProper.
 	 * If selectedMarkingLayer is not proper (not found) the new one is selected from MarkinLayers of selectedImageLayer.
@@ -1323,7 +1356,7 @@ public class InformationCenter {
 			return false;
 		}
 	}
-
+	
 	/**
 	 * Sets the selected MarkingLayer.
 	 *
@@ -1359,7 +1392,7 @@ public class InformationCenter {
 			}
 		}	
 	}
-	
+
 	public void setTempMarkingLayer(MarkingLayer tempMarkingLayer) {
 		this.tempMarkingLayer = tempMarkingLayer;
 	}

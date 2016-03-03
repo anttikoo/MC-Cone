@@ -456,32 +456,7 @@ private void setTextOfJTextFieldFromFileChooser(JFileChooser chooser, String tex
 		return this.fileWritingType;
 	}
 
-	/**
-	 * Converts given File to directory if it is not already one.
-	 *
-	 * @param filePath the file path
-	 * @return the folder of given file
-	 * @throws Exception the exception
-	 */
-	private File getFolder(String filePath) throws Exception{
-		try {
-			File f = new File(filePath);
-			if (f.exists()) {
-				if (f.isDirectory()) {
-					// return the folder
-					return f;
-				} else if (f.isFile()) {
-					// the folderPath was a file -> get the folder of that file
-					return new File(f.getParent());
-				}
-			}
-			// file not exists return the home folder
-			return new File(System.getProperty("user.home"));
-		} catch (Exception e) {
-			LOGGER.severe("Error in getting folder of file " +e.getClass().toString() + " :" +e.getMessage()+ " line: "+ e.getStackTrace()[2].getLineNumber());
-			return null;
-		}
-	}
+
 
 
 /*  // MAY BE NEEDED LATER
@@ -830,7 +805,7 @@ private void initFileDialog() throws Exception{
 		try {
 			
 			if(path != null && path.length()>0){
-				File file = getFolder(path);
+				File file = FileManager.getFolder(path);
 				setProperFilePathForSaving(file.getAbsolutePath());			
 			}
 				

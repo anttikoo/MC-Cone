@@ -319,8 +319,8 @@ public class TaskManager {
 	 * @return the present folder
 	 * @throws Exception the exception
 	 */
-	public String getPresentFolder() throws Exception{
-		return informationCenter.getPresentFolder();
+	public String getPresentFolder(int id) throws Exception{
+		return informationCenter.getPresentFolder(id);
 	}
 	
 	/**
@@ -797,8 +797,8 @@ public class TaskManager {
 	 * @param folder the new present folder
 	 * @throws Exception the exception
 	 */
-	public void setPresentFolder(String folder) throws Exception{
-		this.informationCenter.setPresentFolder(folder);
+	public void setPresentFolder(String folder, int id) throws Exception{
+		this.informationCenter.setPresentFolder(folder, id);
 	}
 
 	/**

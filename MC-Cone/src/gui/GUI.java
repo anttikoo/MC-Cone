@@ -1109,8 +1109,8 @@ public class GUI extends JFrame{
 	 * @return String folder name which is previously used.
 	 * @throws Exception the exception
 	 */
-	public String getPresentFolder() throws Exception{
-		return taskManager.getPresentFolder();
+	public String getPresentFolder(int id) throws Exception{
+		return taskManager.getPresentFolder(id);
 	}
 
 
@@ -2398,8 +2398,8 @@ public class GUI extends JFrame{
  * @param folder String folder name which is previously used.
  * @throws Exception the exception
  */
-public void setPresentFolder(String folder) throws Exception{
-	this.taskManager.setPresentFolder(folder);
+public void setPresentFolder(String folder, int id) throws Exception{
+	this.taskManager.setPresentFolder(folder, id);
 }
 
 /**

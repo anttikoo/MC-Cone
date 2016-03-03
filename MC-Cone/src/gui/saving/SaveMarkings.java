@@ -164,7 +164,7 @@ public class SaveMarkings extends SaverDialog{
 	 * @see gui.saving.SaverDialog#initSelectFileDialog()
 	 */
 	protected void initSelectFileDialog() throws Exception{
-		String path = gui.getPresentFolder();
+		String path = gui.getPresentFolder(ID.FOLDER_XML_FILES);
 		if(path== null)
 			path = System.getProperty("user.home");
 		this.selectFileDialog = new MarkingsSelectFileDialog(this.gui, path, this.backPanel, this.savingType);

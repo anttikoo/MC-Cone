@@ -120,10 +120,8 @@ public class PreCounterThread implements Runnable{
 	private double cellSizeMaxScalingFactor=1.5;
 
 
-
-
-	/** The max cell number in cell group. */
-	private int maxCellNumberInCellGroup=10;
+	/** The max cell number in cell group. Prevents that stack of coordinates will not be too big. */
+	private int maxCellNumberInCellGroup=20;
 
 	/**
 	 * Instantiates a new PreCounterThread.
@@ -418,6 +416,8 @@ public class PreCounterThread implements Runnable{
 			e.printStackTrace();
 		}
 	}
+	
+
 
 	/**
 	 * Creates groups from points by using distances between points.
@@ -429,6 +429,7 @@ public class PreCounterThread implements Runnable{
 		   this.copy_of_current_finalCoordinates=new ArrayList<Point>();
 		   this.copy_of_current_finalCoordinates.addAll(this.current_finalCoordinates);
 		   this.current_finalCentroidCoordinates=new ArrayList<Point>();
+		   this.current_finalCentroidCoordinates.addAll(this.finalCentroidCoordinates); // add all previous final Centroid coordinates
 		   Collections.sort(this.copy_of_current_finalCoordinates, new CoordinateComparator());
 		   while(this.continueCounting && copy_of_current_finalCoordinates.size()>0 ){ // Points are removed from list in method getNeighbourPoints
 			   int randomIndex=(int)(Math.random()*copy_of_current_finalCoordinates.size());
@@ -588,11 +589,13 @@ public class PreCounterThread implements Runnable{
 					 MaxDistancePoint[] maxDistanceValues=getMaxDistanceRoundValues(midPoint, this.current_max_cell_size, weightPointList);
 					 // if amount of points is not exceeding maximum amount of point in cell and if user has selected strict precounting then check is cell circular
 					 if(weightPointList.size()<= this.current_max_coordinate_number_in_cell && (!SharedVariables.useStrickSearch || SharedVariables.useStrickSearch && isCircular(maxDistanceValues))){
-								// one cell
-						   this.current_finalCentroidCoordinates.add(midPoint);
+						 if(!compareIsTooClose(midPoint, this.current_finalCentroidCoordinates)){
+							 // one cell
+							 this.current_finalCentroidCoordinates.add(midPoint);
+						 }
 						   break outerLoop;
 					   }
-						else{// possible several cells
+						else{// possible cluster of cells -> try to separate them
 	
 							WeightPoint w = getWeightPointWithBiggestDistance(maxDistanceValues);
 							if(w==null)
@@ -663,7 +666,7 @@ public class PreCounterThread implements Runnable{
 											selectedPointsForCell.size()<=current_max_coordinate_number_in_cell){
 												// calculate the centroid of cells -> the final point to be saved.
 												midPoint = calculateCentroid(selectedPointsForCell);
-												if(!compareIsTooClose(midPoint))
+												if(!compareIsTooClose(midPoint,this.current_finalCentroidCoordinates))
 													this.current_finalCentroidCoordinates.add(midPoint);
 											}
 											weightPointList.removeAll(candidatePointList); // remove selected points
@@ -740,12 +743,12 @@ public class PreCounterThread implements Runnable{
 	 * @param midPoint the mid point
 	 * @return true, if successful
 	 */
-	private boolean compareIsTooClose(Point midPoint){
-		Iterator<Point> coordIterator = this.current_finalCoordinates.iterator();
+	private boolean compareIsTooClose(Point midPoint, ArrayList<Point> pointListToCheck){
+		Iterator<Point> coordIterator = pointListToCheck.iterator();
 		while(coordIterator.hasNext()){
 			Point p = coordIterator.next();
-			if(p.x > midPoint.x-this.current_min_cell_size && p.x < midPoint.x+this.current_min_cell_size)
-				if(p.y > midPoint.y-this.current_min_cell_size && p.y < midPoint.y+this.current_min_cell_size)
+			if(midPoint.x > p.x-this.current_max_cell_size && midPoint.x < p.x+this.current_max_cell_size)
+				if(midPoint.y > p.y-this.current_max_cell_size && midPoint.y < p.y+this.current_max_cell_size)
 					return true;					
 		}
 		return false;
@@ -893,8 +896,8 @@ public class PreCounterThread implements Runnable{
 
 		// sort list
 		Collections.sort(this.current_colorList);
-		LOGGER.info("Maximum cell size: "+this.current_max_cell_size);
-		LOGGER.info("Minimum cell size: "+this.current_min_cell_size);
+	//	LOGGER.info("Maximum cell size: "+this.current_max_cell_size);
+	//	LOGGER.info("Minimum cell size: "+this.current_min_cell_size);
 	}
 }
 
@@ -954,8 +957,8 @@ public class PreCounterThread implements Runnable{
 	   ArrayList<Point> neighbours=new ArrayList<Point>();
 	   // calculate the max distance 
 	   int maxDistance=(int)(this.current_max_cell_size/this.min_distance_between_cells_boundaries);
-	   int lowerBoundValue=Math.max(p.x-maxDistance,0); // minimum bounds
-	   int upperBoundValue=p.x+maxDistance;				// maximum bounds
+	   int lowerBoundValue=Math.max(p.x-maxDistance,0); // minimum bounds for binary search
+	   int upperBoundValue=p.x+maxDistance;				// maximum bounds for binary search
 	   int[] startEndIndexes=startEndBinarySearch(this.copy_of_current_finalCoordinates, lowerBoundValue, upperBoundValue);
 	   if(startEndIndexes != null && startEndIndexes[0] >= 0
 			   && startEndIndexes[1] <= this.copy_of_current_finalCoordinates.size()-1 && startEndIndexes[0] < startEndIndexes[1])

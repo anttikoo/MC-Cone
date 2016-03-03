@@ -202,7 +202,7 @@ public class ImageSetCreator extends JDialog implements MouseListener, Runnable{
 			this.presentColumnNumber=1;
 			this.presentRowNumber=1;
 			this.gap=15;
-			this.presentFolder=gui.getPresentFolder();
+			this.presentFolder=gui.getPresentFolder(ID.FOLDER_IMAGES);
 			this.createImageThread=new Thread(this, "CreateImage_"+threadNumber++);
 			initComponents();
 			this.progressBallsDialog = new ProgressBallsDialog(this, "Creating set of Images", "", ID.CANCEL, this);
@@ -1329,7 +1329,7 @@ public class ImageSetCreator extends JDialog implements MouseListener, Runnable{
 	 */
 	private void selectFile() throws Exception{
 		if(this.selectFileDialog==null){
-		String path = gui.getPresentFolder();
+		String path = gui.getPresentFolder(ID.FOLDER_IMAGES);
 		if(path== null)
 			path = System.getProperty("user.home");
 		this.selectFileDialog = new SelectFileDialog(this.gui, path, this.backPanel, ID.EXPORT_IMAGE);
