@@ -260,7 +260,7 @@ public class GUI extends JFrame{
 			
 			setMenuItemsEnabled(ID.IMAGELAYERS); // sets items unenabled, cos ImageLayers and MarkingLayers not found at startup
 			
-			LOGGER.info("Started MCcone! Wellcome.");	
+			LOGGER.info("Started MC-Cone! Wellcome.");	
 			
 			//refresh window
 			this.repaint();
@@ -606,12 +606,12 @@ public class GUI extends JFrame{
 	 * @throws Exception the exception
 	 */
 	public void addImageLayerList(ArrayList<ImageLayer> iLayerList) throws Exception{
+		
 		// set the ImageLayers through TaskManager -> InformationCenter.imageLayerList	(finalizes the layers -> gives ids)
 		this.taskManager.addImageLayers(iLayerList);
-
+		
 		//updates the selected Layers and Refreshes GUI
 		refreshLayersAndGUI();
-
 		// refresh precouting components
 		cleanPreCountingIfNecessary();
 	}
