@@ -744,8 +744,8 @@ public class PreCounterThread implements Runnable{
 		Iterator<Point> coordIterator = this.current_finalCoordinates.iterator();
 		while(coordIterator.hasNext()){
 			Point p = coordIterator.next();
-			if(p.x > midPoint.x-this.current_min_cell_size/2 && p.x < midPoint.x+this.current_min_cell_size/2)
-				if(p.y > midPoint.y-this.current_min_cell_size/2 && p.y < midPoint.y+this.current_min_cell_size/2)
+			if(p.x > midPoint.x-this.current_min_cell_size && p.x < midPoint.x+this.current_min_cell_size)
+				if(p.y > midPoint.y-this.current_min_cell_size && p.y < midPoint.y+this.current_min_cell_size)
 					return true;					
 		}
 		return false;
@@ -850,7 +850,7 @@ public class PreCounterThread implements Runnable{
 			cancelInside(); // too small cell -> stop
 			return;
 		}
-
+			// calculate maximum cell size if bigger than previous cell size
 		if(cell_size*this.cellSizeMaxScalingFactor > this.current_max_cell_size)
 			this.current_max_cell_size= (int)(cell_size*this.cellSizeMaxScalingFactor);
 
@@ -893,7 +893,8 @@ public class PreCounterThread implements Runnable{
 
 		// sort list
 		Collections.sort(this.current_colorList);
-
+		LOGGER.info("Maximum cell size: "+this.current_max_cell_size);
+		LOGGER.info("Minimum cell size: "+this.current_min_cell_size);
 	}
 }
 
@@ -1465,7 +1466,7 @@ public void run() {
 
 				if(this.current_colorList != null && this.current_colorList.size()>0){
 					LOGGER.fine("start calculating coordinates: colorlist: "+current_colorList.size()+ "using gap: " +this.current_gap+ "min:"+this.global_min_coordinate_number_in_cell+ " max: "+this.current_max_coordinate_number_in_cell);
-					// go through the image pixels of original image
+					// go through the image pixels of original image and give coordinata
 
 					calculateCoordinates();
 	
