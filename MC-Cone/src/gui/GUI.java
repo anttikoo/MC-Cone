@@ -260,7 +260,7 @@ public class GUI extends JFrame{
 			
 			setMenuItemsEnabled(ID.IMAGELAYERS); // sets items unenabled, cos ImageLayers and MarkingLayers not found at startup
 			
-			LOGGER.info("Started MC-Cone! Wellcome.");	
+			LOGGER.info("Started MC-Cone! Wellcome!");	
 			
 			//refresh window
 			this.repaint();
