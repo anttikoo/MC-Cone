@@ -133,7 +133,7 @@ public class SaveMarkings extends SaverDialog{
 		overwriteFileJCheckBox = new JCheckBox(checkBoxIcon);
 	
 		overwriteFileJCheckBox.setSelected(false);
-		overwriteFileJCheckBox.setBackground(Color_schema.dark_35);
+		overwriteFileJCheckBox.setBackground(Color_schema.dark_30);
 		overwriteFileJCheckBox.setMaximumSize(new Dimension(25,25));
 		overwriteFileJCheckBox.setPreferredSize(new Dimension(25,25));
 		overwriteFileJCheckBox.setMinimumSize(new Dimension(25,25));
