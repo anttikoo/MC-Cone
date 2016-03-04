@@ -1678,13 +1678,15 @@ public void run() {
 				 if(indexes[0] <0 || indexes[0] > pointList.size()-1)
 					 return null;
 
-				 // upperBound
-				 imin=indexes[0]+1;
-				 imax=pointList.size()-1;
+				 // upperBound search
+				 imin=indexes[0]+1; // one bigger than found index for lowerbound
+				 imax=pointList.size()-1; // end of list
 				 upperLoop:
 				 while(imax>=imin){
 					 imid=(int)imin+(imax-imin)/2; // get midpoint
-					 if(pointList.get(imid).x == upperBoundValue){
+					 
+					 if(imid< pointList.size()-1){ // is imid smaller or than list size
+						 if(pointList.get(imid).x == upperBoundValue){
 
 							 if(imid == pointList.size()-1 || pointList.get(imid+1).x > upperBoundValue){
 								 indexes[1]=imid;
@@ -1693,41 +1695,57 @@ public void run() {
 							 else{
 								 imin=imid+1;
 							 }
-					 }
-					 else {
-						 if(pointList.get(imid).x < upperBoundValue){
-						 if(imid< pointList.size()-1){
-							 if(pointList.get(imid+1).x > upperBoundValue){
-								 indexes[1]=imid;
-								 break upperLoop;
+						 }
+						 else { 
+							 if(pointList.get(imid).x < upperBoundValue){ // value smaller than upperboundvalue
+							
+								 if(pointList.get(imid+1).x > upperBoundValue){
+									 indexes[1]=imid;
+									 break upperLoop;
+								 }
+								 else{
+									 imin=imid+1;
+								 }
+							 
+							 
+								 if(imid > pointList.size()-1){ // index overflow, should never happen!
+									 if(indexes[0] < pointList.size()-1){ // lower index is not in last index
+										 // in last index
+										 indexes[1]=pointList.size()-1; // set the last index
+										 break upperLoop; 
+									 }
+									 else
+										 return null; // not found because index not bigger than lowerBound index
+								 } // in last index
+								 else{
+									 indexes[1]=imid;
+									 break upperLoop;
+								 }
+								 
+	
+							 }else{
+								 if(imid > indexes[0]){ // index bigger than lower bound
+									if(pointList.get(imid-1).x <= upperBoundValue){
+										indexes[1]=imid-1;
+										break upperLoop;
+									}
+									else{
+										imax=imid-1;
+									}
+								 }
+								 else{
+									 return null; // not found because index not bigger than lowerBound index
+								 }
 							 }
-							 else{
-								 imin=imid+1;
-							 }
-						 }
-						 else{
-							 // in last index
-							 indexes[1]=imid;
-							 break upperLoop;
-						 }
-
-					 }else{
-						 if(imid > indexes[0]){
-							if(pointList.get(imid-1).x <= upperBoundValue){
-								indexes[1]=imid-1;
-								break upperLoop;
-							}
-							else{
-								imax=imid-1;
-							}
-						 }
-						 else{
-							 return null; // not found because index not bigger than lowerBound index
+	
 						 }
 					 }
-
+					 else{ // index went too big -> should never happen
+						 indexes[1]=pointList.size()-1;
+						 break upperLoop;
 					 }
 				 }
+				 
 
 				 return indexes;
 			} catch (Exception e) {
