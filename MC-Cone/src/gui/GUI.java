@@ -475,6 +475,7 @@ public class GUI extends JFrame{
 					public void actionPerformed(ActionEvent e) {
 						try {
 							clearMarkingsOfSelectedMarkingLayer();
+							cleanPreCountingIfNecessary();
 						} catch (Exception e1) {
 							LOGGER.severe("Error in clearing single counting!");
 							e1.printStackTrace();
@@ -491,6 +492,7 @@ public class GUI extends JFrame{
 					public void actionPerformed(ActionEvent e) {
 						try {
 							clearMarkingsOfAllMarkingLayers();
+							cleanPreCountingIfNecessary();
 						} catch (Exception e1) {
 							LOGGER.severe("Error in clearing all countings!");
 							e1.printStackTrace();
