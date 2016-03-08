@@ -1,4 +1,5 @@
 package gui;
+
 import gui.grid.GridPropertiesPanel;
 import gui.panels.GridPanel;
 import gui.panels.HighlightPanel;
@@ -213,6 +214,7 @@ public class GUI extends JFrame{
 	/** The zoom out button. */
 	private JButton zoomOutButton;
 
+	
 
 	/**
 	 * Class constructor.
@@ -235,6 +237,9 @@ public class GUI extends JFrame{
 			//initialize size, colors and listeners of GUI		
 			initWindowPropertiesAndListeners();
 
+			
+			
+			
 			//initialize menubar
 			initMenubar();
 
@@ -601,6 +606,8 @@ public class GUI extends JFrame{
 		}
 	}
 	
+	
+	
 	/**
 	 * Adds imported ImageLayers to InformationCenter. Updates the selected layers and GUI
 	 *
@@ -608,16 +615,19 @@ public class GUI extends JFrame{
 	 * @throws Exception the exception
 	 */
 	public void addImageLayerList(ArrayList<ImageLayer> iLayerList) throws Exception{
-		
-		// set the ImageLayers through TaskManager -> InformationCenter.imageLayerList	(finalizes the layers -> gives ids)
+			
+	
+		// set the ImageLayers through TaskManager -> InformationCenter.imageLayerList	(finalizes the layers -> gives ids)			
 		this.taskManager.addImageLayers(iLayerList);
 		
 		//updates the selected Layers and Refreshes GUI
 		refreshLayersAndGUI();
+	
 		// refresh precouting components
-		cleanPreCountingIfNecessary();
+		cleanPreCountingIfNecessary();		
+	
 	}
-
+	
 
 	/**
 	 * Adds a single marking to Point p, if no any marking found too close. 
@@ -789,6 +799,7 @@ public class GUI extends JFrame{
 		
 	}
 	
+
 	
 
 	/**
@@ -1256,7 +1267,9 @@ public class GUI extends JFrame{
 		addImageLayerJPanel.add(Box.createRigidArea(new Dimension(0,5)));
 		
 	}
+	
 
+	
 	/**
 	 *  Initializes GlassPane, which is used in precounting cells.
 	 *
@@ -1540,6 +1553,7 @@ public class GUI extends JFrame{
 			JLabel zoomscrollProcent=new JLabel("%");
 			zoomscrollProcent.setFont(new Font("Consolas", Font.BOLD,16));
 			downBarPanel.add(Box.createHorizontalGlue());
+			
 			JLabel precountJLabel=new JLabel("PRECOUNTING:");
 			precountJLabel.setFont(Fonts.b16);
 			downBarPanel.add(precountJLabel);
@@ -1585,6 +1599,8 @@ public class GUI extends JFrame{
 			layers.add(gridPanel, JLayeredPane.DRAG_LAYER);
 			highlightPanel = new HighlightPanel();
 			layers.add(highlightPanel, JLayeredPane.DRAG_LAYER);
+			
+			
 
 			// attach panels
 			visualPanel.add(layers);

@@ -7,13 +7,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -25,7 +22,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 
 
 
@@ -56,10 +52,10 @@ public class ShadyMessageDialog extends JDialog{
 	private int returnValue=-1;
 	
 	/** The parent component. */
-	private Component parentComponent;
+	protected Component parentComponent;
 	
 	/** The dialog back panel. */
-	private JPanel dialogBackPanel;
+	protected JPanel dialogBackPanel;
 	
 	/** The message panel. */
 	protected JPanel messagePanel;
@@ -274,7 +270,7 @@ public class ShadyMessageDialog extends JDialog{
 	/**
 	 * Initializes the dialog.
 	 */
-	private void initDialog(){
+	protected void initDialog(){
 
 		try {
 			this.setResizable(false);		
