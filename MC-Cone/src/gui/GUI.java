@@ -2591,7 +2591,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 
 		try {
 			String osString=System.getProperty("os.name").toLowerCase();
-			LOGGER.info("OS:"+osString);
+			LOGGER.fine("OS:"+osString);
 			if(osString.contains("win")){
 				SharedVariables.setUsedDimmingModeToSrcOver();
 				SharedVariables.setOS(ID.OS_WINDOWS);
