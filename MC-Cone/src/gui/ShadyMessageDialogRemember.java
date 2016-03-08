@@ -1,25 +1,25 @@
 package gui;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.logging.Logger;
-
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import information.Fonts;
 import operators.CheckBoxIcon;
 
+/**
+ * The Class ShadyMessageDialogRemember. A dialog for showing message and user can press button.
+ * Contains a checkbox for saving the answer that user makes by pressing button.
+ */
 public class ShadyMessageDialogRemember extends ShadyMessageDialog {
 
 	/** The Constant serialVersionUID. */
@@ -31,11 +31,29 @@ public class ShadyMessageDialogRemember extends ShadyMessageDialog {
 	/** The remember check box. */
 	private JCheckBox rememberCheckBox;
 
+	/**
+	 * Instantiates a new shady message dialog remember.
+	 *
+	 * @param dialog the dialog
+	 * @param title the title
+	 * @param message the message
+	 * @param typeOfButtons the type of buttons
+	 * @param comp the comp
+	 */
 	public ShadyMessageDialogRemember(JDialog dialog, String title, String message, int typeOfButtons, Component comp) {
 		super(dialog, title, message, typeOfButtons, comp);
 		
 	}
 	
+	/**
+	 * Instantiates a new shady message dialog remember.
+	 *
+	 * @param frame the frame
+	 * @param title the title
+	 * @param message the message
+	 * @param typeOfButtons the type of buttons
+	 * @param comp the component
+	 */
 	public ShadyMessageDialogRemember(JFrame frame, String title, String message, int typeOfButtons, Component comp) {
 		super(frame, title, message, typeOfButtons, comp);
 		

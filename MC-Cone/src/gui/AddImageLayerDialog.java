@@ -1,6 +1,5 @@
 package gui;
 
-import gui.file.FileManager;
 import gui.file.ImageFilter;
 import gui.file.OpenImageFilesDialog;
 import gui.file.OpenMarkingFileDialog;
