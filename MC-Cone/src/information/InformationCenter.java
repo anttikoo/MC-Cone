@@ -1200,8 +1200,9 @@ public class InformationCenter {
 	/**
 	 * Sets the present folder that is used latest.
 	 *
-	 * @param presentFolder the new present folder
+	 * @param presentFolderIn the present folder in
 	 * @param id the id for type of folder ID.IMAGES or ID.XML
+	 * @throws Exception the exception
 	 */
 	public void setPresentFolder(String presentFolderIn, int id) throws Exception {
 		if(presentFolderIn != null && presentFolderIn.length()>0)
