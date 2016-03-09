@@ -121,7 +121,7 @@ public class PreCounterThread implements Runnable{
 
 
 	/** The max cell number in cell group. Prevents that stack of coordinates will not be too big. */
-	private int maxCellNumberInCellGroup=20;
+	private int maxCellNumberInCellGroup=10;
 
 	/**
 	 * Instantiates a new PreCounterThread.
@@ -324,6 +324,8 @@ public class PreCounterThread implements Runnable{
 					   }
 				   }
 			   } // for columns
+			   int progress = (int) Math.round(((double)r/(double)h)*10);
+			   this.pctm.updateProgressBar(progress);
 		   } // for rows
 		   Collections.sort(this.current_finalCoordinates, new CoordinateComparator());
 	   }
@@ -431,17 +433,28 @@ public class PreCounterThread implements Runnable{
 		   this.current_finalCentroidCoordinates=new ArrayList<Point>();
 		   this.current_finalCentroidCoordinates.addAll(this.finalCentroidCoordinates); // add all previous final Centroid coordinates
 		   Collections.sort(this.copy_of_current_finalCoordinates, new CoordinateComparator());
+		   int coordinateAmount = this.copy_of_current_finalCoordinates.size();
 		   while(this.continueCounting && copy_of_current_finalCoordinates.size()>0 ){ // Points are removed from list in method getNeighbourPoints
 			   int randomIndex=(int)(Math.random()*copy_of_current_finalCoordinates.size());
 			   Point firstPoint = copy_of_current_finalCoordinates.get(randomIndex); // get randomly the first point
 			   Stack<Point> stack  = new Stack<Point>();
 			   stack.push(firstPoint);
 			   copy_of_current_finalCoordinates.remove(firstPoint);
+			//   LOGGER.fine("all coordinates: "+copy_of_current_finalCoordinates.size());
 			   // recursively get points to list
 			   ArrayList<Point> groupPoints = getPoints(stack, new ArrayList<Point>());
 	
 			   if(groupPoints != null && groupPoints.size() >= this.global_min_coordinate_number_in_cell ){//&& groupPoints.size() < this.current_max_coordinate_number_in_cell){
 				   createWeightedPointGroup(groupPoints);
+			   }
+			   
+			   // show progress
+			   if(this.copy_of_current_finalCoordinates.size() == 0){
+				   this.pctm.updateProgressBar(100);
+			   }
+			   else{
+				   int value = (int) Math.round(((((double)this.copy_of_current_finalCoordinates.size())/((double)coordinateAmount)))*90);
+				   this.pctm.updateProgressBar(100-value);
 			   }
 		   }
 	   }
@@ -460,7 +473,7 @@ public class PreCounterThread implements Runnable{
 			int h=this.subImage.getHeight();
 			Point midPoint=new Point((int)(w/2),(int)(h/2));
 	
-			for(int x=midPoint.x-radius; x<midPoint.x+radius;x++){
+			for(int x=midPoint.x-radius; x<midPoint.x+radius;x++){ // go from midpoint to edges
 	
 				int delta_y = (int)(Math.sqrt((Math.pow(radius, 2)) - Math.pow((x-midPoint.x),2)));
 				int start_y= midPoint.y -delta_y;
@@ -812,14 +825,14 @@ public class PreCounterThread implements Runnable{
 			ColorChannelVectors colorVector=vIterator.next();
 			// go through vectors and for each color count k -> sum k of three colors -> save
 			int startGap =(int)(colorVector.getSize()/20); 
-			if(startGap<3)
+			if(startGap<3) // if start gap too small set to 3 -> length of slope is 3
 				startGap=3;
 			int endGap=(int)(colorVector.getSize()/4); 
-			if(endGap<5)
+			if(endGap<5) // if end gap too small set to 5 -> length of slope is 5
 				endGap=5;
 			// count maximum slope value and index of it
-			for(int gap = startGap;gap<endGap;gap++){
-				for(int i=gap+1;i<colorVector.getSize()-gap-1;i++){
+			for(int gap = startGap;gap<endGap;gap++){ // try different length of slopes
+				for(int i=gap+1;i<colorVector.getSize()-gap-1;i++){ //
 					int start_x=i-gap;
 					int end_x =i+gap;
 					double kValueSum= colorVector.getKvalueAt(start_x, end_x);
@@ -856,7 +869,8 @@ public class PreCounterThread implements Runnable{
 			// calculate maximum cell size if bigger than previous cell size
 		if(cell_size*this.cellSizeMaxScalingFactor > this.current_max_cell_size)
 			this.current_max_cell_size= (int)(cell_size*this.cellSizeMaxScalingFactor);
-
+		
+		// calculate minimum cell size if smaller than previous cell size
 		if(cell_size*this.cellSizeMinScalingFactor < this.current_min_cell_size)
 			this.current_min_cell_size = Math.max((int)(cell_size*this.cellSizeMinScalingFactor), this.global_min_cell_diameter);
 
@@ -865,7 +879,8 @@ public class PreCounterThread implements Runnable{
 		this.current_gap=2;
 		//initalize the current_max_coordinate_number_in_cell
 		this.current_max_coordinate_number_in_cell=countCoordinatesInCell(((double)this.current_max_cell_size)/2.0, this.current_gap);
-
+		
+		// eveluate gap value -> how many pixels are skipped
 		int gap_candidate=0;
 		doLoop:
 		do{
@@ -877,7 +892,7 @@ public class PreCounterThread implements Runnable{
 			gap_candidate++;
 			
 			int minCoordinatesInCell=countCoordinatesInCell(((double)this.current_min_cell_size)/2.0, gap_candidate);
-			if(minCoordinatesInCell >= this.global_min_coordinate_number_in_cell){
+			if(minCoordinatesInCell >= this.global_min_coordinate_number_in_cell){ // have enough coordinates inside cell of minimum size
 				this.current_gap=gap_candidate;
 				this.current_max_coordinate_number_in_cell=countCoordinatesInCell(((double)this.current_max_cell_size)/2.0, this.current_gap);
 
@@ -889,10 +904,15 @@ public class PreCounterThread implements Runnable{
 
 
 		}while(gap_candidate<20);
-
+		
+		
 
 		// collect colors from whole image by using minCellSize
 		collectInnerCellColorsFromSubImage(minCellSize);
+		
+		
+		//remove background colors from list
+		removeBackgroundColorsFromCurrentColorList(angleVectors, kNumber);
 
 		// sort list
 		Collections.sort(this.current_colorList);
@@ -993,18 +1013,24 @@ public class PreCounterThread implements Runnable{
  * @param groupPoints ArrayList of Points which are
  * @return ArrayList of Points that has been collected in recursion
  */
-private ArrayList<Point> getPoints(Stack<Point> stack, ArrayList<Point> groupPoints) throws Exception{
+private ArrayList<Point> getPoints(Stack<Point> stack, ArrayList<Point> groupPoints){
 
-	   if(stack.isEmpty())
-		   return groupPoints;
+	   try {
+		if(stack.isEmpty())
+			   return groupPoints;
+		//   LOGGER.fine("stack: "+stack.size());
+		   Point firstPoint = stack.pop();
+		   groupPoints.add(firstPoint);
 
-	   Point firstPoint = stack.pop();
-	   groupPoints.add(firstPoint);
-
-	   stack.addAll(getNeighbourPoints(firstPoint)); // adds Points to stack and removes from copy_of_current_finalCoordinates
-	   if(stack.size()> this.current_max_coordinate_number_in_cell*this.maxCellNumberInCellGroup)
-		   return null;
-	   return getPoints(stack, groupPoints);
+		   stack.addAll(getNeighbourPoints(firstPoint)); // adds Points to stack and removes from copy_of_current_finalCoordinates
+		   if(stack.size()> this.current_max_coordinate_number_in_cell*this.maxCellNumberInCellGroup) // if too much of coordinates in stack
+			   return null;
+		   return getPoints(stack, groupPoints);
+	} catch (Exception e) {
+		
+		e.printStackTrace();
+		return null;
+	}
    }
 
 
@@ -1443,6 +1469,80 @@ private ArrayList<Integer> getRelaxedColorsWideRange(int relaxation, int colorIn
 
 
    }
+   
+   private void removeBackgroundColorsFromCurrentColorList(ArrayList<ColorChannelVectors> angleVectors, int indexOfCellBoundary){
+	   try {
+		ArrayList<Integer> foundBGcolors=new ArrayList<Integer>();
+		ArrayList<Integer> singleAngelColors = new ArrayList<Integer>();
+		ArrayList<Integer> removeFoundBGcolors=new ArrayList<Integer>();
+		   
+		   if(this.current_colorList != null && this.current_colorList.size() > 0 && angleVectors != null && indexOfCellBoundary > 3 && angleVectors.size() > indexOfCellBoundary){
+			   // Go end indexes
+			   Iterator<ColorChannelVectors> cvIterator = angleVectors.iterator();
+			   while(cvIterator.hasNext()){
+				   ColorChannelVectors colorVector = cvIterator.next();
+				   singleAngelColors = new ArrayList<Integer>(); // create empty list for single angle
+				   if(colorVector != null){
+					   // go through colors of vector
+					   int startIndex = (indexOfCellBoundary+colorVector.getSize())/2;
+					   for(int i=startIndex;i<colorVector.getSize();i++){
+						   int colorInt = colorVector.getFullColorInt_original(i); // get color Integer from vector
+						   ArrayList<Integer> relaxedColors =  getRelaxedColors(this.pixel_color_relaxation, colorInt); // get relaxed colors
+						   if(relaxedColors != null && relaxedColors.size()>0){
+							   Iterator<Integer> rIterator =relaxedColors.iterator();
+							   while(rIterator.hasNext()){
+								   int rColor= rIterator.next();
+								   if(!singleAngelColors.contains(rColor)){ // not contain yet that relaxed color
+									   singleAngelColors.add(rColor); // add to single list
+									   
+								   }
+							   }
+							   
+						   }
+						  				   					   
+					   }
+				   foundBGcolors.addAll(singleAngelColors); // add all found colors to found list
+			   }
+			   }
+			   
+			   Collections.sort(foundBGcolors); // sort list
+			   
+			   // go through and collect only colors with 6 or more occurrences
+			   Iterator<Integer> cIterator = foundBGcolors.iterator();
+			   int presentColor=Integer.MIN_VALUE;
+			   int occurrences=0;
+			   while(cIterator.hasNext()){
+				   int colorInt=cIterator.next();
+				   if(colorInt == presentColor){ // match
+					   occurrences++;
+				   }
+				   else{ // moved to new color in list
+					   if(occurrences>5) // at least 6 vectors had previous color
+						   removeFoundBGcolors.add(presentColor);
+					   presentColor=colorInt; 
+					   occurrences=1;
+				   }
+				   
+			   }
+			   
+			   // remove colors if found from background
+			   Iterator<Integer> currentIterator= this.current_colorList.iterator();
+			   while(currentIterator.hasNext()){
+				   int currColor=currentIterator.next();
+				   if(removeFoundBGcolors.contains(currColor)){ // is found
+					   currentIterator.remove(); // remove
+				   }
+			   }
+		   
+		   }
+		   
+	} catch (Exception e) {
+		LOGGER.severe("Error in removing background colors!");
+		e.printStackTrace();
+	}
+	   
+	   
+   }
 
    /* 
     * Starts the calculation of precounting. Phases:
@@ -1452,101 +1552,101 @@ private ArrayList<Integer> getRelaxedColorsWideRange(int relaxation, int colorIn
     * @see java.lang.Runnable#run()
     */
    @Override
-public void run() {
-	try {
-		// get 8 angle data from midpoint to edge of subImage
-		if(continueCounting){
-			ArrayList<ColorChannelVectors> angleVectors = get8Angles();
-			if(angleVectors != null && angleVectors.size()>0){
-				// get the colors
-				LOGGER.fine("start calculating differentColors: "+angleVectors.size()+ "Colors: "+this.colorList.size());
-				getDifferentColors(angleVectors);
-
-				if(!continueCounting){
-					abortExecution("No Colors", "Couldn't determine colors of picked cell. try another cell.");
-					return;
-				}
-
-				if(this.current_colorList != null && this.current_colorList.size()>0){
-					LOGGER.fine("start calculating coordinates: colorlist: "+current_colorList.size()+ "using gap: " +this.current_gap+ "min:"+this.global_min_coordinate_number_in_cell+ " max: "+this.current_max_coordinate_number_in_cell);
-					// go through the image pixels of original image and give coordinata
-
-					calculateCoordinates();
+	public void run() {
+		try {
+			// get 8 angle data from midpoint to edge of subImage
+			if(continueCounting){
+				ArrayList<ColorChannelVectors> angleVectors = get8Angles();
+				if(angleVectors != null && angleVectors.size()>0){
+					// get the colors
+					LOGGER.fine("start calculating differentColors: "+angleVectors.size()+ "Colors: "+this.colorList.size());
+					getDifferentColors(angleVectors);
 	
 					if(!continueCounting){
-						abortExecution("No Coordinates", "Couldn't calculate pixel coordinates for cells. Try again.");
+						abortExecution("No Colors", "Couldn't determine colors of picked cell. try another cell.");
 						return;
 					}
-					if(this.current_finalCoordinates != null && this.current_finalCoordinates.size()>=this.global_min_coordinate_number_in_cell){ // number of Points should be more than 10
-						LOGGER.fine("start clustering: "+current_finalCoordinates.size());
-				
-						createPointGroups();
 	
-						LOGGER.fine("end of clustering");
+					if(this.current_colorList != null && this.current_colorList.size()>0){
+						LOGGER.fine("start calculating coordinates: colorlist: "+current_colorList.size()+ "using gap: " +this.current_gap+ "min:"+this.global_min_coordinate_number_in_cell+ " max: "+this.current_max_coordinate_number_in_cell);
+						// go through the image pixels of original image and give coordinata
+	
+						calculateCoordinates();
+		
 						if(!continueCounting){
-							abortExecution("No Cells", "No any cells found.");
+							abortExecution("No Coordinates", "Couldn't calculate pixel coordinates for cells. Try again.");
 							return;
 						}
-						if(this.current_finalCentroidCoordinates != null && this.current_finalCentroidCoordinates.size()>0){
-							this.finalCentroidCoordinates=this.current_finalCentroidCoordinates;
-
-							this.max_cell_size=this.current_max_cell_size;
-							this.min_cell_size=this.current_min_cell_size;
-							this.max_coordinate_number_in_cell=this.current_max_coordinate_number_in_cell;
-							this.taskManger.setSelectedMarkingLayerCoordinates(this.finalCentroidCoordinates);
-
-							this.taskManger.updateSelectedMarkingPanelAndImageLayerInfos();
-							// saved found colors
-							this.colorList.clear();
-							this.colorList.addAll(this.current_colorList);
-							cancelInside();
-							clean();
+						if(this.current_finalCoordinates != null && this.current_finalCoordinates.size()>=this.global_min_coordinate_number_in_cell){ // number of Points should be more than 10
+							LOGGER.fine("start clustering: "+current_finalCoordinates.size());
+					
+							createPointGroups();
+		
+							LOGGER.fine("end of clustering");
+							if(!continueCounting){
+								abortExecution("No Cells", "No any cells found.");
+								return;
+							}
+							if(this.current_finalCentroidCoordinates != null && this.current_finalCentroidCoordinates.size()>0){
+								this.finalCentroidCoordinates=this.current_finalCentroidCoordinates;
+	
+								this.max_cell_size=this.current_max_cell_size;
+								this.min_cell_size=this.current_min_cell_size;
+								this.max_coordinate_number_in_cell=this.current_max_coordinate_number_in_cell;
+								this.taskManger.setSelectedMarkingLayerCoordinates(this.finalCentroidCoordinates);
+	
+								this.taskManger.updateSelectedMarkingPanelAndImageLayerInfos();
+								// saved found colors
+								this.colorList.clear();
+								this.colorList.addAll(this.current_colorList);
+								cancelInside();
+								clean();
+							}
+							else{
+								cancelInside();
+								// inform user that couldn't locate cells
+	
+								abortExecution("No Cells", "No any cells found. Possibly cells are too small to count!");
+	
+	
+								return;
+							}
+	
 						}
 						else{
-							cancelInside();
-							// inform user that couldn't locate cells
-
-							abortExecution("No Cells", "No any cells found.");
-
-
+							// inform user that couldn't get colors
+							abortExecution("No Cells", "No any cells found. Possibly too small picked cell.");
 							return;
 						}
-
+	
 					}
 					else{
 						// inform user that couldn't get colors
-						abortExecution("No Cells", "No any cells found.");
+						abortExecution("No Colors", "Couldn't determine colors of picked cell. try another cell.");
 						return;
+	
 					}
-
 				}
 				else{
 					// inform user that couldn't get colors
 					abortExecution("No Colors", "Couldn't determine colors of picked cell. try another cell.");
+	
 					return;
-
 				}
+	
 			}
 			else{
-				// inform user that couldn't get colors
-				abortExecution("No Colors", "Couldn't determine colors of picked cell. try another cell.");
-
+				abortExecution("Counting not started", "Counting didn't start. Try again.");
+	
 				return;
 			}
-
+			LOGGER.fine("ended counter thread");
+		} catch (Exception e) {
+			cancelInside();
+			e.printStackTrace();
 		}
-		else{
-			abortExecution("Counting not started", "Counting didn't start. Try again.");
-
-			return;
-		}
-		LOGGER.fine("ended counter thread");
-	} catch (Exception e) {
-		cancelInside();
-		e.printStackTrace();
+	
 	}
-
-}
    
    /**
     * Sets the cancelled inside.

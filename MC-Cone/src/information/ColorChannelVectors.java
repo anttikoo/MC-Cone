@@ -16,7 +16,7 @@ public class ColorChannelVectors {
 	/** The blue_original. Original blue colors. */
 	private int[] blue_original;   
 	
-	/** The full color int_original. */
+	/** The full original color as Integer. */
 	private int[] fullColorInt_original;
 	
 	/** The alpha_ma. Vector of moved average of alphas. */

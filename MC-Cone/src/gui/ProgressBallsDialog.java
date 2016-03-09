@@ -1,7 +1,5 @@
 package gui;
 
-import information.ID;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -12,11 +10,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+import information.ID;
 import managers.PreCountThreadManager;
 
 
@@ -53,11 +55,23 @@ public class ProgressBallsDialog extends ShadyMessageDialog implements Runnable 
 	/** The Constant LOGGER. */
 	private final static Logger LOGGER = Logger.getLogger("MCCLogger");
 
+	protected JProgressBar progressBar;
+	
+	
+
+	/**
+	 * Instantiates a new progress balls dialog.
+	 *
+	 * @param frame the frame
+	 * @param title the title
+	 * @param message the message
+	 * @param id the id
+	 * @param comp the comp
+	 */
 	public ProgressBallsDialog(JFrame frame, String title, String message,int id, Component comp){
 		super(frame, title, message, id, comp);
 
 		try {
-			initBalls();
 			initButtonAction();
 			this.painterThread = new Thread(this, title+threadNumber++);
 			this.validate();
@@ -71,8 +85,7 @@ public class ProgressBallsDialog extends ShadyMessageDialog implements Runnable 
 	public ProgressBallsDialog(JDialog jdialog, String title, String message,int id, Component comp){
 		super(jdialog, title, message, id, comp);
 
-		try {
-			initBalls();
+		try {		
 			initButtonAction();
 			this.painterThread = new Thread(this, title+threadNumber++);
 			this.validate();
@@ -144,12 +157,35 @@ public class ProgressBallsDialog extends ShadyMessageDialog implements Runnable 
 			}	
 	}
 	
+	/* (non-Javadoc)
+	 * @see gui.ShadyMessageDialog#initMessagePanel()
+	 */
+	protected int initMessagePanel() throws Exception{
+		this.messagePanel = new JPanel();
+		this.messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.PAGE_AXIS));
+		this.messagePanel.setBackground(Color_schema.dark_30);
+		this.messagePanel.setPreferredSize(new Dimension(250, 40));
+		ballsPanel = new JPanel();
+		ballsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 0));
+		ballsPanel.setBorder(null);
+		ballsPanel.setBackground(this.messagePanel.getBackground());
+		for(int i =0;i<6;i++){
+			ballsPanel.add(new SingleBall());
+		}
+		this.messagePanel.add(Box.createRigidArea(new Dimension(0, 5)));
+		this.messagePanel.add(ballsPanel);
+		
+		return 250; // width of progress balls
+	}
+	
+	
 	/**
 	 * Initializes the components of window.
 	 */
 	private void initBalls(){
 		try {
-
+			
+			
 			ballsPanel = new JPanel();
 			ballsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 0));
 			ballsPanel.setBorder(null);

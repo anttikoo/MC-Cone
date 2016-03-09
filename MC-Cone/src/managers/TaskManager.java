@@ -1,6 +1,7 @@
 package managers;
 import gui.GUI;
 import gui.ProgressBallsDialog;
+import gui.ProgressBarAndBallsDialog;
 import gui.ShadyMessageDialog;
 import gui.grid.SingleGridSize;
 import information.GridProperties;
@@ -631,7 +632,7 @@ public class TaskManager {
 	 * @param pbd the ProgressBallsDialog
 	 * @throws Exception the exception
 	 */
-	public void precountCells(Point middlePoint, int size, ProgressBallsDialog pbd) throws Exception{
+	public void precountCells(Point middlePoint, int size, ProgressBarAndBallsDialog pbd) throws Exception{
 		BufferedImage subImage = getSubImage(middlePoint, size);
 		
 		if(subImage != null && this.informationCenter.getSelectedImageLayer() != null && this.informationCenter.getSelectedMarkingLayer() != null){

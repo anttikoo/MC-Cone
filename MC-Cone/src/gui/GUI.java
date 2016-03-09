@@ -224,7 +224,7 @@ public class GUI extends JFrame{
 	public GUI()
 {		super("gui");
 		//initialize LOGGING 
-		initLogging(Level.INFO);
+		initLogging(Level.FINE);
 		
 		// initialize fonts
 		Fonts.initFonts();
@@ -2993,7 +2993,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 		startStopCellPicking();
 
 		// creates the ProgressBallsDialog
-		ProgressBallsDialog pbd= new ProgressBallsDialog(this, "Counting Cells", "running part 1/2: finding pixels", ID.CANCEL, this);
+		ProgressBarAndBallsDialog pbd= new ProgressBarAndBallsDialog(this, "Counting Cells", "Running", ID.CANCEL, this);
 
 		pbd.showDialog();
 

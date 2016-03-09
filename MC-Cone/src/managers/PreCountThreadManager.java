@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import gui.ProgressBallsDialog;
+import gui.ProgressBarAndBallsDialog;
 import operators.PreCounterThread;
 
 /**
@@ -14,7 +15,7 @@ public class PreCountThreadManager {
 	private PreCounterThread preCounter;
 	
 	/** The progress balls dialog. */
-	private ProgressBallsDialog progressBallsDialog;
+	private ProgressBarAndBallsDialog progressBallsDialog;
 	
 	/** The ID of MarkingLayer. */
 	private int mLayerID=-1;
@@ -33,7 +34,7 @@ public class PreCountThreadManager {
 	 * @param iLayerID the ID of ImageLayer
 	 * @param mLayerID the ID of MarkingLayer
 	 */
-	public PreCountThreadManager(PreCounterThread preCounter, ProgressBallsDialog progressBalls , int iLayerID, int mLayerID){
+	public PreCountThreadManager(PreCounterThread preCounter, ProgressBarAndBallsDialog progressBalls , int iLayerID, int mLayerID){
 		try {
 			this.setiLayerID(iLayerID);
 			this.setmLayerID(mLayerID);
@@ -67,6 +68,12 @@ public class PreCountThreadManager {
 	public void startCounting() throws Exception{
 		LOGGER.fine(this.preCounter.getThreadStatus());
 		this.preCounter.startCounting();
+	}
+	
+	public void updateProgressBar(int value){
+		if(value <= 100 && value >0){
+			this.progressBallsDialog.updateProgressBarValue(value);
+		}
 	}
 
 	/**
@@ -123,7 +130,7 @@ public class PreCountThreadManager {
 	 * @param pbd the new ProgressBallsDialog
 	 * @throws Exception the exception
 	 */
-	public void setProgressBallDialog(ProgressBallsDialog pbd) throws Exception{
+	public void setProgressBallDialog(ProgressBarAndBallsDialog pbd) throws Exception{
 		this.progressBallsDialog=pbd;
 	}
 

@@ -294,32 +294,16 @@ public class ShadyMessageDialog extends JDialog{
 			JPanel titlePanel = new JPanel();
 			titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 			titlePanel.setBackground(Color_schema.dark_30);
-			titleLabel = new JLabel(this.title);
-			
+			titleLabel = new JLabel(this.title);		
 			titleLabel.setFont(Fonts.b20);
 			
 			int titleWidth = titleLabel.getFontMetrics(Fonts.b20).stringWidth(titleLabel.getText());
 			titleLabel.setForeground(Color_schema.white_230);
 			titlePanel.add(Box.createRigidArea(new Dimension(20,0)));
 			titlePanel.add(titleLabel);
-/*
-			messagePanel = new JPanel();
-			messagePanel.setLayout(new FlowLayout(FlowLayout.CENTER,10,10));
-			messagePanel.setBackground(Color_schema.dark_30);
-			JLabel messageLabel = new JLabel(this.message);
-			Font fontConsolas18 = new Font("Consolas", Font.PLAIN,18);
-			int maxwidth =messageLabel.getFontMetrics(Fonts.p18).stringWidth(messageLabel.getText());
-			int titleWidth = titleLabel.getFontMetrics(Fonts.p20).stringWidth(titleLabel.getText());
-			if(titleWidth > maxwidth)
-				maxwidth = titleWidth;
-			
-			messageLabel.setFont(fontConsolas18);
-			messageLabel.setForeground(Color_schema.white_230);
-			messagePanel.add(messageLabel);
-*/
+
 			int maxwidth = initMessagePanel();
-			
-			
+					
 			if(titleWidth > maxwidth)
 				maxwidth = titleWidth;
 			JScrollPane messageScrollPane = new JScrollPane(messagePanel);
@@ -429,7 +413,7 @@ public class ShadyMessageDialog extends JDialog{
 		
 		int maxwidth =messageLabel.getFontMetrics(Fonts.p18).stringWidth(messageLabel.getText())+20;
 		
-		
+		messagePanel.setPreferredSize(new Dimension(maxwidth,30));
 		messageLabel.setFont(Fonts.p18);
 		messageLabel.setForeground(Color_schema.white_230);
 		messageTextPanel.add(messageLabel);
