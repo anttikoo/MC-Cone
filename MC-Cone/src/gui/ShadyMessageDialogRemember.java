@@ -108,7 +108,7 @@ public class ShadyMessageDialogRemember extends ShadyMessageDialog {
 		int checkingPanelWidth = messageLabel.getFontMetrics(Fonts.p20).stringWidth(messageLabel.getText()) +20;
 		if(checkingPanelWidth > maxwidth)
 			maxwidth = checkingPanelWidth;
-		this.messagePanel.setPreferredSize(new Dimension(maxwidth, 50));
+		this.messagePanel.setPreferredSize(new Dimension(maxwidth, 60));
 		messageLabel.setFont(Fonts.p15);
 		messageLabel.setForeground(Color_schema.white_180);
 		rememberPanel.add(rememberCheckBox);

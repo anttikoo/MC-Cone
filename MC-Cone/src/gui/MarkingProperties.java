@@ -492,8 +492,8 @@ protected void initDialog(){
 protected void initMarkingPropertiesPanel() throws Exception{
 	
 	initDialog();
-	this.revalidate();
-	this.repaint();
+	//this.revalidate();
+	//this.repaint();
 }
 
 

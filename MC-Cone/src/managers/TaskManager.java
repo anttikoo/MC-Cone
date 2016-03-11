@@ -661,7 +661,7 @@ public class TaskManager {
 				if(originalImage != null){
 					try{
 					// create new PreCountThreadManager
-					PreCounterThread preCountThread =new PreCounterThread(subImage, originalImage, this);
+					PreCounterThread preCountThread =new PreCounterThread(subImage, originalImage, this,true); // uses multithreading
 					this.preCountThreadManager=new PreCountThreadManager(preCountThread,pbd, iLayerID, mLayerID);
 					// start the counting
 					this.preCountThreadManager.startCounting();
