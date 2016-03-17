@@ -34,6 +34,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.JXBusyLabel;
+import org.jdesktop.swingx.icon.EmptyIcon;
+import org.jdesktop.swingx.painter.BusyPainter;
+
 import information.*;
 
 /**
@@ -59,6 +63,8 @@ public class AddImageLayerDialog extends JDialog{
 	
 	/** The back panel. Contains dimming and the visible panel*/
 	private JPanel backPanel;
+	
+	private JXBusyLabel busyLabel;
 	
 	/** The cancel j button. */
 	private JButton cancelJButton;
@@ -354,15 +360,18 @@ public class AddImageLayerDialog extends JDialog{
 
 	}
 
+
 	/**
 	 *  When closing the window this method sets window invisible and adds newly created ImageLayers to list of ImageLayers.
 	 */
 	private void continueCreatingImageLayers(){
 		try {
 			this.setVisible(false);
-			gui.addImageLayerList(this.dialogImageLayerList);
+			this.gui.addImageLayerList(this.dialogImageLayerList);
 
 			this.dispose();
+
+
 		} catch (Exception e) {
 			LOGGER.severe("ERROR in hiding dialog and saving ImageLayers!");
 			e.printStackTrace();
@@ -383,7 +392,8 @@ public class AddImageLayerDialog extends JDialog{
 			e.printStackTrace();
 		}
 	}
-
+	
+	
 	/**
 	 * Creates ImageAndMarkingPanel from given ImageLayer and it's MarkingLayers.
 	 *
@@ -794,6 +804,8 @@ private JPanel initDownPanel(){
 		MouseListenerCreator.addMouseListenerToNormalButtons(createImageLayersJButton); // changes the colors of button when pressed
 
 
+		
+
 		createImageLayerJPanel.add(createImageLayersJButton, BorderLayout.CENTER);
 		JPanel cancelJpanel = new JPanel();
 		cancelJpanel.setLayout(new BorderLayout());
@@ -1158,6 +1170,8 @@ private JPanel initImageViewPanel(){
 	
 		
 	}
+	
+	
 	
 	/**
 	 * Opens message dialog with ok-button.

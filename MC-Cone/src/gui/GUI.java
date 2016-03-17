@@ -26,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -63,6 +64,9 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.jdesktop.swingx.JXBusyLabel;
+import org.jdesktop.swingx.icon.EmptyIcon;
+import org.jdesktop.swingx.painter.BusyPainter;
 import net.iharder.dnd.FileDrop;
 import operators.CheckBoxIcon;
 import java.io.File;
@@ -213,7 +217,6 @@ public class GUI extends JFrame{
 	
 	/** The zoom out button. */
 	private JButton zoomOutButton;
-
 	
 
 	/**
@@ -621,25 +624,26 @@ public class GUI extends JFrame{
 	}
 	
 	
-	
+		
 	/**
 	 * Adds imported ImageLayers to InformationCenter. Updates the selected layers and GUI
 	 *
 	 * @param iLayerList Array of one or more ImageLayers.
 	 * @throws Exception the exception
 	 */
-	public void addImageLayerList(ArrayList<ImageLayer> iLayerList) throws Exception{
+	public void addImageLayerList(final ArrayList<ImageLayer> iLayerList) throws Exception{
 			
-	
-		// set the ImageLayers through TaskManager -> InformationCenter.imageLayerList	(finalizes the layers -> gives ids)			
-		this.taskManager.addImageLayers(iLayerList);
+				// set the ImageLayers through TaskManager -> InformationCenter.imageLayerList	(finalizes the layers -> gives ids)			
+
+				this.taskManager.addImageLayers(iLayerList);
+								
+				//updates the selected Layers and Refreshes GUI
+				refreshLayersAndGUI();
+							
+
+				// refresh precouting components
+				cleanPreCountingIfNecessary();	
 		
-		//updates the selected Layers and Refreshes GUI
-		refreshLayersAndGUI();
-	
-		// refresh precouting components
-		cleanPreCountingIfNecessary();		
-	
 	}
 	
 
@@ -656,6 +660,7 @@ public class GUI extends JFrame{
 			return taskManager.addSingleMarking(p);
 		return false;
 	}
+	
 
 	/**
 	 * Changes the selected ImageLayer one up or down in ImageLayerlist.
@@ -682,7 +687,7 @@ public class GUI extends JFrame{
 	/**
 	 *  Refreshes the PrecountingManager Thread to initial state if necessary.
 	 */
-	private void cleanPreCountingIfNecessary(){
+	public void cleanPreCountingIfNecessary(){
 		try {
 			// clean precoutingManager
 			if(this.taskManager.getImageLayerList() == null || this.taskManager.getImageLayerList().size()==0 ||
@@ -1568,6 +1573,7 @@ public class GUI extends JFrame{
 			zoomscrollProcent.setFont(new Font("Consolas", Font.BOLD,16));
 			downBarPanel.add(Box.createHorizontalGlue());
 			
+
 			JLabel precountJLabel=new JLabel("PRECOUNTING:");
 			precountJLabel.setFont(Fonts.b16);
 			downBarPanel.add(precountJLabel);
@@ -1855,21 +1861,22 @@ public class GUI extends JFrame{
 	public void openAddImageLayerDialog(File[] fileList){
 		try {
 			if(fileList != null){
-			
+		
 				// open dialog for selecting files	
 				@SuppressWarnings("unused")
-				AddImageLayerDialog addImage = new AddImageLayerDialog(this, getGUI(), fileList);
-				
-				addImage=null;
+				AddImageLayerDialog addImage = new AddImageLayerDialog(this, getGUI(), fileList);							
+				addImage=null;				
 			}
 			else{
 			//	JFrame dialogFrame = new JFrame("DialogFrame");
-				
+			
 				AddImageLayerDialog addImageDialog = new AddImageLayerDialog(this, this);
 				this.guiComponentListener.setChildDialog(addImageDialog);
 				addImageDialog.showDialog();
+				
 				addImageDialog=null;
 				this.guiComponentListener.setChildDialog(null);
+				
 			}
 
 		} catch (Exception e) {

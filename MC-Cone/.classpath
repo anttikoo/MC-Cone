@@ -7,5 +7,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jai_codec.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jai_core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javaGeom-0.11.1.jar"/>
+	<classpathentry kind="lib" path="/home/antti/git/MC-Cone/MC-Cone/lib/swingx-2008_01_27.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

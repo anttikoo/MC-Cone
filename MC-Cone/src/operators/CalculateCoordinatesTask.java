@@ -63,6 +63,7 @@ public class CalculateCoordinatesTask implements Runnable{
 	/** The progressed coordinates. */
 	private int progressedCoordinates=0;
 	
+	/** The should force gap bigger. */
 	private boolean shouldForceGAPbigger=false;
 	
 	/** The skipped weight points. */
@@ -290,88 +291,8 @@ public class CalculateCoordinatesTask implements Runnable{
 					}
 					else{// possible cluster of cells -> try to separate them
 					//	separateClusteredCellsMethodA(maxDistanceValues, weightPointList);
-						separateClusteredCellsMethodB(weightPointList);
-	/*	
-						WeightPoint w = getWeightPointWithBiggestDistance(maxDistanceValues);
-						if(w==null)
-							w = weightPointList.get(weightPointList.size()-1); // get last point of list
-
-						WeightPoint b =null;
-						if(w != null){
-							// find nearest point with biggest weight
-							int counter=0;
-							do{
-								counter++;
-								if(b != null)
-									w=b;
-								b = getWeightPointWithBiggestWeightAtDistance(w, weightPointList, Math.max(this.current_gap*2,this.current_min_cell_size/2)); // finds the biggest weight point at distance
-							}while((w.x != b.x || w.y != b.y) && counter<100);
-
-							if(w.x == b.x && w.y == b.y){ // w has the biggest weight -> near at center of cell
-								int radius=this.current_min_cell_size/2;
-								Point p = calculateCentroid(getPointsInside(w.getPoint(), radius, weightPointList));
-								if(p == null)
-									p=w.getPoint();
-
-
-								ArrayList<WeightPoint> selectedPointsForCell=new ArrayList<WeightPoint>();
-								ArrayList<WeightPoint> candidatePointList=getPointsInside(p, radius, weightPointList); // get points at distance of radius
-								if(candidatePointList != null)
-									if(candidatePointList != null && candidatePointList.size()>= 1 &&
-									candidatePointList.size() <=this.current_max_coordinate_number_in_cell){
-
-										if(candidatePointList.size() >= SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL && isCircular(p, candidatePointList)){ //
-											selectedPointsForCell.addAll(candidatePointList);
-										}
-										double averagePointsPerArea = ((double)candidatePointList.size())/(Math.PI*(double)radius*(double)radius);
-										double pointsPerArea=averagePointsPerArea;
-										int pointsBefore= candidatePointList.size();
-
-										// search the correct cell size from min size to max size
-										candidateLoop:
-											while(pointsPerArea*1.5 > averagePointsPerArea && radius <=this.current_max_cell_size/2){
-												radius+=this.current_gap; // grow radius with gap value
-												if(candidatePointList != null && candidatePointList.size()>=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL)
-													p=calculateCentroid(candidatePointList);
-												candidatePointList=getPointsInside(p, radius, weightPointList);
-												if(candidatePointList==null){
-													break;
-												}
-												else{  // calculate how many points are at area grown in last loop.
-													pointsPerArea=calculateOuterRadiusArea(candidatePointList.size()-pointsBefore, radius, radius-this.current_gap);
-													if(pointsPerArea*5 > averagePointsPerArea){ // not reached to cell boundary yet because lot of cells
-														averagePointsPerArea=((double)candidatePointList.size())/(Math.PI*(double)radius*(double)radius);
-														pointsBefore=candidatePointList.size();
-
-														if(candidatePointList.size() >=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL &&
-																candidatePointList.size() <= this.current_max_coordinate_number_in_cell && isCircular(p, candidatePointList)){ // is points in circle
-															selectedPointsForCell.clear();
-															selectedPointsForCell.addAll(candidatePointList);
-
-														}
-													}
-													else{
-														break candidateLoop;
-													}
-												}
-											}
-										// create midpoint from selectedPoints
-										if(selectedPointsForCell != null && selectedPointsForCell.size()>0 && 
-												selectedPointsForCell.size()>=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL &&
-												selectedPointsForCell.size()<=current_max_coordinate_number_in_cell && isDistanceBiggerThanMinimum(selectedPointsForCell, this.current_min_cell_size)){
-											// calculate the centroid of cells -> the final point to be saved.
-											midPoint = new CentroidFromNpoints(calculateCentroid(selectedPointsForCell),selectedPointsForCell.size());
-											// check is the midpoint too close to points at currentCentroidCoordinates
-											if(!compareIsTooClose(midPoint,this.currentCentroidCoordinates, this.current_max_cell_size))
-												this.currentCentroidCoordinates.add(midPoint);
-										}
-										weightPointList.removeAll(candidatePointList); // remove selected points
-										Collections.sort(weightPointList, new WeightPointComparator());
-
-									}
-							} // not
-						}
-		*/			}
+						separateClusteredCellsMethodB(weightPointList); // use B method
+				}
 					rounds++;			
 				}
 		}else{
