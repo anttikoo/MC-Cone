@@ -505,6 +505,20 @@ public class GUI extends JFrame{
 					}
 				});
 				break;
+				
+				
+			case ID.MENU_ITEM_USE_STRICT_PRECOUNTING:
+				item.addChangeListener(new ChangeListener() {
+					
+					@Override
+					public void stateChanged(ChangeEvent e) {
+						SharedVariables.setUseStrickSearch(((JCheckBoxMenuItem)e.getSource()).isSelected());
+						
+					}
+				});
+				break;
+				
+		
 			case ID.MENU_ITEM_GRID_PROPERTIES:
 				item.addActionListener(new ActionListener() {
 
@@ -1422,19 +1436,19 @@ public class GUI extends JFrame{
 			JCheckBoxMenuItem useStrictPrecounting = new JCheckBoxMenuItem("Use Strict Precounting");
 			
 			useStrictPrecounting.setSelected(false);
-			useStrictPrecounting.addChangeListener(new ChangeListener() {
-				
-				@Override
-				public void stateChanged(ChangeEvent e) {
-					SharedVariables.setUseStrickSearch(((JCheckBoxMenuItem)e.getSource()).isSelected());
-					
-				}
-			});
+			addActionsToMenuItems(useStrictPrecounting, ID.MENU_ITEM_USE_STRICT_PRECOUNTING);
+		/*
+			JCheckBoxMenuItem useDeeperPrecounting = new JCheckBoxMenuItem("Use Deeper Precounting");
+			
+			useDeeperPrecounting.setSelected(false);
+			addActionsToMenuItems(useDeeperPrecounting, ID.MENU_ITEM_USE_DEEPER_PRECOUNTING);
+			*/
 			
 			menu_edit.add(menu_edit_set_marking_properties);
 			menu_edit.add(menu_edit_clear_single_countings);
 			menu_edit.add(menu_edit_clear_all_countings);
 			menu_edit.add(useStrictPrecounting);
+		//	menu_edit.add(useDeeperPrecounting);
 			
 			menu_show = new JMenu("Show");
 			menu_show.setMnemonic(KeyEvent.VK_S);
@@ -2606,6 +2620,9 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 					SharedVariables.setOS(ID.OS_LINUX_UNIX);
 				}
 			}
+			
+			int processors = Runtime.getRuntime().availableProcessors();
+			
 		} catch (Exception e) {
 			LOGGER.severe("Error in setting OS specific settings!");
 			e.printStackTrace();

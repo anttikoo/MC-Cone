@@ -5,12 +5,17 @@ import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Stack;
 import java.util.logging.Logger;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
+import information.CentroidFromNpoints;
 import information.SharedVariables;
 import math.geom2d.Point2D;
 
-// TODO: Auto-generated Javadoc
+
 /**
  * The Class CalculateCoordinatesTask.
  */
@@ -38,10 +43,13 @@ public class CalculateCoordinatesTask implements Runnable{
 	private int current_min_cell_size;  
 
 	/** The current centroid coordinates. Results of this run of Thread.  */
-	private ArrayList<Point> currentCentroidCoordinates; 
+//	private ArrayList<Point> currentCentroidCoordinates; 
+	
+	private ArrayList<CentroidFromNpoints> currentCentroidCoordinates;
 
 	/** The max cell number in cell group. Prevents that stack of coordinates will not be too big. */
 	private int max_cell_number_in_cell_group=10;
+
 
 	/** The global_min_coordinate_number_in_cell. This is global minimum for coordinate number. */
 	//private final int global_min_coordinate_number_in_cell =SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL;
@@ -55,11 +63,9 @@ public class CalculateCoordinatesTask implements Runnable{
 	/** The progressed coordinates. */
 	private int progressedCoordinates=0;
 	
-	/** The stop counting. */
-	private boolean stopCounting=false;
+	private boolean shouldForceGAPbigger=false;
 	
-	private int threadNumber =0;
-	
+	/** The skipped weight points. */
 	private int skippedWeightPoints=0;
 
 	/**
@@ -84,7 +90,6 @@ public class CalculateCoordinatesTask implements Runnable{
 		this.current_min_cell_size=currentMinCellSize;
 		this.max_cell_number_in_cell_group= maxCellNumberInCellGroup;
 		this.min_distance_between_cells_boundaries=minDinstanceBetweenCellBoundaries;
-		this.threadNumber=threadNumber;
 		
 
 	}
@@ -148,20 +153,69 @@ public class CalculateCoordinatesTask implements Runnable{
 	 * Compares is point too close to any point at pool of current coordinates.
 	 *
 	 * @param midPoint the mid point
-	 * @param pointListToCheck the point list to check
+	 * @param currentCentroidCoordinates the current centroid coordinates
+	 * @param minDistance the minimum distance to points
 	 * @return true, if successful
+	 * @throws Exception the exception
 	 */
-	private boolean compareIsTooClose(Point midPoint, ArrayList<Point> pointListToCheck){
-		Iterator<Point> coordIterator = pointListToCheck.iterator();
+	private boolean compareIsTooClose(Point midPoint, ArrayList<CentroidFromNpoints> currentCentroidCoordinates, int minDistance) throws Exception{
+		Iterator<CentroidFromNpoints> coordIterator = currentCentroidCoordinates.iterator();
 		while(coordIterator.hasNext()){
 			Point p = coordIterator.next();
-			if(midPoint.x > p.x-this.current_max_cell_size && midPoint.x < p.x+this.current_max_cell_size)
-				if(midPoint.y > p.y-this.current_max_cell_size && midPoint.y < p.y+this.current_max_cell_size)
+			if(isPointsTooClose(midPoint, p, minDistance))	// is too close			
 					return true;					
 		}
 		return false;
 
 	}
+	
+	/**
+	 * Checks if is given points closer to each other than given distance.
+	 *
+	 * @param p1 the point 1
+	 * @param p2 the point 2
+	 * @param minDistance the minimum distance to points
+	 * @return true, if is points too close
+	 * @throws Exception the exception
+	 */
+	private boolean isPointsTooClose(Point p1, Point p2, int minDistance) throws Exception{
+		if(p1 != null && p2 != null){
+			if(p1.x > p2.x-minDistance && p1.x < p2.x+minDistance)
+				if(p1.y > p2.y-minDistance && p1.y < p2.y+minDistance)
+					return true;	
+		}
+		return false;
+
+	}
+	
+	
+	/**
+	 * Compares is point too close to any point at pool of current coordinates. If is too close, checks which point has composed of bigger group of points.
+	 *
+	 * @param point the CentroidFromNpoints
+	 * @param minDistance the minimum distance to points
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean compareIsTooCloseOrMinor(CentroidFromNpoints point, int minDistance) throws Exception{
+		Iterator<CentroidFromNpoints> centroidIterator = this.currentCentroidCoordinates.iterator();
+		while(centroidIterator.hasNext()){
+			CentroidFromNpoints cPoint = centroidIterator.next();
+			if(compareIsTooClose(cPoint, this.currentCentroidCoordinates, minDistance)){ // too close
+				// check which one has more points
+				if(isPointsTooClose(point, cPoint, minDistance)){
+					if(point.getNumberOfCoordinates() < cPoint.getNumberOfCoordinates()){
+						return true;
+					}
+					
+				}
+			}
+			
+		}
+		return false;	
+	}
+	
+
 
 	/**
 	 * Creates groups from current coordinates by using distances between them. Basically coordinates close to each other are in same cell.
@@ -171,7 +225,7 @@ public class CalculateCoordinatesTask implements Runnable{
 		try {
 
 			Collections.sort(this.current_coordinates, new CoordinateComparator());
-			currentCentroidCoordinates = new ArrayList<Point>();
+			currentCentroidCoordinates = new ArrayList<CentroidFromNpoints>();
 			int sizeOfWholeList= this.current_coordinates.size();
 			
 			while(this.continueCounting && current_coordinates.size()>0 ){ // Points are removed from list in method getNeighbourPoints
@@ -186,11 +240,10 @@ public class CalculateCoordinatesTask implements Runnable{
 
 				if(groupPoints != null && groupPoints.size() >= SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL){//&& groupPoints.size() < this.current_max_coordinate_number_in_cell){
 					createWeightedPointGroup(groupPoints);
+					setProgressedCoordinates(sizeOfWholeList-this.current_coordinates.size()); // show progress to user
 				}
 				
-				setProgressedCoordinates(sizeOfWholeList-this.current_coordinates.size());
-				
-			//	System.out.println("Progress: " +threadNumber+ ": "+this.progressedCoordinates);
+
 
 
 			}
@@ -220,20 +273,25 @@ public class CalculateCoordinatesTask implements Runnable{
 			// go trough weight points
 			outerLoop:
 				while(weightPointList.size()>= SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL && rounds<=10){
-					// calculate center of points
-					Point midPoint =calculateCentroid(weightPointList);
+					// calculate center of points by using weights
+					CentroidFromNpoints midPoint = new CentroidFromNpoints(calculateCentroid(weightPointList), weightPointList.size());
 					// count circular data
 					MaxDistancePoint[] maxDistanceValues=getMaxDistanceRoundValues(midPoint, this.current_max_cell_size, weightPointList);
 					// if amount of points is not exceeding maximum amount of point in cell and if user has selected strict precounting then check is cell circular
 					if(weightPointList.size()<= this.current_max_coordinate_number_in_cell && (!SharedVariables.useStrickSearch || SharedVariables.useStrickSearch && isCircular(maxDistanceValues))){
-						if(!compareIsTooClose(midPoint, this.currentCentroidCoordinates)){
-							// one cell
-							this.currentCentroidCoordinates.add(midPoint);
+						if(!compareIsTooClose(midPoint, this.currentCentroidCoordinates, this.current_max_cell_size)){
+							// check is cell bigger than minimum size of cells
+							if(isDistanceBiggerThanMinimum(weightPointList, this.current_min_cell_size)){						
+								// add one cell
+								this.currentCentroidCoordinates.add(midPoint);
+							}
 						}
 						break outerLoop;
 					}
 					else{// possible cluster of cells -> try to separate them
-
+						separateClusteredCellsMethodA(maxDistanceValues, weightPointList);
+					//	separateClusteredCellsMethodB(weightPointList);
+	/*	
 						WeightPoint w = getWeightPointWithBiggestDistance(maxDistanceValues);
 						if(w==null)
 							w = weightPointList.get(weightPointList.size()-1); // get last point of list
@@ -246,7 +304,7 @@ public class CalculateCoordinatesTask implements Runnable{
 								counter++;
 								if(b != null)
 									w=b;
-								b = getWeightPointWithBiggestWeightAtDistance(w, weightPointList, this.current_min_cell_size/2); // finds the biggest weight point at distance
+								b = getWeightPointWithBiggestWeightAtDistance(w, weightPointList, Math.max(this.current_gap*2,this.current_min_cell_size/2)); // finds the biggest weight point at distance
 							}while((w.x != b.x || w.y != b.y) && counter<100);
 
 							if(w.x == b.x && w.y == b.y){ // w has the biggest weight -> near at center of cell
@@ -300,10 +358,11 @@ public class CalculateCoordinatesTask implements Runnable{
 										// create midpoint from selectedPoints
 										if(selectedPointsForCell != null && selectedPointsForCell.size()>0 && 
 												selectedPointsForCell.size()>=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL &&
-												selectedPointsForCell.size()<=current_max_coordinate_number_in_cell){
+												selectedPointsForCell.size()<=current_max_coordinate_number_in_cell && isDistanceBiggerThanMinimum(selectedPointsForCell, this.current_min_cell_size)){
 											// calculate the centroid of cells -> the final point to be saved.
-											midPoint = calculateCentroid(selectedPointsForCell);
-											if(!compareIsTooClose(midPoint,this.currentCentroidCoordinates))
+											midPoint = new CentroidFromNpoints(calculateCentroid(selectedPointsForCell),selectedPointsForCell.size());
+											// check is the midpoint too close to points at currentCentroidCoordinates
+											if(!compareIsTooClose(midPoint,this.currentCentroidCoordinates, this.current_max_cell_size))
 												this.currentCentroidCoordinates.add(midPoint);
 										}
 										weightPointList.removeAll(candidatePointList); // remove selected points
@@ -312,13 +371,236 @@ public class CalculateCoordinatesTask implements Runnable{
 									}
 							} // not
 						}
-					}
+		*/			}
 					rounds++;			
 				}
 		}else{
 		//	LOGGER.fine("WeightPoint list too small");
 			skippedWeightPoints+= weightPointList.size();
 		}
+	}
+	
+	private void separateClusteredCellsMethodB(ArrayList<WeightPoint> weightPointList) throws Exception{
+		if(weightPointList != null && weightPointList.size()>0){
+			// get randomly a point from list and find the local maximum of distance -> do it 100 rounds
+			ArrayList<WeightPoint> foundLocalMaximumList = new ArrayList<WeightPoint>();
+			
+			// iterate 100 runs to get
+			for(int i=0; i<100;i++){
+				
+				// get random WeightPoint
+				 Random generator = new Random();
+				 int index = generator.nextInt(weightPointList.size());
+				 WeightPoint wp = weightPointList.get(index);
+				 WeightPoint foundWP=null;
+				 int counter=0;
+				 // start iteration to find WeightPoint with local maximum weight
+				 do{
+					 counter++;
+					 foundWP = getWeightPointWithBiggestWeightAtDistance(wp, weightPointList, Math.max(this.current_gap*2,this.current_max_cell_size/2+this.min_distance_between_cells_boundaries));
+					 if(foundWP.x == wp.x && foundWP.y == wp.y){ // reached to WeightPoint with biggest Weight
+						 if(foundLocalMaximumList != null && foundLocalMaximumList.size()>0){
+							 Iterator<WeightPoint> foundIterator= foundLocalMaximumList.iterator();
+							 while(foundIterator.hasNext()){
+								 WeightPoint possiblyMatch=foundIterator.next();
+								 if(possiblyMatch.x == foundWP.x && possiblyMatch.y == foundWP.y){
+									 possiblyMatch.increaseWeight(foundWP.getWeight());
+									 break;
+								 }
+									 
+							 }			 
+						 }
+						 else{ // add to empty list
+							 foundLocalMaximumList.add(foundWP); // found local maximum -> add to list
+							 break; 
+						 }
+						 
+						 
+					 }
+					 // continue do loop to find local maximum
+					 wp=foundWP;
+		 
+				 }while(counter<100);			
+			}
+			
+			
+			// calculate average of weight
+			Iterator<WeightPoint> wIterator = weightPointList.iterator();
+					
+			double weightSum=0;
+			while(wIterator.hasNext()){
+				weightSum += wIterator.next().getWeight();			
+			}
+			double average = weightSum/weightPointList.size();
+			
+			
+			if(foundLocalMaximumList != null && foundLocalMaximumList.size()>0){
+				// sort decsending
+				Collections.sort(foundLocalMaximumList, new WeightPointComparator(true)); // descending ordering
+				
+				double weightTreshold = average + (foundLocalMaximumList.get(0).getWeight()-average)/9*10;
+					
+				while(foundLocalMaximumList.size() > 0){
+					// get first point and remove all point at distance current_min_cell_size/2
+					
+					WeightPoint majorPoint = foundLocalMaximumList.get(0);
+					ArrayList<WeightPoint> pointsInside = getPointsInside(majorPoint, this.current_min_cell_size/2, weightPointList);
+					if(majorPoint.getWeight() > weightTreshold){
+						// check that enough points over majorPoint
+						
+						if(pointsInside != null && pointsInside.size()>0 && 
+								pointsInside.size()>=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL &&
+										pointsInside.size()<=current_max_coordinate_number_in_cell){
+							
+							CentroidFromNpoints midPoint = new CentroidFromNpoints(majorPoint,pointsInside.size());
+							// check is the midpoint too close to points at currentCentroidCoordinates
+							if(!compareIsTooClose(midPoint,this.currentCentroidCoordinates, this.current_max_cell_size))
+								this.currentCentroidCoordinates.add(midPoint);
+							
+							
+						}
+						
+					}
+					//	foundMajorLocalMaximumList.add(majorPoint);
+					// remove from list
+					weightPointList.removeAll(pointsInside);
+					Collections.sort(weightPointList, new WeightPointComparator());
+					
+					foundLocalMaximumList.remove(majorPoint);
+								
+					ArrayList<WeightPoint> minorPoints=getPointsInside(majorPoint, this.current_min_cell_size/2, foundLocalMaximumList);
+					
+					if(minorPoints != null && minorPoints.size()>0)
+						foundLocalMaximumList.removeAll(minorPoints);
+						
+				}				
+			}				
+		}	
+	}
+	
+	/**
+	 * Separate clustered cells method a.
+	 *
+	 * @param maxDistanceValues the max distance values
+	 * @param weightPointList the weight point list
+	 * @throws Exception the exception
+	 */
+	private void separateClusteredCellsMethodA(MaxDistancePoint[] maxDistanceValues, ArrayList<WeightPoint> weightPointList) throws Exception{
+		
+		WeightPoint w = getWeightPointWithBiggestDistance(maxDistanceValues); // get point that has longest distance from center
+		if(w==null)
+			w = weightPointList.get(weightPointList.size()-1); // get last point of list
+
+		WeightPoint b =null;
+		if(w != null){
+			// find nearest point with biggest weight
+			int counter=0;
+			do{ // find point that has biggest weight
+				counter++;
+				if(b != null)
+					w=b;
+				b = getWeightPointWithBiggestWeightAtDistance(w, weightPointList, Math.max(this.current_gap*2,this.current_min_cell_size/2)); // finds the biggest weight point at distance
+			}while((w.x != b.x || w.y != b.y) && counter<100); // if going to same coordinate -> found biggest weight
+
+			if(w.x == b.x && w.y == b.y){ // w has the biggest weight -> near at center of cell
+				int radius=this.current_min_cell_size/2;
+				Point p = calculateCentroid(getPointsInside(w.getPoint(), radius, weightPointList));
+				if(p == null)
+					p=w.getPoint();
+
+
+				ArrayList<WeightPoint> selectedPointsForCell=new ArrayList<WeightPoint>();
+				ArrayList<WeightPoint> candidatePointList=getPointsInside(p, radius, weightPointList); // get points at distance of radius
+				if(candidatePointList != null)
+					if(candidatePointList != null && candidatePointList.size()>= 1 &&
+					candidatePointList.size() <=this.current_max_coordinate_number_in_cell){
+
+						if(candidatePointList.size() >= SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL && isCircular(p, candidatePointList)){ //
+							selectedPointsForCell.addAll(candidatePointList);
+						}
+						double averagePointsPerArea = ((double)candidatePointList.size())/(Math.PI*(double)radius*(double)radius);
+						double pointsPerArea=averagePointsPerArea;
+						int pointsBefore= candidatePointList.size();
+
+						// search the correct cell size from min size to max size
+						candidateLoop:
+							while(pointsPerArea*1.5 > averagePointsPerArea && radius <=this.current_max_cell_size/2){
+								radius+=this.current_gap; // grow radius with gap value
+								if(candidatePointList != null && candidatePointList.size()>=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL)
+									p=calculateCentroid(candidatePointList);
+								candidatePointList=getPointsInside(p, radius, weightPointList);
+								if(candidatePointList==null){
+									break;
+								}
+								else{  // calculate how many points are at area grown in last loop.
+									pointsPerArea=calculateOuterRadiusArea(candidatePointList.size()-pointsBefore, radius, radius-this.current_gap);
+									if(pointsPerArea*5 > averagePointsPerArea){ // not reached to cell boundary yet because lot of cells
+										averagePointsPerArea=((double)candidatePointList.size())/(Math.PI*(double)radius*(double)radius);
+										pointsBefore=candidatePointList.size();
+
+										if(candidatePointList.size() >=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL &&
+												candidatePointList.size() <= this.current_max_coordinate_number_in_cell && isCircular(p, candidatePointList)){ // is points in circle
+											selectedPointsForCell.clear();
+											selectedPointsForCell.addAll(candidatePointList);
+
+										}
+									}
+									else{
+										break candidateLoop;
+									}
+								}
+							}
+						// create midpoint from selectedPoints
+						if(selectedPointsForCell != null && selectedPointsForCell.size()>0 && 
+								selectedPointsForCell.size()>=SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL &&
+								selectedPointsForCell.size()<=current_max_coordinate_number_in_cell && isDistanceBiggerThanMinimum(selectedPointsForCell, this.current_min_cell_size)){
+							// calculate the centroid of cells -> the final point to be saved.
+							CentroidFromNpoints midPoint = new CentroidFromNpoints(calculateCentroid(selectedPointsForCell),selectedPointsForCell.size());
+							// check is the midpoint too close to points at currentCentroidCoordinates
+							if(!compareIsTooClose(midPoint,this.currentCentroidCoordinates, this.current_max_cell_size))
+								this.currentCentroidCoordinates.add(midPoint);
+						}
+						weightPointList.removeAll(candidatePointList); // remove selected points
+						Collections.sort(weightPointList, new WeightPointComparator());
+
+					}
+			} // not
+		}
+	}
+	
+	/**
+	 * Checks if is distance bigger than minimum.
+	 *
+	 * @param weightPoints the weight points
+	 * @param minimumSize the minimum size
+	 * @return true, if is distance bigger than minimum
+	 * @throws Exception the exception
+	 */
+	private boolean isDistanceBiggerThanMinimum(ArrayList<WeightPoint> weightPoints, int minimumSize) throws Exception{
+		int maxDistance =0;
+		if(weightPoints != null && weightPoints.size() > 0){
+			for(int i=0;i<weightPoints.size();i++){
+				WeightPoint wp1 = weightPoints.get(i);
+				for(int j=0;j<weightPoints.size();j++){
+					WeightPoint wp2 = weightPoints.get(j);
+					if(i!=j){
+						double distance = wp1.distance(wp2);
+						if(distance>maxDistance)
+							maxDistance = (int)distance; // collect max distance
+					}
+					
+				}
+				
+			}
+			
+			if(maxDistance >= minimumSize)
+				return true;
+			
+			
+		}
+		return false;
+		
+		
 	}
 
 	/**
@@ -366,7 +648,7 @@ public class CalculateCoordinatesTask implements Runnable{
 	 *
 	 * @return the centroid coordinates
 	 */
-	public ArrayList<Point> getCentroidCoordinates(){
+	public ArrayList<CentroidFromNpoints> getCentroidCoordinates(){
 		return this.currentCentroidCoordinates;
 		
 	}
@@ -415,6 +697,7 @@ public class CalculateCoordinatesTask implements Runnable{
 		int lowerBoundValue=Math.max(p.x-maxDistance,0); // minimum bounds for binary search
 		int upperBoundValue=p.x+maxDistance;				// maximum bounds for binary search
 		int[] startEndIndexes=startEndBinarySearch(this.current_coordinates, lowerBoundValue, upperBoundValue);
+
 		if(startEndIndexes != null && startEndIndexes[0] >= 0
 				&& startEndIndexes[1] <= this.current_coordinates.size()-1 && startEndIndexes[0] < startEndIndexes[1])
 
@@ -448,7 +731,17 @@ public class CalculateCoordinatesTask implements Runnable{
 			Point firstPoint = stack.pop();
 			groupPoints.add(firstPoint);
 
-			ArrayList<Point> neighbourPoints= getNeighbourPoints(firstPoint);
+			ArrayList<Point> neighbourPoints = null;
+			try {
+				neighbourPoints = getNeighbourPoints(firstPoint);
+			} catch (StackOverflowError st) {
+				LOGGER.severe("Error in precounting: too big stacks");
+				continueCounting=false;
+				setShouldForceGAPbigger(true);
+			//	st.printStackTrace();
+				return null;
+			}
+			
 			if(neighbourPoints == null)
 				return null; // could this be return groupPoints;
 			stack.addAll(neighbourPoints); // adds Points to stack and removes from copy_of_current_finalCoordinates
@@ -458,8 +751,9 @@ public class CalculateCoordinatesTask implements Runnable{
 			return getPoints(stack, groupPoints);
 			
 		} catch (Exception e) {
+			continueCounting=false;
 			LOGGER.severe("Error in grouping points!");
-			e.printStackTrace();
+		//	e.printStackTrace();
 			return null;
 		}
 	}
@@ -943,5 +1237,23 @@ public class CalculateCoordinatesTask implements Runnable{
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	/**
+	 * Checks if is should force ga pbigger.
+	 *
+	 * @return true, if is should force ga pbigger
+	 */
+	public boolean isShouldForceGAPbigger() {
+		return shouldForceGAPbigger;
+	}
+
+	/**
+	 * Sets the should force ga pbigger.
+	 *
+	 * @param shouldForceGAPbigger the new should force gap bigger
+	 */
+	public void setShouldForceGAPbigger(boolean shouldForceGAPbigger) {
+		this.shouldForceGAPbigger = shouldForceGAPbigger;
 	}
 }

@@ -1,6 +1,8 @@
 package operators;
 
+import information.CentroidFromNpoints;
 import information.ColorChannelVectors;
+import information.ID;
 import information.ImageColorChannels;
 import information.SharedVariables;
 import java.awt.Graphics2D;
@@ -39,31 +41,32 @@ import gui.ProgressBallsDialog;
 public class PreCounterThread implements Runnable{
 
 	
+	
+	
 	/** The Constant LOGGER. */
 	private final static Logger LOGGER = Logger.getLogger("MCCLogger");
 	
 	/** The cancelled inside. Boolean is precounting stopped by program. */
 	private boolean cancelledInside=false;
 	
-	/** The cell size max scaling factor. When user picks a cell -> all cell sizes that are 50% bigger than picked one are taken to countings. */
-	private double cellSizeMaxScalingFactor=1.25;
+	/** The cell size max scaling factor. When user picks a cell -> all cell sizes that are 25% bigger than picked one are taken to countings. */
+	private double cellSizeMaxScalingFactor=1.2;
 	
-	/** The cell size min scaling factor. When user picks a cell -> all cell sizes that are half of picked one are taken to countings. */
-	private double cellSizeMinScalingFactor=0.75;
+	/** The cell size min scaling factor. When user picks a cell -> all cell sizes that are  at most 25% smaller than picked one are taken to countings. */
+	private double cellSizeMinScalingFactor=0.8;
 	
 	/** The color list. List of different colors that are tried to find from image.  */
 	private ArrayList<Integer> colorList;
 	
-	private int completed_coordinates_amount=0;
-	
+
 	/** The continue counting. Boolean to check has user stopped precounting or is precounting ready. */
 	private boolean continueCounting=true;
-	
+
 	private ArrayList<Point> copy_of_current_finalCoordinates;
-		
+	
 	/** The counter thread. Thread doing the counting. */
 	private Thread counterThread;
-	
+		
 	/** The current_color list. Used for finding cells */
 	private ArrayList<Integer> current_colorList;
 	
@@ -75,17 +78,22 @@ public class PreCounterThread implements Runnable{
 	
 	/** The current_gap. A gap between pixels that are evaluated.  */
 	private int current_gap =2;
+	
 	/** The current_max_cell_size. */
 	private int current_max_cell_size;
-	
 	/** The current_max_coordinate_number_in_cell. */
 	private int current_max_coordinate_number_in_cell=Integer.MIN_VALUE;
 	
 	/** The current_min_cell_size. */
 	private int current_min_cell_size;
 	
+	private ExecutorService executor= null;
+	
 	/** The final centroid coordinates. These coordinates are the final results and markings are painted in this positions of image. */
 	private ArrayList<Point> finalCentroidCoordinates;
+	
+	/** The forced_gap. If problem with too small gap, then forced it bigger*/
+	private int forced_gap=0;
 	
 	/** The global_min_cell_diameter. This is global minimum for cell diameter */
 	private final int global_min_cell_diameter =SharedVariables.GLOBAL_MIN_CELL_DIAMETER; // 
@@ -120,24 +128,23 @@ public class PreCounterThread implements Runnable{
 	/** The pixel_color_relaxation. How much each color channel of pixel will be spread. */
 	private int pixel_color_relaxation=3; // from 0 - 5 is ok
 	
+	private ThreadPoolExecutor poolExecutor=null;
+	
+	private boolean stoppedGrougpingBySingleThread =false; // has progress stopped by single thread
+
+
 	/** The sub image. The image that user picks inside the rectangle. */
 	private BufferedImage subImage;
-
-
+	
+	
 	/** The sub image pixels. */
 	private byte[] subImagePixels;
-	
-	
+
+
+
 	/** The task manger. */
-	private TaskManager taskManger;
-
-	/** The use threading. */
-	private boolean useThreading=false;
-
-	private ExecutorService executor= null;;
+	private TaskManager taskManger;;
 	
-	private ThreadPoolExecutor poolExecutor=null;
-
 	/**
 	 * Instantiates a new PreCounterThread.
 	 *
@@ -145,15 +152,17 @@ public class PreCounterThread implements Runnable{
 	 * @param originalImage the original image
 	 * @param taskManager the task manager
 	 */
-	public PreCounterThread(BufferedImage subImage, BufferedImage originalImage , TaskManager taskManager, boolean useThreading){
+	public PreCounterThread(BufferedImage subImage, BufferedImage originalImage , TaskManager taskManager){
 		try {
-			setUseThreading(useThreading);
+			
 			this.taskManger=taskManager;
 			this.subImage=subImage;
 			this.originalImage=originalImage;
 			this.counterThread=new Thread(this, "counter");
 			this.colorList=new ArrayList<Integer>();
 			this.finalCentroidCoordinates = new ArrayList<Point>();
+			setUpMultiThreading();
+			this.forced_gap=0;
 		} catch (Exception e) {
 			LOGGER.severe("Error in initializing Precounter!");
 			e.printStackTrace();
@@ -177,6 +186,25 @@ public class PreCounterThread implements Runnable{
 		}
 		clean();
 	}
+	
+	/**
+	 * Aborts the  execution.
+	 *
+	 * @param title the title
+	 * @param message the message
+	 */
+	private int abortExecutionAndAskUserToContinue(String title, String message){
+		try {
+			
+				return this.taskManger.showYesNoMessageToUser(title, message);
+		} catch (Exception e) {
+			LOGGER.severe("Error in cancelling precount execution!");
+			e.printStackTrace();
+			return ID.NO;
+		}
+		
+	}
+	
 
 	/**
 	 * Adds the colors to colorList if identical color not found.
@@ -228,8 +256,6 @@ public class PreCounterThread implements Runnable{
 			return null;
 		}
 	   }
-
-
 
 	/**
 	 * Determines colors channels into vectors. Alpha, red, green and blue are separated channels. 
@@ -311,7 +337,6 @@ public class PreCounterThread implements Runnable{
 
 
 
-
 	/**
 	 * Goes trough the pixels of original image and checks is the color found from colorList. 
 	 * If found -> coordinate of pixel saved to list.
@@ -345,9 +370,10 @@ public class PreCounterThread implements Runnable{
 		   } // for rows
 		   Collections.sort(this.current_finalCoordinates, new CoordinateComparator());
 	   }
-	
-	
-	
+
+
+
+
 	/**
 	 * Goes trough the pixels of original image and checks is the color found from colorList. 
 	 * If found -> coordinate of pixel saved to list.
@@ -357,25 +383,44 @@ public class PreCounterThread implements Runnable{
 	private void calculateCoordinatesMultiThreaded() throws Exception{
 		   getOriginalImageAsByteArray(this.originalImage);
 		   ArrayList<CreateCoordinatesTask> createTaskList=new ArrayList<CreateCoordinatesTask>();
-		   final ArrayBlockingQueue<Runnable> queue =new ArrayBlockingQueue<Runnable>(10);
+		   final ArrayBlockingQueue<Runnable> queue =new ArrayBlockingQueue<Runnable>(SharedVariables.availableProcessors);
 		   this.current_finalCoordinates=new ArrayList<Point>();
 		   int w= this.originalImage.getWidth();
 		   int h = this.originalImage.getHeight();
 		   
-		   int pixelRows=(int) Math.round((((double)h)/10.00)); // count how many rows
-		   LOGGER.fine("Rows in splitted image: "+pixelRows);
+		   int pixelRows=(int) Math.round((((double)h)/(double)SharedVariables.availableProcessors)); // count how many rows made, splitted to each available processor
+		   LOGGER.fine("Rows in splitted image: "+pixelRows+ " image width: "+w);
 		   
 		   // go through whole byte array by collecting bytes to smaller byte arrays. New byte array contains as many bytes as image has pixels in pixelRows.
 		   // create Threads and add to list
-		   for(int startIndex=0, endIndex =(pixelRows*w)*3-1, rowCounter=0;startIndex< endIndex && endIndex<this.originalImagePixels.length;startIndex = endIndex+1, endIndex += (pixelRows*w)*3, rowCounter+=pixelRows){
-			   try{
-				 
-				   createTaskList.add(new CreateCoordinatesTask(pixelRows, w, 
-						   Arrays.copyOfRange(this.originalImagePixels, startIndex, endIndex), 
-						   rowCounter, this.current_gap, this.current_colorList));
+		   boolean continueFor=true;
+		   for(int startIndex=0, endIndex =(pixelRows*w)*3-1, rowCounter=0;endIndex<this.originalImagePixels.length &&  continueFor;  rowCounter+=pixelRows){
+			   try{ // startIndex += endIndex+1, endIndex += (pixelRows*w)*3,
+				   if(continueCounting){
+					   if(endIndex == this.originalImagePixels.length-1) // at last index
+						   continueFor=false;
+						   
+					   int rows= (endIndex-startIndex+1)/(3*w);
+					   System.out.println(" index: " +endIndex + " of "+this.originalImagePixels.length);
+					   createTaskList.add(new CreateCoordinatesTask(rows, w, 
+							   Arrays.copyOfRange(this.originalImagePixels, startIndex, endIndex+1),  // has to add 1 to get last index included
+							   rowCounter, this.current_gap, this.current_colorList));
+					
+					   // set start and end indexes
+					   startIndex += (pixelRows*w)*3; 
+					   endIndex += (pixelRows*w)*3;
+					   
+					   if(endIndex  >= this.originalImagePixels.length) // if overflow -> set to last inder of array
+						   endIndex=this.originalImagePixels.length-1;
+	   
+				   }
+				   else
+					   return;
 			   }
 			   catch(Exception e){
 				   LOGGER.severe("Error in creating CreateCoordinatesTask!");
+				  cancelInside();
+				   
 				   e.printStackTrace();
 			   }
 		   }
@@ -426,7 +471,9 @@ public class PreCounterThread implements Runnable{
 		   // sort coordinates although they should be in right order
 		   Collections.sort(this.current_finalCoordinates, new CoordinateComparator());
 	   }
-
+	
+	
+	
 	/**
 	 * Calculates outer radius area.
 	 *
@@ -501,7 +548,6 @@ public class PreCounterThread implements Runnable{
 			return 250;
 		return colorValue;
 	}
-	
 
 	/**
 	 * Cleans the counting thread variables to start a fresh counting.
@@ -513,11 +559,13 @@ public class PreCounterThread implements Runnable{
 			this.current_colorList=null;
 			this.current_finalCentroidCoordinates=null;
 			this.current_max_cell_size=0;
+		
 		} catch (Exception e) {
 			LOGGER.severe("Error in cleaning Precounter!");
 			e.printStackTrace();
 		}
 	}
+	
 
 	/**
 	 * Collects the inner cell colors from sub image that user has picked.
@@ -547,8 +595,6 @@ public class PreCounterThread implements Runnable{
 			}
 		}
 	}
-	
-
 
 	/**
 	 * Compares is point too close to any point at pool of current coordinates.
@@ -577,20 +623,8 @@ public class PreCounterThread implements Runnable{
 		
 	}
 	
-	public void updateCalculatingProgress(int progressValue){
-		if(this.current_finalCoordinates != null && this.current_finalCoordinates.size() > 0){
-			int value = 10 + (int) Math.round((((double)progressValue)/((double)this.current_finalCoordinates.size()))*90);
-			   this.pctm.updateProgressBar(value);
-				
-		}
-		
-	}
-	
-	public void updateCreatingProgress(int progressValue){
-		this.pctm.updateProgressBar(progressValue);
-	}
-	
-	
+
+
 	/**
 	 * Convert the BufferedImage to image type for precounting.
 	 *
@@ -606,7 +640,7 @@ public class PreCounterThread implements Runnable{
 		    g2d.dispose();
 		    return img;
 		}
-
+	
 	/**
 	 * Converts image to channels for alpha, red, green and blue.
 	 *
@@ -667,7 +701,7 @@ public class PreCounterThread implements Runnable{
 			return null;
 		}
 	   }
-
+	
 	/**
 	 * Counts number of coordinates that are inside the cell.
 	 *
@@ -680,7 +714,8 @@ public class PreCounterThread implements Runnable{
 		return (int)(area/Math.pow(gap_candidate,2));
 
 	}
-
+	
+	
 	/**
 	 * Creates groups from current coordinates by using distances between them. Basically coordinates close to each other are in same cell.
 	 */
@@ -728,10 +763,10 @@ public class PreCounterThread implements Runnable{
 	 */
 	private void createPointGroupsMultiThreaded(){
 		try {
+			
 			this.current_finalCentroidCoordinates=new ArrayList<Point>();
 			this.current_finalCentroidCoordinates.addAll(this.finalCentroidCoordinates); // add all previous final Centroid coordinates
 			
-			this.completed_coordinates_amount=0;
 			ArrayList<CalculateCoordinatesTask> taskList= new ArrayList<CalculateCoordinatesTask>();
 			// check size of list
 			if(this.current_finalCoordinates != null){
@@ -743,16 +778,15 @@ public class PreCounterThread implements Runnable{
 					taskList.add(calculateTask);
 				}
 				else{ // several threads because lot of coordinates
-					int size =2000;
-					if(this.current_finalCoordinates.size() <3000)
-						size =  (int) Math.round((((double)this.current_finalCoordinates.size())/2));
 					
+										
+					ArrayList<int[]> indexes = getIndexesForCreatingCoordinates(); // get indexes how to make parts for threads
 					int counter=1;
-					// create sublists of current final coordinates and create tasks by using the sub lists.
-					for(int indexStart=0, indexEnd=size; indexEnd<this.current_finalCoordinates.size() && indexStart < indexEnd;indexStart+=size){
-						
+					Iterator<int[]> indexIterator = indexes.iterator();
+					while(indexIterator.hasNext()){
+						int[] indexStartEnd=indexIterator.next();
 						// create list of coordinates
-						ArrayList<Point> sublist = new ArrayList<Point>(this.current_finalCoordinates.subList(indexStart, indexEnd));
+						ArrayList<Point> sublist = new ArrayList<Point>(this.current_finalCoordinates.subList(indexStartEnd[0], indexStartEnd[1]));
 						
 						// create tasks and add to tasklist
 						if(sublist != null && sublist.size() >0 ){
@@ -761,15 +795,9 @@ public class PreCounterThread implements Runnable{
 									this.maxCellNumberInCellGroup, this.min_distance_between_cells_boundaries, counter++);
 							taskList.add(calculateTask);	
 						}
-										
-						if(indexEnd + size >= this.current_finalCoordinates.size()){
-							indexEnd=this.current_finalCoordinates.size()-1;
-						}
-						else{
-							indexEnd +=size;
-						}
+	
 					}
-					
+	
 				}
 					// create executor
 					executor = Executors.newFixedThreadPool(taskList.size());
@@ -784,8 +812,13 @@ public class PreCounterThread implements Runnable{
 						int progress = 0;
 						Iterator<CalculateCoordinatesTask> taskCheckIterator = taskList.iterator();
 						while(taskCheckIterator.hasNext()){
-							
-							progress += (taskCheckIterator.next()).getProgressedCoordinates();	// get progress of each task			
+							CalculateCoordinatesTask singleTask = taskCheckIterator.next();
+							if(!singleTask.isContinueCounting() && singleTask.isShouldForceGAPbigger()){ // is aborted by single thread (some error)
+								stoppedGrougpingBySingleThread=true;
+								this.setContinueCounting(false);
+								this.forced_gap=this.current_gap+1;
+							}
+							progress += (singleTask).getProgressedCoordinates();	// get progress of each task			
 						}
 						
 						updateCalculatingProgress(progress); // send the value
@@ -802,25 +835,78 @@ public class PreCounterThread implements Runnable{
 							executor.shutdownNow();
 							
 						}
+						
 						return;
 
 					}
 				
 				// combine the results
+					
+					//if maximum size of cell has been changed -> remove all current_finalCentroidCoordinates
+					if(this.current_max_cell_size> this.max_cell_size){
+						this.current_finalCentroidCoordinates.clear();
+					}
+					
+					// go through finalized tasks
+					for(int i=0;i<taskList.size();i++){
+						CalculateCoordinatesTask singleTask = taskList.get(i);
+						CalculateCoordinatesTask nextTask=null;
+						if(i<taskList.size()-1)
+							nextTask = taskList.get(i+1);
+						ArrayList<CentroidFromNpoints> centroidCoordinates = singleTask.getCentroidCoordinates();
+						Iterator<CentroidFromNpoints> centroidIterator = centroidCoordinates.iterator();
+						// go through points
+						while(centroidIterator.hasNext()){
+
+							// check that next task has no centroids too close or they are not composed from more points
+			
+							CentroidFromNpoints midPoint = centroidIterator.next();
+							
+							if(!compareIsTooClose(midPoint, this.current_finalCentroidCoordinates)){ // check is too close to point at final centroids.
+								
+								// not too close -> check is too close to centroids of next task
+								if(i<taskList.size()-1){ // not yet in last position of tasklist -> check towards to next task
+								
+									if(nextTask != null){
+										if(!nextTask.compareIsTooCloseOrMinor(midPoint,this.current_max_cell_size)){ // check is not too close or has bigger number of coordinates
+											this.current_finalCentroidCoordinates.add(midPoint);										
+										}	
+									}	
+								}
+								else{ // in last position
+									// one cell
+									 this.current_finalCentroidCoordinates.add(midPoint);
+									
+								}
+							}
+						}
+
+					}
+					
+					/*
 					Iterator<CalculateCoordinatesTask> finalizedTaskCheckIterator = taskList.iterator();
 					while(finalizedTaskCheckIterator.hasNext()){
 					
 						CalculateCoordinatesTask singleTask = finalizedTaskCheckIterator.next();
-						ArrayList<Point> centroidCoordinates = singleTask.getCentroidCoordinates();
-						Iterator<Point> centroidIterator = centroidCoordinates.iterator();
+						ArrayList<CentroidFromNpoints> centroidCoordinates = singleTask.getCentroidCoordinates();
+						for (int i =0; i<centroidCoordinates.size();i++){
+							
+							
+							
+						}
+						
+						
+						Iterator<CentroidFromNpoints> centroidIterator = centroidCoordinates.iterator();
 						while(centroidIterator.hasNext()){
 							Point midPoint = centroidIterator.next();
 							if(!compareIsTooClose(midPoint, this.current_finalCentroidCoordinates)){
 								 // one cell
 								 this.current_finalCentroidCoordinates.add(midPoint);
 							 }
-						}	
-					}	
+						}
+						
+						
+					}	*/
 			}
 		} catch (Exception e) {
 			LOGGER.severe("Error in precounting cells multithreaded!");
@@ -1030,172 +1116,319 @@ public class PreCounterThread implements Runnable{
 		return null;
 	}
 
-
-   /**
-    * Determines the different colors of picked cell. 
-    * Goes through ColorChannelVectors and calculates the maximum sum of slopes value for each channel value at position i in vector.
-    *
-    * @param angleVectors the angle vectors
-    * @throws Exception the exception
-    */
-   private void getDifferentColors(ArrayList<ColorChannelVectors> angleVectors) throws Exception{
-	this.current_colorList=new ArrayList<Integer>();
-	if(this.colorList.size()>0)
-		this.current_colorList.addAll(this.colorList);
-	this.current_max_coordinate_number_in_cell=this.max_coordinate_number_in_cell;
-	this.current_max_cell_size=this.max_cell_size;
-	this.current_min_cell_size=this.min_cell_size;
-
-
-	if(angleVectors != null && angleVectors.size()>0){
-		int sumOfMaxKindexes = 0; 	// inital value
-		int kNumber=0;				// inital value
-		int minCellSize =Integer.MAX_VALUE;
-		Iterator<ColorChannelVectors> vIterator = angleVectors.iterator();
-		while(vIterator.hasNext()){
-			double maxK=0;
-			int indexOfMaxK=0;
-			ColorChannelVectors colorVector=vIterator.next();
-			// go through vectors and for each color count k -> sum k of three colors -> save
-			int startGap =(int)(colorVector.getSize()/20); 
-			if(startGap<3) // if start gap too small set to 3 -> length of slope is 3
-				startGap=3;
-			int endGap=(int)(colorVector.getSize()/4); 
-			if(endGap<5) // if end gap too small set to 5 -> length of slope is 5
-				endGap=5;
-			// count maximum slope value and index of it
-			for(int gap = startGap;gap<endGap;gap++){ // try different length of slopes
-				for(int i=gap+1;i<colorVector.getSize()-gap-1;i++){ //
-					int start_x=i-gap;
-					int end_x =i+gap;
-					double kValueSum= colorVector.getKvalueAt(start_x, end_x);
-					if(kValueSum > maxK){
-						maxK=kValueSum;
-						indexOfMaxK=start_x;
+	/**
+	    * Determines the different colors of picked cell. 
+	    * Goes through ColorChannelVectors and calculates the maximum sum of slopes value for each channel value at position i in vector.
+	    *
+	    * @param angleVectors the angle vectors
+	    * @throws Exception the exception
+	    */
+	   private void getDifferentColors(ArrayList<ColorChannelVectors> angleVectors) throws Exception{
+		this.current_colorList=new ArrayList<Integer>();
+		if(this.colorList.size()>0)
+			this.current_colorList.addAll(this.colorList);
+		this.current_max_coordinate_number_in_cell=this.max_coordinate_number_in_cell;
+		this.current_max_cell_size=this.max_cell_size;
+		this.current_min_cell_size=this.min_cell_size;
+	
+	
+		if(angleVectors != null && angleVectors.size()>0){
+			int sumOfMaxKindexes = 0; 	// inital value
+			int kNumber=0;				// inital value
+			int minCellSize =Integer.MAX_VALUE;
+			Iterator<ColorChannelVectors> vIterator = angleVectors.iterator();
+			while(vIterator.hasNext()){
+				double maxK=0;
+				int indexOfMaxK=0;
+				ColorChannelVectors colorVector=vIterator.next();
+				// go through vectors and for each color count k -> sum k of three colors -> save
+				int startGap =(int)(colorVector.getSize()/20); 
+				if(startGap<3) // if start gap too small set to 3 -> length of slope is 3
+					startGap=3;
+				int endGap=(int)(colorVector.getSize()/4); 
+				if(endGap<5) // if end gap too small set to 5 -> length of slope is 5
+					endGap=5;
+				// count maximum slope value and index of it
+				for(int gap = startGap;gap<endGap;gap++){ // try different length of slopes
+					for(int i=gap+1;i<colorVector.getSize()-gap-1;i++){ //
+						int start_x=i-gap; // start of slope
+						int end_x =i+gap;  // end of slope
+						double kValueSum= colorVector.getKvalueAt(start_x, end_x); // get the k value by color change between start and end point
+						if(kValueSum > maxK){
+							maxK=kValueSum;
+							indexOfMaxK=start_x;
+						}
+					}
+				}
+				// store int colors from 0 -> indexOfMax from vectors
+				if(indexOfMaxK>0){
+					sumOfMaxKindexes+=indexOfMaxK; // add for sum
+					kNumber++;
+					if(indexOfMaxK<minCellSize)
+						minCellSize=indexOfMaxK; // stores the smallest cell size from middle to border of cell
+					for(int i= 0;i<indexOfMaxK;i++){
+						int colorInt = colorVector.getFullColorInt_original(i);
+						addColorsIfNotFound(getRelaxedColors(this.pixel_color_relaxation, colorInt)); // collect if not already in list.
+	
 					}
 				}
 			}
-			// store int colors from 0 -> indexOfMax from vectors
-			if(indexOfMaxK>0){
-				sumOfMaxKindexes+=indexOfMaxK; // add for sum
-				kNumber++;
-				if(indexOfMaxK<minCellSize)
-					minCellSize=indexOfMaxK; // stores the smallest cell size from middle to border of cell
-				for(int i= 0;i<indexOfMaxK;i++){
-					int colorInt = colorVector.getFullColorInt_original(i);
-					addColorsIfNotFound(getRelaxedColors(this.pixel_color_relaxation, colorInt)); // collect if not already in list.
-
-				}
+			if(kNumber <1){
+				cancelInside();
+				return;
 			}
-		}
-		if(kNumber <1){
-			cancelInside();
-			return;
-		}
-
-		int cell_size=(int)(sumOfMaxKindexes*2/kNumber); // count average cell diameter kNumber
-		if(cell_size < this.global_min_cell_diameter){
-			LOGGER.warning("Too small cell picked in cell counting");
-			cancelInside(); // too small cell -> stop
-			return;
-		}
-			// calculate maximum cell size if bigger than previous cell size
-		if(cell_size*this.cellSizeMaxScalingFactor > this.current_max_cell_size)
-			this.current_max_cell_size= (int)(cell_size*this.cellSizeMaxScalingFactor);
-		
-		// calculate minimum cell size if smaller than previous cell size
-		if(cell_size*this.cellSizeMinScalingFactor < this.current_min_cell_size)
-			this.current_min_cell_size = Math.max((int)(cell_size*this.cellSizeMinScalingFactor), this.global_min_cell_diameter);
-
-
-
-		this.current_gap=2;
-		//initalize the current_max_coordinate_number_in_cell
-		this.current_max_coordinate_number_in_cell=countCoordinatesInCell(((double)this.current_max_cell_size)/2.0, this.current_gap);
-		
-		// eveluate gap value -> how many pixels are skipped
-		int gap_candidate=0;
-		doLoop:
-		do{
-			if(gap_candidate>=SharedVariables.MAX_GAP){
-				
-				break doLoop;
+	
+			int cell_size=(int)(sumOfMaxKindexes*2/kNumber); // count average cell diameter kNumber
+			if(cell_size < this.global_min_cell_diameter){
+				LOGGER.warning("Too small cell picked in cell counting");
+				cancelInside(); // too small cell -> stop
+				return;
 			}
-			// count new gap by increasing by one
-			gap_candidate++;
+				// calculate maximum cell size if bigger than previous cell size
+			if(cell_size*this.cellSizeMaxScalingFactor > this.current_max_cell_size)
+				this.current_max_cell_size= (int)(cell_size*this.cellSizeMaxScalingFactor);
 			
-			int minCoordinatesInCell=countCoordinatesInCell(((double)this.current_min_cell_size)/2.0, gap_candidate);
-			if(minCoordinatesInCell >= this.global_min_coordinate_number_in_cell){ // have enough coordinates inside cell of minimum size
-				this.current_gap=gap_candidate;
-				this.current_max_coordinate_number_in_cell=countCoordinatesInCell(((double)this.current_max_cell_size)/2.0, this.current_gap);
-
+			// calculate minimum cell size if smaller than previous cell size
+			if(cell_size*this.cellSizeMinScalingFactor < this.current_min_cell_size)
+				this.current_min_cell_size = Math.max((int)(cell_size*this.cellSizeMinScalingFactor), this.global_min_cell_diameter);
+	
+			// check that difference is big enough
+			if(this.current_max_cell_size-this.current_min_cell_size <10){
+				this.current_max_cell_size=this.current_min_cell_size+10;
 			}
-			else{
-				// don't change gap values
-				break doLoop;
-			}
-
-
-		}while(gap_candidate<20);
-		
-		
-
-		// collect colors from whole image by using minCellSize
-		collectInnerCellColorsFromSubImage(minCellSize);
-		
-		
-		//remove background colors from list
-		removeBackgroundColorsFromCurrentColorList(angleVectors, kNumber);
-
-		// sort list
-		Collections.sort(this.current_colorList);
-	//	LOGGER.info("Maximum cell size: "+this.current_max_cell_size);
-	//	LOGGER.info("Minimum cell size: "+this.current_min_cell_size);
-	}
-}
-
-   /**
-    * Returns the image as byte array.
-    *
-    * @param imageIn the image in
-    * @return the image as byte array
-    * @throws Exception the exception
-    */
-   private byte[] getImageAsByteArray(BufferedImage imageIn) throws Exception{
-	   BufferedImage image = convert(imageIn, BufferedImage.TYPE_3BYTE_BGR); // convert to 3byte bgr image
-		return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-
-   }
-
-   /**
-    * Returns the max distance round values. The points are separated
-    *
-    * @param mP the point where other points are compared
-    * @param circleSize the circle size
-    * @param pList the list
-    * @return the max distance round values
-    */
-   private MaxDistancePoint[] getMaxDistanceRoundValues(Point mP, int circleSize, ArrayList<WeightPoint> pList){
-
-	   try {
-		MaxDistancePoint[] maxPoints=new MaxDistancePoint[8];
-		   for (Iterator<WeightPoint> iterator = pList.iterator(); iterator.hasNext();) {
-				WeightPoint searchPoint = iterator.next();
-				int sliceNumber= isInsideWhichSlice(mP, searchPoint, circleSize);
-				if(sliceNumber>0 && sliceNumber <=8){
-					double distance = mP.distance(searchPoint);
-					if(maxPoints[sliceNumber-1] == null || maxPoints[sliceNumber-1].getDistance() < distance){
-						maxPoints[sliceNumber-1] = new MaxDistancePoint(searchPoint, distance);
-					}
+	
+			this.current_gap=2;
+			//initalize the current_max_coordinate_number_in_cell
+			this.current_max_coordinate_number_in_cell=countCoordinatesInCell(((double)this.current_max_cell_size)/2.0, this.current_gap);
+			
+			int imageSize = this.originalImage.getHeight()*this.originalImage.getWidth();
+			
+			
+			// eveluate gap value -> how many pixels are skipped
+			int gap_candidate=this.forced_gap;
+			doLoop:
+			do{
+				if(gap_candidate>=SharedVariables.MAX_GAP){				
+					break doLoop;
 				}
-		   }
-		   return maxPoints;
-	} catch (Exception e) {
-		LOGGER.severe("Error in getting maximum distance values!");
-		e.printStackTrace();
-		return null;
+				
+				/*
+				 * TESTING GAP 1
+				 */
+				
+			//	if(forced_gap==0 &&  gap_candidate==1) 
+			//		break doLoop;
+				
+
+				/* set gap to 1 when: 
+				 * - current_cell_size is not too big
+				 * -imagesize is not too big
+				 * - at least 4 threads can be used
+				 * -THIS MAY BE QUITE SLOW, but gives better results when very small cells
+				 */
+				if(forced_gap==0 && 
+						imageSize < SharedVariables.IMAGE_SIZE_MEDIUM && 
+						this.current_min_cell_size < SharedVariables.GAPPING_CELL_SIZE_SMALL &&  
+						SharedVariables.availableProcessors>=8 && 
+						gap_candidate==1) 
+					break doLoop;
+				
+				
+				
+				/* set gap to 2 when: 
+				 * -imagesize is smaller than ~ 10MP
+				 * - at least 8 threads can be used
+				 */
+				
+				if(forced_gap < 3 && 
+						imageSize < SharedVariables.IMAGE_SIZE_BIG && 
+						SharedVariables.availableProcessors>=8 && 
+						gap_candidate==2) 
+					break doLoop;
+				
+				/* set gap to 2 when: 
+				 * - current_cell_size is very small
+				 * -imagesize is very big
+				 * - at least 2 threads can be used
+				 * -THIS MAY BE QUITE SLOW, but gives better results when very small cells
+				 */
+				
+				if(forced_gap < 3 && 
+						imageSize < SharedVariables.IMAGE_SIZE_MEDIUM && 
+						this.current_min_cell_size < SharedVariables.GAPPING_CELL_SIZE_SMALL &&  
+						SharedVariables.availableProcessors>=2 && 
+						gap_candidate==2) 
+					break doLoop;
+				
+				/* set gap to 2 when: 
+				 * -imagesize is medium
+				 * - at least 4 threads can be used
+				 */
+				if(forced_gap < 3 && 
+						imageSize < SharedVariables.IMAGE_SIZE_MEDIUM &&
+						SharedVariables.availableProcessors>=4 && 
+						gap_candidate==2) 
+					break doLoop;
+				
+				// count new gap by increasing by one
+				gap_candidate++;
+				
+				int minCoordinatesInCell=countCoordinatesInCell(((double)this.current_min_cell_size)/2.0, gap_candidate);
+				if(minCoordinatesInCell >= this.global_min_coordinate_number_in_cell){ // have enough coordinates inside cell of minimum size
+					this.current_gap=gap_candidate;
+					this.current_max_coordinate_number_in_cell=countCoordinatesInCell(((double)this.current_max_cell_size)/2.0, this.current_gap);
+	
+				}
+				else{
+					// don't change gap values
+					break doLoop;
+				}
+	
+	
+			}while(gap_candidate<20);
+			
+			
+	
+			// collect colors from whole image by using minCellSize
+			collectInnerCellColorsFromSubImage(minCellSize);
+			
+			
+			//remove background colors from list
+			removeBackgroundColorsFromCurrentColorList(angleVectors, kNumber);
+	
+			// sort list
+			Collections.sort(this.current_colorList);
+		//	LOGGER.info("Maximum cell size: "+this.current_max_cell_size);
+		//	LOGGER.info("Minimum cell size: "+this.current_min_cell_size);
+		}
 	}
-   }
+
+	/**
+	    * Returns the image as byte array.
+	    *
+	    * @param imageIn the image in
+	    * @return the image as byte array
+	    * @throws Exception the exception
+	    */
+	   private byte[] getImageAsByteArray(BufferedImage imageIn) throws Exception{
+		   BufferedImage image = convert(imageIn, BufferedImage.TYPE_3BYTE_BGR); // convert to 3byte bgr image
+			return ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+	
+	   }
+
+	/**
+	 * Returns the indexes for creating coordinates. If group too small and maximum cell size can't fit in it -> enlarge groups.
+	 *
+	 * @return the indexes for creating coordinates
+	 */
+	private ArrayList<int[]> getIndexesForCreatingCoordinates(){
+		try {
+			int size=0;
+			int divider=2;
+			ArrayList<int[]> indexes = new ArrayList<int[]>();
+			if(this.current_finalCoordinates != null && this.current_finalCoordinates.size()>0){
+				// probably big amount of points
+				if(this.current_finalCoordinates.size()>3000){
+					divider=SharedVariables.availableProcessors;
+					
+				}
+						
+
+				//check if too small parts -> change divider smaller
+				boolean checkParts=true;
+				while(divider>1 && checkParts){
+					
+					if(divider == 1){
+						indexes.add(new int[] {0,this.current_finalCoordinates.size()-1}); // whole list
+						break;
+					}
+					
+					size =  (int) Math.round((((double)this.current_finalCoordinates.size())/(double)divider));
+					checkParts=false;
+					indexes = new ArrayList<int[]>(); // empty array
+			
+					// go through coordinates to get optimum number of parts (threads). If group too small and maximum cell can't fit in it -> enlarge groups
+					for(int indexStart=0, indexEnd=size; indexEnd<this.current_finalCoordinates.size() && indexStart < indexEnd;indexStart+=size){
+						// is the difference between first and last value bigger than maximum cell size
+						if(this.current_finalCoordinates.get(indexEnd).x - this.current_finalCoordinates.get(indexStart).x < this.current_max_cell_size*2){ 
+							// too small part -> divider has to be smaller
+							divider--;
+							if(divider == 1){
+								indexes.clear();
+								indexes.add(new int[] {0,this.current_finalCoordinates.size()-1}); // whole list
+								checkParts=false; // stop checking
+							}
+							else{
+								checkParts=true; // continue checking
+							}
+						
+							break; // break for loop
+							
+						}
+						int overlapStartIndex=0; // set the overlapping startIndex
+						if(indexStart>0){
+							int startValue = this.current_finalCoordinates.get(indexStart).x-this.max_cell_size;
+							int endValue =  this.current_finalCoordinates.get(indexEnd).x;
+
+							int[] overlappedIndexes = startEndBinarySearch(this.current_finalCoordinates, startValue, endValue);
+							overlapStartIndex=overlappedIndexes[0]; // set the starting index for overlapping with previous part
+							
+						}
+						
+						indexes.add(new int[] {overlapStartIndex,indexEnd}); // add to list indexes of new part of point list.
+			
+						if(indexEnd + size >= this.current_finalCoordinates.size()){ // set the end index for next for loop
+							indexEnd=this.current_finalCoordinates.size()-1;
+						}
+						else{
+							indexEnd +=size;
+						}
+						
+						
+						
+					}
+					
+				}
+			}
+			
+			return indexes;
+		} catch (Exception e) {
+			LOGGER.severe("Error in counting group sizes for threads of CreateCoordinates!");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
+	    * Returns the max distance round values. The points are separated
+	    *
+	    * @param mP the point where other points are compared
+	    * @param circleSize the circle size
+	    * @param pList the list
+	    * @return the max distance round values
+	    */
+	   private MaxDistancePoint[] getMaxDistanceRoundValues(Point mP, int circleSize, ArrayList<WeightPoint> pList){
+	
+		   try {
+			MaxDistancePoint[] maxPoints=new MaxDistancePoint[8];
+			   for (Iterator<WeightPoint> iterator = pList.iterator(); iterator.hasNext();) {
+					WeightPoint searchPoint = iterator.next();
+					int sliceNumber= isInsideWhichSlice(mP, searchPoint, circleSize);
+					if(sliceNumber>0 && sliceNumber <=8){
+						double distance = mP.distance(searchPoint);
+						if(maxPoints[sliceNumber-1] == null || maxPoints[sliceNumber-1].getDistance() < distance){
+							maxPoints[sliceNumber-1] = new MaxDistancePoint(searchPoint, distance);
+						}
+					}
+			   }
+			   return maxPoints;
+		} catch (Exception e) {
+			LOGGER.severe("Error in getting maximum distance values!");
+			e.printStackTrace();
+			return null;
+		}
+	   }
+
 
    /**
     * Returns the neighbor points that are close enough to given point.
@@ -1225,8 +1458,6 @@ public class PreCounterThread implements Runnable{
 		this.copy_of_current_finalCoordinates.removeAll(neighbours);
 		return neighbours;
    }
-
-
 
    /**
     * Returns the original image as byte array.
@@ -1292,6 +1523,7 @@ private ArrayList<Point> getPoints(Stack<Point> stack, ArrayList<Point> groupPoi
 		}
 	   return pointsInside;
 }
+
 
 
    /**
@@ -1394,7 +1626,7 @@ private ArrayList<Integer> getRelaxedColorsWideRange(int relaxation, int colorIn
 	}
 	return integerList;
 }
-   
+
    /**
     * Returns the sub image as byte array.
     *
@@ -1405,7 +1637,6 @@ private ArrayList<Integer> getRelaxedColorsWideRange(int relaxation, int colorIn
 		this.subImagePixels = getImageAsByteArray(imageIn);
 
   }
-    
 
    /**
  * Returns the thread status.
@@ -1418,52 +1649,53 @@ public String getThreadStatus() throws Exception{
 }
 
 
-	/**
-	 * Returns the weight point with biggest distance.
-	 *
-	 * @param maxDistanceList the max distance list
-	 * @return the weight point with biggest distance
-	 */
-	private WeightPoint getWeightPointWithBiggestDistance(MaxDistancePoint[] maxDistanceList){
-		try {
-		
-			   MaxDistancePoint maxDistancePoint=null;
-			   for (int i = 0; i < maxDistanceList.length; i++) {
-				if(maxDistanceList[i] != null && (maxDistancePoint == null ||
-						(maxDistancePoint != null && maxDistanceList[i].getDistance() > maxDistancePoint.getDistance()))){
-					maxDistancePoint=maxDistanceList[i];
-				}
-			}
-			   return maxDistancePoint;
-		} catch (Exception e) {
-			LOGGER.severe("Error in getting WeightPoint of biggest distance!");
-			e.printStackTrace();
-			return null;
-		}
-	   }
-
-	/**
-	    * Returns the weight point with biggest weight at distance.
-	    *
-	    * @param midPoint the mid point
-	    * @param weightPointList the weight point list
-	    * @param distance the distance
-	    * @return the weight point with biggest weight at distance
-	    * @throws Exception the exception
-	    */
-	   private WeightPoint getWeightPointWithBiggestWeightAtDistance(WeightPoint midPoint, ArrayList<WeightPoint> weightPointList, int distance) throws Exception{
-		   WeightPoint maxWeightPoint=null;
-		   for (Iterator<WeightPoint> iterator = weightPointList.iterator(); iterator.hasNext();) {
-			WeightPoint weightPoint = (WeightPoint) iterator.next();
-			if(weightPoint != null && (maxWeightPoint == null || maxWeightPoint != null && weightPoint.getWeight() >= maxWeightPoint.getWeight())){
-				if(midPoint.distance(weightPoint) <= distance)
-					maxWeightPoint = weightPoint;
+   /**
+ * Returns the weight point with biggest distance.
+ *
+ * @param maxDistanceList the max distance list
+ * @return the weight point with biggest distance
+ */
+private WeightPoint getWeightPointWithBiggestDistance(MaxDistancePoint[] maxDistanceList){
+	try {
+	
+		   MaxDistancePoint maxDistancePoint=null;
+		   for (int i = 0; i < maxDistanceList.length; i++) {
+			if(maxDistanceList[i] != null && (maxDistancePoint == null ||
+					(maxDistancePoint != null && maxDistanceList[i].getDistance() > maxDistancePoint.getDistance()))){
+				maxDistancePoint=maxDistanceList[i];
 			}
 		}
-		   if(maxWeightPoint == null)
-			   return getWeightPointWithBiggestWeightAtDistance(midPoint, weightPointList, (int)(distance*2));
-		   return maxWeightPoint;
-	   }
+		   return maxDistancePoint;
+	} catch (Exception e) {
+		LOGGER.severe("Error in getting WeightPoint of biggest distance!");
+		e.printStackTrace();
+		return null;
+	}
+   }
+   
+   /**
+    * Returns the weight point with biggest weight at distance.
+    *
+    * @param midPoint the mid point
+    * @param weightPointList the weight point list
+    * @param distance the distance
+    * @return the weight point with biggest weight at distance
+    * @throws Exception the exception
+    */
+   private WeightPoint getWeightPointWithBiggestWeightAtDistance(WeightPoint midPoint, ArrayList<WeightPoint> weightPointList, int distance) throws Exception{
+	   WeightPoint maxWeightPoint=null;
+	   for (Iterator<WeightPoint> iterator = weightPointList.iterator(); iterator.hasNext();) {
+		WeightPoint weightPoint = (WeightPoint) iterator.next();
+		if(weightPoint != null && (maxWeightPoint == null || maxWeightPoint != null && weightPoint.getWeight() >= maxWeightPoint.getWeight())){
+			if(midPoint.distance(weightPoint) <= distance)
+				maxWeightPoint = weightPoint;
+		}
+	}
+	   if(maxWeightPoint == null)
+		   return getWeightPointWithBiggestWeightAtDistance(midPoint, weightPointList, (int)(distance*2));
+	   return maxWeightPoint;
+   }
+    
 
    /**
     * Checks is color at image position found from colorList. The color value is reduced
@@ -1486,36 +1718,36 @@ public String getThreadStatus() throws Exception{
 		   return false; // color not found
    }
 
-   /**
-    * Initializes the Thread.
-    *
-    * @throws Exception the exception
-    */
-   public void initThread() throws Exception{
-	this.setContinueCounting(true);
-	this.cancelledInside=false;
-	this.counterThread=new Thread(this, "counter");
-}
 
+	/**
+	    * Initializes the Thread.
+	    *
+	    * @throws Exception the exception
+	    */
+	   public void initThread() throws Exception{
+		this.setContinueCounting(true);
+		this.cancelledInside=false;
+		this.counterThread=new Thread(this, "counter");
+	}
 
-   /**
-    * Calculates is given searchPoint inside a triangle composed from given points.
-    *
-    * @param midPoint the one corner for triangle
-    * @param searchPoint the point to be searched
-    * @param second the second triangle point
-    * @param third the third triangle point
-    * @return true, if found point inside triangle
-    * @throws Exception the exception
-    */
-   private boolean inside(Point midPoint, Point searchPoint, Point second, Point third) throws Exception{
-	   int[] xList= new int[] {midPoint.x, second.x, third.x};
-	   int[] yList= new int[] {midPoint.y, second.y, third.y};
-
-	   Polygon slicePolygon=new Polygon(xList,yList,3);
-
-	   return slicePolygon.contains(searchPoint);
-   }
+	/**
+	    * Calculates is given searchPoint inside a triangle composed from given points.
+	    *
+	    * @param midPoint the one corner for triangle
+	    * @param searchPoint the point to be searched
+	    * @param second the second triangle point
+	    * @param third the third triangle point
+	    * @return true, if found point inside triangle
+	    * @throws Exception the exception
+	    */
+	   private boolean inside(Point midPoint, Point searchPoint, Point second, Point third) throws Exception{
+		   int[] xList= new int[] {midPoint.x, second.x, third.x};
+		   int[] yList= new int[] {midPoint.y, second.y, third.y};
+	
+		   Polygon slicePolygon=new Polygon(xList,yList,3);
+	
+		   return slicePolygon.contains(searchPoint);
+	   }
 
    /**
     * Checks if is cancelled by program. In other words,has this Thread stopped the counting.
@@ -1555,6 +1787,7 @@ public String getThreadStatus() throws Exception{
 	   return true;
    }
 
+
    /**
     * Checks if is the shape composed from WeightPoints circular.
     *
@@ -1566,6 +1799,7 @@ public String getThreadStatus() throws Exception{
 	   MaxDistancePoint[] maxDistanceValues=getMaxDistanceRoundValues(midPoint, this.current_max_cell_size,weightPointList);
 	   return isCircular(maxDistanceValues);
    }
+
 
    /**
     * Checks if is counting.
@@ -1703,10 +1937,6 @@ public String getThreadStatus() throws Exception{
 
    }
 
-   public boolean isUseThreading() {
-	return useThreading;
-}
-   
    private void removeBackgroundColorsFromCurrentColorList(ArrayList<ColorChannelVectors> angleVectors, int indexOfCellBoundary){
 	   try {
 		ArrayList<Integer> foundBGcolors=new ArrayList<Integer>();
@@ -1792,7 +2022,12 @@ public String getThreadStatus() throws Exception{
 	public void run() {
 		try {
 			long start= System.currentTimeMillis();
+			// set boolean values for correct running
+		
+			continueCounting=true;
+			
 			// get 8 angle data from midpoint to edge of subImage
+			
 			if(continueCounting){
 				ArrayList<ColorChannelVectors> angleVectors = get8Angles();
 				if(angleVectors != null && angleVectors.size()>0){
@@ -1807,29 +2042,39 @@ public String getThreadStatus() throws Exception{
 	
 					if(this.current_colorList != null && this.current_colorList.size()>0){
 								
-						LOGGER.fine("start calculating coordinates: colorlist: "+current_colorList.size()+ "using gap: " +this.current_gap+ "min:"+this.global_min_coordinate_number_in_cell+ " max: "+this.current_max_coordinate_number_in_cell);
+						LOGGER.fine("start calculating coordinates: colorlist: "+current_colorList.size()+ " using gap: " +this.current_gap+ " min:"+this.global_min_coordinate_number_in_cell+ " max: "+this.current_max_coordinate_number_in_cell);
+						LOGGER.fine(" min cell size: "+this.current_min_cell_size+ " max cell size: "+this.current_max_cell_size);
 						// go through the image pixels of original image and give coordinates multithreaded or not
-						if(useThreading)
+						if(SharedVariables.useMultiThreadingInCalculatingCoordinates)
 							calculateCoordinatesMultiThreaded();
 						else	
 							calculateCoordinates();
 		
 						if(!continueCounting){
-							abortExecution("No Coordinates", "Couldn't calculate pixel coordinates for cells. Try again.");
+							abortExecution("No Coordinates", "Couldn't calculate pixel coordinates for cells. Check Log from Help-menu!.");
 							return;
 						}
 						if(this.current_finalCoordinates != null && this.current_finalCoordinates.size()>=this.global_min_coordinate_number_in_cell){ // number of Points should be more than 10
 							LOGGER.fine("start clustering: "+current_finalCoordinates.size());
 							
 							// Is multithreading on
-							if(useThreading)
+							if(SharedVariables.useMultThreadingIncreatingPointGroups)
 								createPointGroupsMultiThreaded();						
 							else
 								createPointGroups();
 		
-							LOGGER.fine("end of clustering");
+							LOGGER.fine("end of grouping coordinates");
 							if(!continueCounting){
-								abortExecution("No Cells", "No any cells found.");
+								
+								if(this.forced_gap >0){ // single thread stopped and forced gap is bigger than zero
+									cancelInside();
+									
+									abortExecution("Problems in counting cells", "Trying with different settings. Pick a new Cell!");	
+									clean();
+								}
+								else{ //
+									abortExecution("No Cells", "No any cells found.");									
+								}
 								return;
 							}
 							if(this.current_finalCentroidCoordinates != null && this.current_finalCentroidCoordinates.size()>0){
@@ -1844,25 +2089,27 @@ public String getThreadStatus() throws Exception{
 								// saved found colors
 								this.colorList.clear();
 								this.colorList.addAll(this.current_colorList);
+						
+								forced_gap=0; // not use forced gap next time, because wass successfull counting
 								cancelInside();
 								clean();
 							}
 							else{
+								
+								
 								cancelInside();
 								// inform user that couldn't locate cells
-	
+
 								abortExecution("No Cells", "No any cells found. Possibly cells are too small to count!");
-	
-	
 								return;
+								
 							}
-	
-							}
-							else{
-								// inform user that couldn't get colors
-								abortExecution("No Cells", "No any cells found. Possibly too small picked cell.");
-								return;
-							}
+						}
+						else{
+							// inform user that couldn't get colors
+							abortExecution("No Cells", "No any cells found. Possibly too small picked cell.");
+							return;
+						}
 							
 						
 					}	
@@ -1898,6 +2145,8 @@ public String getThreadStatus() throws Exception{
 		}
 	
 	}
+
+
    
    /**
     * Sets the cancelled inside.
@@ -1909,7 +2158,7 @@ public String getThreadStatus() throws Exception{
 	this.cancelledInside = cancelledInside;
 }
 
-
+ 
    /**
     * Sets the continue counting.
     *
@@ -1919,7 +2168,6 @@ public String getThreadStatus() throws Exception{
    public void setContinueCounting(boolean continueCounting) throws Exception{
 	this.continueCounting = continueCounting;
 }
-
 
 
    /**
@@ -1934,14 +2182,16 @@ public String getThreadStatus() throws Exception{
 
 
 
-	/**
-	 * Sets the progress dialog.
-	 *
-	 * @param pbd the new ProgressBallsDialog
-	 * @throws Exception the exception
-	 */
-	public void setProgressBallDialog(ProgressBallsDialog pbd) throws Exception{
-	}
+   /**
+ * Sets the progress dialog.
+ *
+ * @param pbd the new ProgressBallsDialog
+ * @throws Exception the exception
+ */
+public void setProgressBallDialog(ProgressBallsDialog pbd) throws Exception{
+}
+
+
 
 	/**
 	 * Sets the sub image.
@@ -1953,10 +2203,14 @@ public String getThreadStatus() throws Exception{
 		this.subImage=subImage;
 	}
 
-	public void setUseThreading(boolean useThreading) {
-		this.useThreading = useThreading;
+	private void setUpMultiThreading() throws Exception{
+		int processors = Runtime.getRuntime().availableProcessors();
+		SharedVariables.setAvailableProcessors(processors);
+		LOGGER.info("available processors: " +processors);
+		
 	}
 
+	
 	/**
 	 * Starts the Thread for counting.
 	 *
@@ -2043,7 +2297,7 @@ public String getThreadStatus() throws Exception{
 					 if(imid< pointList.size()-1){ // is imid smaller or than list size
 						 if(pointList.get(imid).x == upperBoundValue){
 
-							 if(imid == pointList.size()-1 || pointList.get(imid+1).x > upperBoundValue){
+							 if(imid == pointList.size()-1 || pointList.get(imid+1).x > upperBoundValue){ // is in end or no same value in next index
 								 indexes[1]=imid;
 								 break upperLoop;
 							 }
@@ -2138,6 +2392,19 @@ public String getThreadStatus() throws Exception{
 			return null;
 		}
    }
+
+	public void updateCalculatingProgress(int progressValue){
+		if(this.current_finalCoordinates != null && this.current_finalCoordinates.size() > 0){
+			int value = 10 + (int) Math.round((((double)progressValue)/((double)this.current_finalCoordinates.size()))*90);
+			   this.pctm.updateProgressBar(value);
+				
+		}
+		
+	}
+	
+	public void updateCreatingProgress(int progressValue){
+		this.pctm.updateProgressBar(progressValue);
+	}
 	
 	/**
 	 * The Class MovingAverage. Contains double values in linked list and methods for counting average of values.

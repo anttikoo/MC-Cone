@@ -466,7 +466,7 @@ public class ShadyMessageDialog extends JDialog{
 public int showDialog(){
 	try {
 		this.validate();
-	//	this.repaint();
+		this.repaint();
 
 	
 		this.setVisible(true);

@@ -40,6 +40,16 @@ public class CreateCoordinatesTask implements Runnable{
 
 
 	
+	/**
+	 * Instantiates a new creates the coordinates task. Reads given byte of pixels, compares colors to given colorlist and if found saves as Point.
+	 *
+	 * @param h the height of image composed from bytes
+	 * @param w the width of image
+	 * @param imageBytes the image bytes
+	 * @param rowsBefore the rows before this part of image
+	 * @param currentGap the current gap
+	 * @param colorList the color list
+	 */
 	public CreateCoordinatesTask(int h, int w, byte[] imageBytes, int rowsBefore, int currentGap, ArrayList<Integer> colorList) {
 		this.imageWidth=w;
 		this.imageHeight=h;
@@ -57,10 +67,20 @@ public class CreateCoordinatesTask implements Runnable{
 	}
 	
 	
+	/**
+	 * Checks if is continue counting.
+	 *
+	 * @return true, if is continue counting
+	 */
 	public boolean isContinueCounting() {
 		return continueCounting;
 	}
 
+	/**
+	 * Sets the continue counting.
+	 *
+	 * @param continueCounting the new continue counting
+	 */
 	public void setContinueCounting(boolean continueCounting) {
 		this.continueCounting = continueCounting;
 	}
@@ -104,24 +124,28 @@ public class CreateCoordinatesTask implements Runnable{
 	   }
 	
 	   /**
-	    * Checks is color at image position found from colorList. The color value is reduced
-	    *
-	    * @param r the row
-	    * @param c the column
-	    * @param w the width of image
-	    * @return true, if found the color
-	    * @throws Exception the exception
-	    */
-	   private boolean hasCellColor(int r, int c, int w) throws Exception{
-
+   	 * Checks is color at image position found from colorList. The color value is reduced
+   	 *
+   	 * @param r the row
+   	 * @param c the column
+   	 * @param w the width of image
+   	 * @return true, if found the color
+   	 */
+	   private boolean hasCellColor(int r, int c, int w){
 		   int index = (c + r*w)*3; // count the index. Each pixel consists three bytes
-
-		   int argb =  ( 255 << 24) | ((int)(this.imageBytes[index+2] & 0xFF) << 16) | ((int)(this.imageBytes[index + 1] & 0xFF) << 8) | ((int)this.imageBytes[index] & 0xFF);
-		   int reducedNoiseArgb = getReducedNoiseColor(argb);
-		   if(foundColor(reducedNoiseArgb))
-			   return true; // found color
-		   else
-			   return false; // color not found
+		   try {
+			
+			   int argb =  ( 255 << 24) | ((int)(this.imageBytes[index+2] & 0xFF) << 16) | ((int)(this.imageBytes[index + 1] & 0xFF) << 8) | ((int)this.imageBytes[index] & 0xFF);
+			   int reducedNoiseArgb = getReducedNoiseColor(argb);
+			   if(foundColor(reducedNoiseArgb))
+				   return true; // found color
+			   else
+				   return false; // color not found
+		} catch (Exception e) {
+			LOGGER.severe("Error in checking has cell color: "+index + " "+ " gap:"+ current_gap+ " size: "+(this.imageBytes.length-1) + " error: "+e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
 	   }
 	   
 	   

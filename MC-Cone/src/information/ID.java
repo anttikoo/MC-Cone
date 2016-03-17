@@ -144,6 +144,8 @@ public class ID {
 	public static final int ML_ORDER_INSERTED_ID=137;
 	public static final int FOLDER_IMAGES=138;
 	public static final int FOLDER_XML_FILES=139;
+	public static final int MENU_ITEM_USE_STRICT_PRECOUNTING= 140;
+	public static final int MENU_ITEM_USE_DEEPER_PRECOUNTING= 141;
 	
 	
 	

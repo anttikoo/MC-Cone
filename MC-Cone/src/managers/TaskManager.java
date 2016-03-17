@@ -661,7 +661,7 @@ public class TaskManager {
 				if(originalImage != null){
 					try{
 					// create new PreCountThreadManager
-					PreCounterThread preCountThread =new PreCounterThread(subImage, originalImage, this,true); // uses multithreading
+					PreCounterThread preCountThread =new PreCounterThread(subImage, originalImage, this); 
 					this.preCountThreadManager=new PreCountThreadManager(preCountThread,pbd, iLayerID, mLayerID);
 					// start the counting
 					this.preCountThreadManager.startCounting();
@@ -889,10 +889,25 @@ public class TaskManager {
 	 * @param message the message
 	 * @throws Exception the exception
 	 */
-	public  void showMessageToUser(String title, String message) throws Exception{
+	public void showMessageToUser(String title, String message) throws Exception{
 		ShadyMessageDialog dialog = new ShadyMessageDialog(this.gui, title, message, ID.OK, this.gui);
 		dialog.showDialog();
 		dialog=null;
+	}
+	
+	/**
+	 * Shows message to user and return the selection YES or NO.
+	 *
+	 * @param title the title
+	 * @param message the message
+	 * @return the int ID of user has selected YES or NO
+	 * @throws Exception the exception
+	 */
+	public int showYesNoMessageToUser(String title, String message) throws Exception{
+		ShadyMessageDialog dialog = new ShadyMessageDialog(this.gui, title, message, ID.YES_NO, this.gui);
+		int returnValue=dialog.showDialog();
+		dialog=null;
+		return returnValue;
 	}
 
 	/**
