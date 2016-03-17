@@ -130,6 +130,8 @@ public class PreCounterThread implements Runnable{
 	
 	private ThreadPoolExecutor poolExecutor=null;
 	
+	private boolean stoppedGrougpingBySingleThread =false; // has progress stopped by single thread
+
 
 	/** The sub image. The image that user picks inside the rectangle. */
 	private BufferedImage subImage;
@@ -183,6 +185,24 @@ public class PreCounterThread implements Runnable{
 			e.printStackTrace();
 		}
 		clean();
+	}
+	
+	/**
+	 * Aborts the  execution.
+	 *
+	 * @param title the title
+	 * @param message the message
+	 */
+	private int abortExecutionAndAskUserToContinue(String title, String message){
+		try {
+			
+				return this.taskManger.showYesNoMessageToUser(title, message);
+		} catch (Exception e) {
+			LOGGER.severe("Error in cancelling precount execution!");
+			e.printStackTrace();
+			return ID.NO;
+		}
+		
 	}
 	
 
@@ -794,7 +814,7 @@ public class PreCounterThread implements Runnable{
 						while(taskCheckIterator.hasNext()){
 							CalculateCoordinatesTask singleTask = taskCheckIterator.next();
 							if(!singleTask.isContinueCounting() && singleTask.isShouldForceGAPbigger()){ // is aborted by single thread (some error)
-							
+								stoppedGrougpingBySingleThread=true;
 								this.setContinueCounting(false);
 								this.forced_gap=this.current_gap+1;
 							}
