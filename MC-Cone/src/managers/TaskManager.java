@@ -1,7 +1,5 @@
 package managers;
 import gui.GUI;
-import gui.ProgressBallsDialog;
-import gui.ProgressBarAndBallsDialog;
 import gui.ShadyMessageDialog;
 import gui.grid.SingleGridSize;
 import information.GridProperties;

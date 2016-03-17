@@ -3,7 +3,7 @@ package managers;
 import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import gui.ProgressBallsDialog;
+
 import gui.ProgressBarAndBallsDialog;
 import operators.PreCounterThread;
 
