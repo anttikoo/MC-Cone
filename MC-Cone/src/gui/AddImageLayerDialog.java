@@ -33,11 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-
-import org.jdesktop.swingx.JXBusyLabel;
-import org.jdesktop.swingx.icon.EmptyIcon;
-import org.jdesktop.swingx.painter.BusyPainter;
-
 import information.*;
 
 /**
@@ -63,9 +58,7 @@ public class AddImageLayerDialog extends JDialog{
 	
 	/** The back panel. Contains dimming and the visible panel*/
 	private JPanel backPanel;
-	
-	private JXBusyLabel busyLabel;
-	
+		
 	/** The cancel j button. */
 	private JButton cancelJButton;
 	
