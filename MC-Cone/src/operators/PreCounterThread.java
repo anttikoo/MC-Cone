@@ -843,7 +843,7 @@ public class PreCounterThread implements Runnable{
 				// combine the results
 					
 					//if maximum size of cell has been changed -> remove all current_finalCentroidCoordinates
-					if(this.current_max_cell_size> this.max_cell_size){
+					if(this.current_max_cell_size > this.max_cell_size*this.cellSizeMaxScalingFactor){
 						this.current_finalCentroidCoordinates.clear();
 					}
 					

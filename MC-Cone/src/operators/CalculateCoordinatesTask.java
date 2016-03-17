@@ -289,8 +289,8 @@ public class CalculateCoordinatesTask implements Runnable{
 						break outerLoop;
 					}
 					else{// possible cluster of cells -> try to separate them
-						separateClusteredCellsMethodA(maxDistanceValues, weightPointList);
-					//	separateClusteredCellsMethodB(weightPointList);
+					//	separateClusteredCellsMethodA(maxDistanceValues, weightPointList);
+						separateClusteredCellsMethodB(weightPointList);
 	/*	
 						WeightPoint w = getWeightPointWithBiggestDistance(maxDistanceValues);
 						if(w==null)
@@ -456,8 +456,7 @@ public class CalculateCoordinatesTask implements Runnable{
 							// check is the midpoint too close to points at currentCentroidCoordinates
 							if(!compareIsTooClose(midPoint,this.currentCentroidCoordinates, this.current_max_cell_size))
 								this.currentCentroidCoordinates.add(midPoint);
-							
-							
+						
 						}
 						
 					}
@@ -479,7 +478,8 @@ public class CalculateCoordinatesTask implements Runnable{
 	}
 	
 	/**
-	 * Separate clustered cells method a.
+	 * Separate clustered cells method A. Tries to form cells from given coordinates. 
+	 * Not used in this version. Should be combined somehow with method B.
 	 *
 	 * @param maxDistanceValues the max distance values
 	 * @param weightPointList the weight point list
@@ -693,7 +693,8 @@ public class CalculateCoordinatesTask implements Runnable{
 	private ArrayList<Point> getNeighbourPoints(Point p) throws Exception{
 		ArrayList<Point> neighbours=new ArrayList<Point>();
 		// calculate the max distance 
-		int maxDistance=(int)(this.current_max_cell_size/this.min_distance_between_cells_boundaries);
+	//	int maxDistance= Math.min((int)((double)this.current_max_cell_size/(double)this.min_distance_between_cells_boundaries), this.current_min_cell_size);
+		int maxDistance= (int)((double)this.current_max_cell_size/(double)this.min_distance_between_cells_boundaries);	
 		int lowerBoundValue=Math.max(p.x-maxDistance,0); // minimum bounds for binary search
 		int upperBoundValue=p.x+maxDistance;				// maximum bounds for binary search
 		int[] startEndIndexes=startEndBinarySearch(this.current_coordinates, lowerBoundValue, upperBoundValue);

@@ -909,6 +909,8 @@ public class TaskManager {
 		dialog=null;
 		return returnValue;
 	}
+	
+
 
 	/**
 	 * FOR TESTING PURPOSES : add coordinates to second.
