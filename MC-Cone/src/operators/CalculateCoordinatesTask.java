@@ -8,9 +8,6 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Stack;
 import java.util.logging.Logger;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
-
 import information.CentroidFromNpoints;
 import information.SharedVariables;
 import math.geom2d.Point2D;
@@ -406,6 +403,7 @@ public class CalculateCoordinatesTask implements Runnable{
 	 * @param weightPointList the weight point list
 	 * @throws Exception the exception
 	 */
+	@SuppressWarnings("unused")
 	private void separateClusteredCellsMethodA(MaxDistancePoint[] maxDistanceValues, ArrayList<WeightPoint> weightPointList) throws Exception{
 		
 		WeightPoint w = getWeightPointWithBiggestDistance(maxDistanceValues); // get point that has longest distance from center

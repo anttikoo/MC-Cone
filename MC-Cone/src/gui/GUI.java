@@ -26,7 +26,6 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
-import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
@@ -224,7 +223,7 @@ public class GUI extends JFrame{
 	public GUI()
 {		super("gui");
 		//initialize LOGGING 
-		initLogging(Level.FINE);
+		initLogging(Level.INFO);
 		
 		// initialize fonts
 		Fonts.initFonts();
@@ -2625,7 +2624,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 				}
 			}
 			
-			int processors = Runtime.getRuntime().availableProcessors();
+			
 			
 		} catch (Exception e) {
 			LOGGER.severe("Error in setting OS specific settings!");
