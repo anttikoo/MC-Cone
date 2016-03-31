@@ -1,7 +1,6 @@
 package information;
 
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
