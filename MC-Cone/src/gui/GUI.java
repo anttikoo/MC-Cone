@@ -223,7 +223,7 @@ public class GUI extends JFrame{
 	public GUI()
 {		super("gui");
 		//initialize LOGGING 
-		initLogging(Level.INFO);
+		initLogging(Level.FINE);
 		
 		// initialize fonts
 		Fonts.initFonts();
@@ -1182,6 +1182,19 @@ public class GUI extends JFrame{
 	 */
 	public double getSizeMultiplier() throws Exception{
 		return this.taskManager.getShapeSizeMultiplier();
+	}
+	
+	/**
+	 * Returns the java version as double (for example 1.8).
+	 *
+	 * @return the version 
+	 * @throws Exception the exception
+	 */
+	private double getVersion () throws Exception{
+	    String version = System.getProperty("java.version");
+	    int pos = version.indexOf('.');
+	    pos = version.indexOf('.', pos+1);
+	    return Double.parseDouble (version.substring (0, pos));
 	}
 	
 	/**
@@ -2607,8 +2620,17 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	private void setUpOSsharedVariables(){
 
 		try {
+			double version = 1.8;
+			try {
+				version = getVersion();
+				LOGGER.fine("JAVA version: "+version);
+			} catch (Exception e) {
+				LOGGER.severe("Error in analyzing used java version!");
+				e.printStackTrace();
+			}
+			
 			String osString=System.getProperty("os.name").toLowerCase();
-			LOGGER.fine("OS:"+osString);
+			LOGGER.fine("Operation System: "+osString);
 			if(osString.contains("win")){
 				SharedVariables.setUsedDimmingModeToSrcOver();
 				SharedVariables.setOS(ID.OS_WINDOWS);
@@ -2620,10 +2642,16 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 				}
 				else{ // unix or linux
 				//	SharedVariables.setUsedDimmingModeToSrcIn();
+					if(version < 1.8)
+						SharedVariables.setUsedDimmingModeToSrcIn();
+					else
 					SharedVariables.setUsedDimmingModeToSrcOver();
+					
+					// set OS variable
 					SharedVariables.setOS(ID.OS_LINUX_UNIX);
 				}
 			}
+			
 			
 			
 			
