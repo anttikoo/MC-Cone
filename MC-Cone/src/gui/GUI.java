@@ -2619,7 +2619,8 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 					SharedVariables.setOS(ID.OS_MAC);
 				}
 				else{ // unix or linux
-					SharedVariables.setUsedDimmingModeToSrcIn();
+				//	SharedVariables.setUsedDimmingModeToSrcIn();
+					SharedVariables.setUsedDimmingModeToSrcOver();
 					SharedVariables.setOS(ID.OS_LINUX_UNIX);
 				}
 			}

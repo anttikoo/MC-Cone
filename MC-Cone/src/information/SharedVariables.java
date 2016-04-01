@@ -76,7 +76,7 @@ public class SharedVariables {
 	public static int transparencyModeIN = AlphaComposite.SRC_IN;
 	
 	/** The transparency mode out. */
-	public static int transparencyModeOut= AlphaComposite.SRC_OUT;
+	public static  int transparencyModeOut= AlphaComposite.SRC_OUT;
 	
 	/** The transparency mode over. */
 	public static int transparencyModeOVER = AlphaComposite.SRC_OVER;
