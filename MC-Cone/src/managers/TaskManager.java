@@ -138,8 +138,8 @@ public class TaskManager {
 	 *
 	 * @throws Exception the exception
 	 */
-	public void copySelectedMarkingLayerMarkingsTemporary() throws Exception{
-		this.informationCenter.copySelectedMarkingLayerMarkingsTemporary();
+	public boolean copySelectedMarkingLayerMarkingsTemporary() throws Exception{
+		return this.informationCenter.copySelectedMarkingLayerMarkingsTemporary();
 		
 	}
 
@@ -526,6 +526,10 @@ public class TaskManager {
 			return true;
 		
 		return false;
+	}
+	
+	public boolean hasTemporaryMarkingLayerForCopy() throws Exception{
+		return this.informationCenter.hasTemporaryMarkingLayerForCopy();
 	}
 
 	/**

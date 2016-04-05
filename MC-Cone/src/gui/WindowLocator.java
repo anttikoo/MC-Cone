@@ -21,7 +21,7 @@ public class WindowLocator {
 	public static Rectangle getVisibleWindowBounds(Component comp) throws Exception{
 		
 		Rectangle parentRectangle=comp.getBounds();
-		if(SharedVariables.operationSystem == ID.OS_LINUX_UNIX){ // in linux may the unity menu bar affect to painting of dimming 
+		if(SharedVariables.operationSystem == ID.OS_LINUX_UNIX ){ // in linux may the unity menu bar affect to painting of dimming 
 			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 			Rectangle windowBounds = ge.getMaximumWindowBounds();
 			

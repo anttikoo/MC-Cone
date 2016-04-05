@@ -213,6 +213,23 @@ public class GUI extends JFrame{
 	
 	/** The zoom out button. */
 	private JButton zoomOutButton;
+
+	/** The save markings dialog. */
+	private SaveMarkings saveMarkingsDialog = null;
+
+	/** The add image. */
+	private AddImageLayerDialog addImage = null;
+
+	/** The open images. */
+	private AddImageLayerDialog openImages = null;
+
+	/** The export results. */
+	private ExportResults exportResults = null;
+
+	/** The export image. */
+	private ExportImage exportImage = null;
+
+
 	
 
 	/**
@@ -366,6 +383,40 @@ public class GUI extends JFrame{
 							setVisibilityOfAllMarkingLayers(true);
 						} catch (Exception e1) {
 							LOGGER.severe("Error in setting all MarkingLayers visible!");
+							e1.printStackTrace();
+						}
+
+					}
+				});
+				break;
+				
+			case ID.MENU_ITEM_EDIT_COPY_MARKINGS:
+				item.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						try {
+							copySelectedMarkingLayerMarkingsTemporary();
+						} catch (Exception e1) {
+							LOGGER.severe("Error in copying markings!");
+							e1.printStackTrace();
+						}
+
+					}
+				});
+				break;
+				
+			case ID.MENU_ITEM_EDIT_PASTE_MARKINGS:
+				item.addActionListener(new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						try {
+							pasteMarkingsToSelectedMarkingLayer();
+						} catch (Exception e1) {
+							LOGGER.severe("Error in pasting selectedMarkingLayer!");
 							e1.printStackTrace();
 						}
 
@@ -806,7 +857,18 @@ public class GUI extends JFrame{
 	 */
 	public void copySelectedMarkingLayerMarkingsTemporary(){
 		try {
-			this.taskManager.copySelectedMarkingLayerMarkingsTemporary();
+			if(this.taskManager.getSelectedMarkingLayer() != null){
+				if(!this.taskManager.copySelectedMarkingLayerMarkingsTemporary()){
+					showMessage("No data to copy", "Selected MarkingLayer may not contain data to copy!",ID.OK);
+				}
+				else{
+					
+				}
+			}
+			else{
+				showMessage("No MarkingLayer!", "Not found MarkingLayer where from to copy markings!",ID.OK);
+			}
+			
 		} catch (Exception e) {
 			LOGGER.severe("Error in copying data of MarkingLayer!");
 			e.printStackTrace();
@@ -904,9 +966,11 @@ public class GUI extends JFrame{
 	 */
 	public void exportImages() throws Exception{
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
-
-			@SuppressWarnings("unused")
-			ExportImage exportImage = new ExportImage(this, this, taskManager.getImageLayerList());
+			if(exportImage == null){
+				exportImage = new ExportImage(this, this, taskManager.getImageLayerList());
+				exportImage.showDialog();
+				exportImage = null;
+			}
 		}
 		else{
 			showMessage( "Not starting exporting images", "Not exported images, because no images were found", ID.OK);
@@ -923,11 +987,11 @@ public class GUI extends JFrame{
 
 			
 			
-			ImageSetCreator iCreator=new ImageSetCreator(this, this.taskManager, this);
-			this.guiComponentListener.setChildDialog(iCreator);
-			iCreator.showDialog();
-			iCreator=null;
-			this.guiComponentListener.setChildDialog(null);
+		ImageSetCreator iCreator=new ImageSetCreator(this, this.taskManager, this);
+		this.guiComponentListener.setChildDialog(iCreator);
+		iCreator.showDialog();
+		iCreator=null;
+		this.guiComponentListener.setChildDialog(null);
 			
 			
 
@@ -941,9 +1005,11 @@ public class GUI extends JFrame{
 	 */
 	public void exportResults(int id) throws Exception{
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
-
-			
-			 new ExportResults(this, this, taskManager.getImageLayerList(), id);
+			if(exportResults == null){
+				exportResults = new ExportResults(this, this, taskManager.getImageLayerList(), id);
+				exportResults.showDialog();
+				exportResults = null;
+			}
 		}
 		else{
 			showMessage( "Not starting saving", "Not saved markings, because no markings were found", ID.OK);
@@ -1182,6 +1248,19 @@ public class GUI extends JFrame{
 	 */
 	public double getSizeMultiplier() throws Exception{
 		return this.taskManager.getShapeSizeMultiplier();
+	}
+	
+	/**
+	 * Returns the java version as double (for example 1.8).
+	 *
+	 * @return the version 
+	 * @throws Exception the exception
+	 */
+	private double getVersion () throws Exception{
+	    String version = System.getProperty("java.version");
+	    int pos = version.indexOf('.');
+	    pos = version.indexOf('.', pos+1);
+	    return Double.parseDouble (version.substring (0, pos));
 	}
 	
 	/**
@@ -1433,7 +1512,17 @@ public class GUI extends JFrame{
 			menu_edit_clear_all_countings.setMnemonic(KeyEvent.VK_R);
 			addActionsToMenuItems(menu_edit_clear_all_countings, ID.MENU_ITEM_EDIT_CLEAR_ALL_COUNTINGS);
 
-				
+			JMenuItem menu_edit_copy_markings = new JMenuItem("Copy markings of selected MarkingLayer");
+			menu_edit_copy_markings.setMnemonic(KeyEvent.VK_C);
+			menu_edit_copy_markings.setToolTipText("CTRL + C");
+			addActionsToMenuItems(menu_edit_copy_markings, ID.MENU_ITEM_EDIT_COPY_MARKINGS);
+			
+			JMenuItem menu_edit_paste_markings = new JMenuItem("Paste markings to selected MarkingLayer");
+			menu_edit_paste_markings.setMnemonic(KeyEvent.VK_V);
+			menu_edit_paste_markings.setToolTipText("CTRL + V");
+			addActionsToMenuItems(menu_edit_paste_markings, ID.MENU_ITEM_EDIT_PASTE_MARKINGS);
+			
+			
 			JCheckBoxMenuItem useStrictPrecounting = new JCheckBoxMenuItem("Use Strict Precounting");
 			
 			useStrictPrecounting.setSelected(false);
@@ -1448,6 +1537,8 @@ public class GUI extends JFrame{
 			menu_edit.add(menu_edit_set_marking_properties);
 			menu_edit.add(menu_edit_clear_single_countings);
 			menu_edit.add(menu_edit_clear_all_countings);
+			menu_edit.add(menu_edit_copy_markings);
+			menu_edit.add(menu_edit_paste_markings);
 			menu_edit.add(useStrictPrecounting);
 		//	menu_edit.add(useDeeperPrecounting);
 			
@@ -1822,13 +1913,13 @@ public class GUI extends JFrame{
 		try {
 
 			// open dialog for selecting files
-		//	JFrame dialogFrame = new JFrame("DialogFrame");
-		
-			AddImageLayerDialog addImage = new AddImageLayerDialog(this, this, taskManager.getImageLayerList());
-			this.guiComponentListener.setChildDialog(addImage);
-			addImage.showDialog();
-			this.guiComponentListener.setChildDialog(null);
-			addImage=null;
+			if(addImage == null){ // check that is not already created
+				addImage = new AddImageLayerDialog(this, this, taskManager.getImageLayerList());
+				this.guiComponentListener.setChildDialog(addImage);
+				addImage.showDialog();
+				this.guiComponentListener.setChildDialog(null);
+				addImage=null;
+			}
 		} catch (Exception e) {
 			LOGGER.severe("Error in adding new ImageLayer:  " +e.getClass().toString() + " :" +e.getMessage());
 			e.printStackTrace();
@@ -1857,21 +1948,20 @@ public class GUI extends JFrame{
 	public void openAddImageLayerDialog(File[] fileList){
 		try {
 			if(fileList != null){
-		
-				// open dialog for selecting files	
-				@SuppressWarnings("unused")
-				AddImageLayerDialog addImage = new AddImageLayerDialog(this, getGUI(), fileList);							
-				addImage=null;				
+				if(addImage == null){
+					addImage = new AddImageLayerDialog(this, getGUI(), fileList);							
+					addImage=null;		
+				}
 			}
 			else{
-			//	JFrame dialogFrame = new JFrame("DialogFrame");
-			
-				AddImageLayerDialog addImageDialog = new AddImageLayerDialog(this, this);
-				this.guiComponentListener.setChildDialog(addImageDialog);
-				addImageDialog.showDialog();
+				if(openImages == null){ // check that not already open.
+					openImages = new AddImageLayerDialog(this, this);
+					this.guiComponentListener.setChildDialog(openImages);
+					openImages.showDialog();
 				
-				addImageDialog=null;
-				this.guiComponentListener.setChildDialog(null);
+					openImages=null;
+					this.guiComponentListener.setChildDialog(null);
+				}
 				
 			}
 
@@ -1899,20 +1989,29 @@ public class GUI extends JFrame{
 	public void pasteMarkingsToSelectedMarkingLayer(){
 		try {
 			MarkingLayer selectedMarkingLayer = this.taskManager.getSelectedMarkingLayer();
+			
 			if(selectedMarkingLayer != null){
-				String name = selectedMarkingLayer.getLayerName();
-				// ask the user should the ImageLayer being deleted
-				ShadyMessageDialog dialog = new ShadyMessageDialog(this, "Paste markings", "Paste markings to "+name, ID.APPEND_OVERWRITE_CANCEL, this);
-				int returnValue = dialog.showDialog();
-				if(returnValue != ID.CANCEL){ // confirmed pasting the ImageLayer
-					if(this.taskManager.pasteMarkingsToSelectedMarkingLayer(returnValue)){
-						refreshLayersAndGUI();
-					}
-					
-					
-				}
 				
-				dialog=null;
+				if (this.taskManager.hasTemporaryMarkingLayerForCopy()) {
+					String name = selectedMarkingLayer.getLayerName();
+					// ask the user should the ImageLayer being deleted
+					ShadyMessageDialog dialog = new ShadyMessageDialog(this, "Paste markings",
+							"Paste markings to " + name, ID.APPEND_OVERWRITE_CANCEL, this);
+					int returnValue = dialog.showDialog();
+					if (returnValue != ID.CANCEL) { // confirmed pasting the ImageLayer
+						if (this.taskManager.pasteMarkingsToSelectedMarkingLayer(returnValue)) {
+							refreshLayersAndGUI();
+						}
+
+					}
+					dialog = null;
+				}
+				else{
+					showMessage("No markins", "No markings found to copy!", ID.OK);				
+				}
+			}
+			else{
+				showMessage("No MarkingLayer!", "No MarkingLayer where to copy data!", ID.OK);	
 			}
 		} catch (Exception e) {
 			LOGGER.severe("Error in pasting data of MarkingLayer!");
@@ -2221,17 +2320,16 @@ public class GUI extends JFrame{
 	public void saveMarkings() throws Exception{
 
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
-
-			@SuppressWarnings("unused")
-			SaveMarkings saveMarkingsDialog=new SaveMarkings(this, this, this.taskManager.getImageLayerList());
-			
-			saveMarkingsDialog=null;
+				if(saveMarkingsDialog == null){
+					saveMarkingsDialog = new SaveMarkings(this, getGUI(), this.taskManager.getImageLayerList());
+					saveMarkingsDialog.showDialog();
+					saveMarkingsDialog=null;
+				}
 		}
 		else{
 			showMessage( "Not starting saving", "Not saved markings, because no markings were found", ID.OK);
 
 		}
-
 	}
 
 	/**
@@ -2607,8 +2705,19 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	private void setUpOSsharedVariables(){
 
 		try {
+			double version = 1.8;
+			
+			try {
+				version = getVersion();
+				LOGGER.fine("JAVA version: "+version);
+				SharedVariables.setJavaVersion(version);
+			} catch (Exception e) {
+				LOGGER.severe("Error in analyzing used java version!");
+				e.printStackTrace();
+			}
+			
 			String osString=System.getProperty("os.name").toLowerCase();
-			LOGGER.fine("OS:"+osString);
+			LOGGER.fine("Operation System: "+osString);
 			if(osString.contains("win")){
 				SharedVariables.setUsedDimmingModeToSrcOver();
 				SharedVariables.setOS(ID.OS_WINDOWS);
@@ -2619,10 +2728,17 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 					SharedVariables.setOS(ID.OS_MAC);
 				}
 				else{ // unix or linux
-					SharedVariables.setUsedDimmingModeToSrcIn();
+				//	SharedVariables.setUsedDimmingModeToSrcIn();
+					if(version < 1.8)
+						SharedVariables.setUsedDimmingModeToSrcIn();
+					else
+					SharedVariables.setUsedDimmingModeToSrcOver();
+					
+					// set OS variable
 					SharedVariables.setOS(ID.OS_LINUX_UNIX);
 				}
 			}
+			
 			
 			
 			

@@ -69,7 +69,7 @@ public class MouseListenerCreator {
 		}
 		if(typeOfButton== ID.BUTTON_CANCEL){
 			InputMap inputMap= (button).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0,false), "cancel_pressed");
+			inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0,true), "cancel_pressed");
 			ActionMap actionMap = 	(button).getActionMap();
 			actionMap.put("cancel_pressed", new AbstractAction() {
 	
@@ -95,6 +95,8 @@ public class MouseListenerCreator {
 	
 			});
 		}
+		
+		
 		
 	}
 

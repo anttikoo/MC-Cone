@@ -399,7 +399,7 @@ public class PreCounterThread implements Runnable{
 						   continueFor=false;
 						   
 					   int rows= (endIndex-startIndex+1)/(3*w);
-					   System.out.println(" index: " +endIndex + " of "+this.originalImagePixels.length);
+					//   System.out.println(" index: " +endIndex + " of "+this.originalImagePixels.length);
 					   createTaskList.add(new CreateCoordinatesTask(rows, w, 
 							   Arrays.copyOfRange(this.originalImagePixels, startIndex, endIndex+1),  // has to add 1 to get last index included
 							   rowCounter, this.current_gap, this.current_colorList));

@@ -146,7 +146,8 @@ public class ID {
 	public static final int FOLDER_XML_FILES=139;
 	public static final int MENU_ITEM_USE_STRICT_PRECOUNTING= 140;
 	public static final int MENU_ITEM_USE_DEEPER_PRECOUNTING= 141;
-	
+	public static final int MENU_ITEM_EDIT_COPY_MARKINGS= 142;
+	public static final int MENU_ITEM_EDIT_PASTE_MARKINGS= 143;
 	
 	
 	

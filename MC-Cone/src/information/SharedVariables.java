@@ -14,32 +14,20 @@ public class SharedVariables {
 	/** The can user select grid rectangles. */
 	public static boolean canUserSelectGridRectangles=false;
 	
-	/** The Constant GAPPING_CELL_SIZE_SMALL. */
-	public static final int GAPPING_CELL_SIZE_SMALL = 10;
-	
-	/** The Constant GAPPING_CELL_SIZE_MEDIUM. */
-	public static final int GAPPING_CELL_SIZE_MEDIUM = 30;
-	
-	/** The Constant GAPPING_CELL_SIZE_BIG. */
-	public static final int GAPPING_CELL_SIZE_BIG = 50;
-		
-	/** The Constant IMAGE_SIZE_SMALL. Size in pixels. */
-	public static final int IMAGE_SIZE_SMALL = 1000000;
-	
-	/** The Constant IMAGE_SIZE_MEDIUM. Size in pixels.*/
-	public static final int IMAGE_SIZE_MEDIUM = 5000000;
-	
-	/** The Constant IMAGE_SIZE_BIG. Size in pixels. */
-	public static final int IMAGE_SIZE_BIG = 10000000;
-	
-	/** The Constant IMAGE_SIZE_BIG. Size in pixels. */
-	public static final int IMAGE_SIZE_EXTRA_BIG = 50000000;
-	
 	/** The Constant DISTANCE_TO_ADD. */
 	public static final int DISTANCE_TO_ADD = 10;
 	
 	/** The Constant DISTANCE_TO_REMOVE. */
 	public static final int DISTANCE_TO_REMOVE = 20;
+	
+	/** The Constant GAPPING_CELL_SIZE_BIG. */
+	public static final int GAPPING_CELL_SIZE_BIG = 50;
+		
+	/** The Constant GAPPING_CELL_SIZE_MEDIUM. */
+	public static final int GAPPING_CELL_SIZE_MEDIUM = 30;
+	
+	/** The Constant GAPPING_CELL_SIZE_SMALL. */
+	public static final int GAPPING_CELL_SIZE_SMALL = 10;
 	
 	/** The Constant GLOBAL_CIRCULARITY. */
 	public static final double GLOBAL_CIRCULARITY = 1.8;
@@ -56,8 +44,22 @@ public class SharedVariables {
 	/** The Constant heighthUp. */
 	public static final String heighthUp = "HEIGHT_UP";
 	
+	/** The Constant IMAGE_SIZE_BIG. Size in pixels. */
+	public static final int IMAGE_SIZE_BIG = 10000000;
+	
+	/** The Constant IMAGE_SIZE_BIG. Size in pixels. */
+	public static final int IMAGE_SIZE_EXTRA_BIG = 50000000;
+	
+	/** The Constant IMAGE_SIZE_MEDIUM. Size in pixels.*/
+	public static final int IMAGE_SIZE_MEDIUM = 5000000;
+	
+	/** The Constant IMAGE_SIZE_SMALL. Size in pixels. */
+	public static final int IMAGE_SIZE_SMALL = 1000000;
+	
 	/** The Constant IMAGESET_EXPORT_MAX_RESOLUTION. */
 	public static final int IMAGESET_EXPORT_MAX_RESOLUTION = 5000;
+	
+	public static double javaVersion = 1.7;
 	
 	/** The Constant MAX_GAP. */
 	public static final int MAX_GAP = 6;
@@ -76,7 +78,7 @@ public class SharedVariables {
 	public static int transparencyModeIN = AlphaComposite.SRC_IN;
 	
 	/** The transparency mode out. */
-	public static int transparencyModeOut= AlphaComposite.SRC_OUT;
+	public static  int transparencyModeOut= AlphaComposite.SRC_OUT;
 	
 	/** The transparency mode over. */
 	public static int transparencyModeOVER = AlphaComposite.SRC_OVER;
@@ -89,7 +91,7 @@ public class SharedVariables {
 	
 	/** The use multi threading in calculating coordinates. */
 	public static boolean useMultiThreadingInCalculatingCoordinates=false;
-	
+
 	/** The use mult threading increating point groups. */
 	public static boolean useMultThreadingIncreatingPointGroups=false;
 
@@ -98,7 +100,7 @@ public class SharedVariables {
 
 	/** The Constant version. */
 	public static final String version = "0.9";
-
+	
 	/** The Constant widthDown. */
 	public static final String widthDown = "WIDTH_DOWN";
 	
@@ -107,6 +109,15 @@ public class SharedVariables {
 	
 	
 	/**
+	 * Returns the java version.
+	 *
+	 * @return the java version
+	 */
+	public static double getJavaVersion() {
+		return javaVersion;
+	}
+
+	/**
 	 * Returns the remember_answer_pc.
 	 *
 	 * @return the remember_answer_pc_value
@@ -114,7 +125,7 @@ public class SharedVariables {
 	public static int getRememberAnswerPC() {
 		return remember_answer_pc_ow;
 	}
-	
+
 	/**
 	 * Checks if is use strick search.
 	 *
@@ -124,8 +135,6 @@ public class SharedVariables {
 		return useStrickSearch;
 	}
 	
-
-
 	/**
 	 * Sets the available processors.
 	 *
@@ -138,6 +147,17 @@ public class SharedVariables {
 			useMultiThreadingInCalculatingCoordinates=true;
 			useMultThreadingIncreatingPointGroups=true;
 		}
+	}
+	
+
+
+	/**
+	 * Sets the java version.
+	 *
+	 * @param javaVersion the new java version
+	 */
+	public static void setJavaVersion(double javaVersion) {
+		SharedVariables.javaVersion = javaVersion;
 	}
 
 	

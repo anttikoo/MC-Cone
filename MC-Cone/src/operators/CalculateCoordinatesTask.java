@@ -962,9 +962,13 @@ public class CalculateCoordinatesTask implements Runnable{
 	 */
 	@Override
 	public void run() {
-		setContinueCounting(true);
-		createPointGroups();
-		System.out.println("Ended the run");
+		try{
+			setContinueCounting(true);
+			createPointGroups();
+		}
+		catch(Exception e){
+			LOGGER.severe("Error in start calculating coordinates!");
+		}
 
 	}
 
