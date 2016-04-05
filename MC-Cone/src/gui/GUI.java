@@ -968,6 +968,7 @@ public class GUI extends JFrame{
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
 			if(exportImage == null){
 				exportImage = new ExportImage(this, this, taskManager.getImageLayerList());
+				exportImage.showDialog();
 				exportImage = null;
 			}
 		}
@@ -1006,6 +1007,7 @@ public class GUI extends JFrame{
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
 			if(exportResults == null){
 				exportResults = new ExportResults(this, this, taskManager.getImageLayerList(), id);
+				exportResults.showDialog();
 				exportResults = null;
 			}
 		}
@@ -2318,10 +2320,11 @@ public class GUI extends JFrame{
 	public void saveMarkings() throws Exception{
 
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
-				if(saveMarkingsDialog == null)
-					saveMarkingsDialog = new SaveMarkings(this, this, this.taskManager.getImageLayerList());
-			
-			saveMarkingsDialog=null;
+				if(saveMarkingsDialog == null){
+					saveMarkingsDialog = new SaveMarkings(this, getGUI(), this.taskManager.getImageLayerList());
+					saveMarkingsDialog.showDialog();
+					saveMarkingsDialog=null;
+				}
 		}
 		else{
 			showMessage( "Not starting saving", "Not saved markings, because no markings were found", ID.OK);
@@ -2703,9 +2706,11 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 
 		try {
 			double version = 1.8;
+			
 			try {
 				version = getVersion();
 				LOGGER.fine("JAVA version: "+version);
+				SharedVariables.setJavaVersion(version);
 			} catch (Exception e) {
 				LOGGER.severe("Error in analyzing used java version!");
 				e.printStackTrace();

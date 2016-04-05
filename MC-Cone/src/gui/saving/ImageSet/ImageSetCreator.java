@@ -445,6 +445,7 @@ public class ImageSetCreator extends JDialog implements MouseListener, Runnable{
 	 */
 	private void createImagesFromPresentImageLayers() throws Exception{
 		visibleDialog = new SelectAndCreateImageFiles(this, this.gui, taskManager.getImageLayerList(), ID.EXPORT_PREVIEW_IMAGES);
+		((SelectAndCreateImageFiles)visibleDialog).showDialog();
 		
 		// create SingleDrawImagePanels of all images
 		if(((SelectAndCreateImageFiles)visibleDialog).getCreatedBufferedImages() != null && ((SelectAndCreateImageFiles)visibleDialog).getCreatedBufferedImages().size()>0){
@@ -454,6 +455,7 @@ public class ImageSetCreator extends JDialog implements MouseListener, Runnable{
 				SingleDrawImagePanel sip=new SingleDrawImagePanel(biwn.getImage(), biwn.getImageName(), taskManager, getSelectedFont());
 				sip.addMouseListener(this);
 				this.drawImagePanels.add(sip);
+				
 			}
 
 			updatePanelFonts();

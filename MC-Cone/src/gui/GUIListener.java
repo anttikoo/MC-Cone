@@ -432,8 +432,8 @@ public class GUIListener extends MouseInputAdapter {
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "export_csv_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK), "export_tab_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "export_clip_pressed");		
-				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK |KeyEvent.CTRL_DOWN_MASK ), "show_all_markings_pressed");
-				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.SHIFT_DOWN_MASK |KeyEvent.CTRL_DOWN_MASK ), "hide_all_markings_pressed");
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK), "show_all_markings_pressed");
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.SHIFT_DOWN_MASK ), "hide_all_markings_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), "zoom_out_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), "zoom_in_pressed");
 
@@ -478,14 +478,17 @@ public class GUIListener extends MouseInputAdapter {
 				//Save markings
 				actionMap.put("save_pressed", new AbstractAction() {
 
+
 					/** The Constant serialVersionUID. */
-					private static final long serialVersionUID = 14L;
+					private static final long serialVersionUID = -3062329114905431995L;
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {			
-								gui.saveMarkings();							
-					
+							
+							gui.saveMarkings();	
+							System.out.println("Pressed save!");
+								
 						} catch (Exception e1) {
 							LOGGER.severe("Error in saving markings!");
 							e1.printStackTrace();

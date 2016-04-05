@@ -129,7 +129,7 @@ private Component parentComponent=null;
 			setImageList();
 			updateSaveButtonState();
 			this.revalidate();
-			this.setVisible(true);
+		//	this.setVisible(true);
 
 		} catch (Exception e) {
 
@@ -161,8 +161,8 @@ private Component parentComponent=null;
 		//	initKeyListenerToDialog(); -> this is done in MouseListenerCreator..
 			setImageList();
 			updateSaveButtonState();
-			this.revalidate();
-			this.setVisible(true);
+		//	this.revalidate();
+		//	this.setVisible(true);
 
 		} catch (Exception e) {
 			LOGGER.severe("Error in saving Markings:  " +e.getMessage() + " line: " +e.getStackTrace()[2].getLineNumber());
@@ -502,12 +502,13 @@ private Component parentComponent=null;
 	private void initComponents() throws Exception{
 		
 		this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
+	
 		this.setUndecorated(true);
 		this.setBackground(new Color(0,0,0,0)); // transparent color
 		this.setContentPane(new ContentPane()); // set contentpane to get dimming
 		this.getContentPane().setBackground(Color_schema.dark_30);
 		this.getContentPane().setLayout(new GridBagLayout());
-
+		//init backpanel where all funtions are shown.
 		backPanel = new JPanel();
 		backPanel.setBackground(Color_schema.dark_30);
 		backPanel.setLayout(new BorderLayout());
@@ -1011,6 +1012,10 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 			}
 		}
 
+	}
+	
+	public void showDialog(){
+		this.setVisible(true);
 	}
 
 	/**
