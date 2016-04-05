@@ -232,8 +232,7 @@ public class InformationCenter {
 			LOGGER.info("Trying copy MarkingLayer, which contains no markings!");
 			return false;
 		}
-			
-		
+					
 	}
 
 	/**
