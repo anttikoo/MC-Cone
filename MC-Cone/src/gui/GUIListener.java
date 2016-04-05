@@ -96,6 +96,8 @@ public class GUIListener extends MouseInputAdapter {
 
 	/** The Constant LOGGER for Logging purposes. */
 	private final static Logger LOGGER = Logger.getLogger("MCCLogger");
+	
+
 
 	/**
 	 * A Class constructor. Inits the timers.
@@ -441,9 +443,7 @@ public class GUIListener extends MouseInputAdapter {
 
 				actionMap.put("ctrl_pressed", new AbstractAction() {
 
-					/**
-					 * 
-					 */
+					/** The Constant serialVersionUID. */
 					private static final long serialVersionUID = 12L;
 
 					@Override
@@ -460,15 +460,14 @@ public class GUIListener extends MouseInputAdapter {
 
 				actionMap.put("ctrl_released", new AbstractAction() {
 
-					/**
-					 * 
-					 */
+					/** The Constant serialVersionUID. */
 					private static final long serialVersionUID = 13L;
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
 							is_CTRL_pressed=false;
+					
 						} catch (Exception e1) {
 							LOGGER.severe("Error in action by released control key!");
 							e1.printStackTrace();
@@ -479,15 +478,14 @@ public class GUIListener extends MouseInputAdapter {
 				//Save markings
 				actionMap.put("save_pressed", new AbstractAction() {
 
-					/**
-					 * 
-					 */
+					/** The Constant serialVersionUID. */
 					private static final long serialVersionUID = 14L;
 
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						try {
-							gui.saveMarkings();
+						try {			
+								gui.saveMarkings();							
+					
 						} catch (Exception e1) {
 							LOGGER.severe("Error in saving markings!");
 							e1.printStackTrace();
@@ -495,12 +493,12 @@ public class GUIListener extends MouseInputAdapter {
 
 					}
 				});
+				
+			
 					// export csv
 					actionMap.put("export_csv_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 15L;
 
 						@Override
@@ -517,9 +515,7 @@ public class GUIListener extends MouseInputAdapter {
 					// export images
 					actionMap.put("export_images_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 16L;
 
 						@Override
@@ -536,9 +532,7 @@ public class GUIListener extends MouseInputAdapter {
 					// managing layers
 					actionMap.put("manage_layers_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 17L;
 
 						@Override
@@ -557,9 +551,7 @@ public class GUIListener extends MouseInputAdapter {
 					// adding layers
 					actionMap.put("add_layers_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 18L;
 
 						@Override
@@ -576,9 +568,7 @@ public class GUIListener extends MouseInputAdapter {
 					// exportin tab delimited file
 					actionMap.put("export_tab_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 19L;
 
 						@Override
@@ -595,9 +585,7 @@ public class GUIListener extends MouseInputAdapter {
 					// export results to clipboard
 					actionMap.put("export_clip_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 20L;
 
 						@Override
@@ -614,9 +602,7 @@ public class GUIListener extends MouseInputAdapter {
 					// hiding all markings
 					actionMap.put("hide_all_markings_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 221L;
 
 						@Override
@@ -634,9 +620,7 @@ public class GUIListener extends MouseInputAdapter {
 					// showin all markings
 					actionMap.put("show_all_markings_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 222L;
 
 						@Override
@@ -653,9 +637,7 @@ public class GUIListener extends MouseInputAdapter {
 					// zooming out
 					actionMap.put("zoom_out_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 223L;
 
 						@Override
@@ -672,9 +654,7 @@ public class GUIListener extends MouseInputAdapter {
 					// zooming in
 					actionMap.put("zoom_in_pressed", new AbstractAction() {
 
-						/**
-						 * 
-						 */
+						/** The Constant serialVersionUID. */
 						private static final long serialVersionUID = 224L;
 
 						@Override

@@ -222,13 +222,16 @@ public class InformationCenter {
 	 *
 	 * @throws Exception the exception
 	 */
-	public void copySelectedMarkingLayerMarkingsTemporary() throws Exception{
+	public boolean copySelectedMarkingLayerMarkingsTemporary() throws Exception{
 		MarkingLayer selectedMarkingLayer = getSelectedMarkingLayer();
 		if(selectedMarkingLayer != null && selectedMarkingLayer.getCoordinateList() != null && selectedMarkingLayer.getCoordinateList().size()>0){
-			this.tempMarkingLayer = selectedMarkingLayer.makeCopy();		
+			this.tempMarkingLayer = selectedMarkingLayer.makeCopy();	
+			return true;
 		}
-		else
+		else{
 			LOGGER.info("Trying copy MarkingLayer, which contains no markings!");
+			return false;
+		}
 			
 		
 	}
@@ -772,6 +775,19 @@ public class InformationCenter {
 	 */
 	public ArrayList<MarkingLayer> getVisibleMarkingLayerList() throws Exception {
 		return visibleMarkingLayerList;
+	}
+	
+	/**
+	 * Checks for temporary marking layer for copy.
+	 *
+	 * @return true, if found MarkingLayer including markings
+	 * @throws Exception the exception
+	 */
+	public boolean hasTemporaryMarkingLayerForCopy() throws Exception{
+		if(this.tempMarkingLayer != null && this.tempMarkingLayer.getCoordinateList() != null && this.tempMarkingLayer.getCoordinateList().size()>0)
+			return true;
+		
+		return false;
 	}
 
 	/**
