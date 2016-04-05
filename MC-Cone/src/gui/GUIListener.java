@@ -487,7 +487,7 @@ public class GUIListener extends MouseInputAdapter {
 						try {			
 							
 							gui.saveMarkings();	
-							System.out.println("Pressed save!");
+							
 								
 						} catch (Exception e1) {
 							LOGGER.severe("Error in saving markings!");
