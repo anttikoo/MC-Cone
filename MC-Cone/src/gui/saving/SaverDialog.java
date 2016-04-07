@@ -128,7 +128,7 @@ private Component parentComponent=null;
 			initComponents();
 			setImageList();
 			updateSaveButtonState();
-			this.revalidate();
+		//	this.revalidate();
 		//	this.setVisible(true);
 
 		} catch (Exception e) {
@@ -501,8 +501,8 @@ private Component parentComponent=null;
 	 */
 	private void initComponents() throws Exception{
 		
-		this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
-	
+	//	this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
+		this.setBounds(gui.getBounds());
 		this.setUndecorated(true);
 		this.setBackground(new Color(0,0,0,0)); // transparent color
 		this.setContentPane(new ContentPane()); // set contentpane to get dimming
@@ -973,6 +973,25 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 			oneImagePathHeight=0;
 
 	}
+	
+	/**
+	 * Sets the panel position and child dialogs when user drags the main window. 
+	 * This is only happening in Linux. In other OS the dragging is not possible, because modal dialogs are used.
+	 */
+	public void setPanelPosition(){
+		try {
+			this.setBounds(this.gui.getVisibleWindowBounds());
+		/*	if(this.visibleDialog != null)
+				this.visibleDialog.setBounds(this.getBounds());
+			
+			if(this.shadyMessageDialog != null)
+				this.shadyMessageDialog.setBounds(this.getBounds());
+				*/
+		} catch (Exception e) {
+			LOGGER.severe("ERROR in setting Panel Position!");
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Sets the present folder.
@@ -1016,6 +1035,7 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 	
 	public void showDialog(){
 		this.setVisible(true);
+		this.repaint();
 	}
 
 	/**

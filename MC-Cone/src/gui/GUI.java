@@ -228,6 +228,9 @@ public class GUI extends JFrame{
 
 	/** The export image. */
 	private ExportImage exportImage = null;
+	
+	/** The visible panel. */
+	private boolean visiblePanel=false;
 
 
 	
@@ -2320,10 +2323,26 @@ public class GUI extends JFrame{
 	public void saveMarkings() throws Exception{
 
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
-				if(saveMarkingsDialog == null){
-					saveMarkingsDialog = new SaveMarkings(this, getGUI(), this.taskManager.getImageLayerList());
-					saveMarkingsDialog.showDialog();
-					saveMarkingsDialog=null;
+				if(saveMarkingsDialog == null && !visiblePanel){
+					visiblePanel=true;
+					
+						
+							try {
+								saveMarkingsDialog = new SaveMarkings(getGUI(), getGUI(), taskManager.getImageLayerList());
+								
+								this.guiComponentListener.setChildDialog(saveMarkingsDialog);
+								saveMarkingsDialog.showDialog();
+								this.guiComponentListener.setChildDialog(null);
+								
+								saveMarkingsDialog=null;
+							} catch (Exception e) {
+								
+								e.printStackTrace();
+							}
+							
+					
+					
+					visiblePanel=false;
 				}
 		}
 		else{

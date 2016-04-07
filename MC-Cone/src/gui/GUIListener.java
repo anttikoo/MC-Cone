@@ -93,6 +93,8 @@ public class GUIListener extends MouseInputAdapter {
 	
 	/** The zoom slider. Source from GUI. */
 	private JSlider zoomSlider;
+	
+
 
 	/** The Constant LOGGER for Logging purposes. */
 	private final static Logger LOGGER = Logger.getLogger("MCCLogger");
@@ -483,8 +485,18 @@ public class GUIListener extends MouseInputAdapter {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {			
-							
-							gui.saveMarkings();	
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									try {
+										gui.saveMarkings();
+									} catch (Exception ex) {
+										// TODO Auto-generated catch block
+										ex.printStackTrace();
+									}	
+								}
+							});
+								
+						
 							
 								
 						} catch (Exception e1) {
@@ -869,6 +881,8 @@ public class GUIListener extends MouseInputAdapter {
 			}
 		});
 	}
+	
+	
 
 	/**
 	 * Initializes the timer for zooming.
