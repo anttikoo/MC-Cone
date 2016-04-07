@@ -524,7 +524,7 @@ public class PreCounterThread implements Runnable{
 		this.continueCounting=false;
 		
 		if(this.executor != null)
-			this.executor.shutdown();
+			this.executor.shutdownNow();
 
 		if(this.pctm != null)
 			this.pctm.cancelCounting();
@@ -846,64 +846,44 @@ public class PreCounterThread implements Runnable{
 					
 					// go through finalized tasks
 					for(int i=0;i<taskList.size();i++){
-						CalculateCoordinatesTask singleTask = taskList.get(i);
-						CalculateCoordinatesTask nextTask=null;
-						if(i<taskList.size()-1)
-							nextTask = taskList.get(i+1);
-						ArrayList<CentroidFromNpoints> centroidCoordinates = singleTask.getCentroidCoordinates();
-						Iterator<CentroidFromNpoints> centroidIterator = centroidCoordinates.iterator();
-						// go through points
-						while(centroidIterator.hasNext()){
+						if (continueCounting) {
+							CalculateCoordinatesTask singleTask = taskList.get(i);
+							CalculateCoordinatesTask nextTask = null;
+							if (i < taskList.size() - 1)
+								nextTask = taskList.get(i + 1);
+							ArrayList<CentroidFromNpoints> centroidCoordinates = singleTask.getCentroidCoordinates();
+							Iterator<CentroidFromNpoints> centroidIterator = centroidCoordinates.iterator();
+							// go through points
+							while (centroidIterator.hasNext()) {
 
-							// check that next task has no centroids too close or they are not composed from more points
-			
-							CentroidFromNpoints midPoint = centroidIterator.next();
-							
-							if(!compareIsTooClose(midPoint, this.current_finalCentroidCoordinates)){ // check is too close to point at final centroids.
-								
-								// not too close -> check is too close to centroids of next task
-								if(i<taskList.size()-1){ // not yet in last position of tasklist -> check towards to next task
-								
-									if(nextTask != null){
-										if(!nextTask.compareIsTooCloseOrMinor(midPoint,this.current_max_cell_size)){ // check is not too close or has bigger number of coordinates
-											this.current_finalCentroidCoordinates.add(midPoint);										
-										}	
-									}	
+								// check that next task has no centroids too close or they are not composed from more points
+
+								CentroidFromNpoints midPoint = centroidIterator.next();
+
+								if (!compareIsTooClose(midPoint, this.current_finalCentroidCoordinates)) { // check is too close to point at final centroids.
+
+									// not too close -> check is too close to centroids of next task
+									if (i < taskList.size() - 1) { // not yet in last position of tasklist -> check towards to next task
+
+										if (nextTask != null) {
+											if (!nextTask.compareIsTooCloseOrMinor(midPoint,
+													this.current_max_cell_size)) { // check is not too close or has bigger number of coordinates
+												this.current_finalCentroidCoordinates.add(midPoint);
+											}
+										}
+									} else { // in last position
+													// one cell
+										this.current_finalCentroidCoordinates.add(midPoint);
+
+									}
 								}
-								else{ // in last position
-									// one cell
-									 this.current_finalCentroidCoordinates.add(midPoint);
-									
-								}
-							}
+							} 
+						}else{ // cancelled the counting
+							return;
 						}
 
 					}
-					
-					/*
-					Iterator<CalculateCoordinatesTask> finalizedTaskCheckIterator = taskList.iterator();
-					while(finalizedTaskCheckIterator.hasNext()){
-					
-						CalculateCoordinatesTask singleTask = finalizedTaskCheckIterator.next();
-						ArrayList<CentroidFromNpoints> centroidCoordinates = singleTask.getCentroidCoordinates();
-						for (int i =0; i<centroidCoordinates.size();i++){
-							
-							
-							
-						}
-						
-						
-						Iterator<CentroidFromNpoints> centroidIterator = centroidCoordinates.iterator();
-						while(centroidIterator.hasNext()){
-							Point midPoint = centroidIterator.next();
-							if(!compareIsTooClose(midPoint, this.current_finalCentroidCoordinates)){
-								 // one cell
-								 this.current_finalCentroidCoordinates.add(midPoint);
-							 }
-						}
-						
-						
-					}	*/
+			
 			}
 		} catch (Exception e) {
 			LOGGER.severe("Error in precounting cells multithreaded!");

@@ -240,7 +240,7 @@ public class GUI extends JFrame{
 	public GUI()
 {		super("gui");
 		//initialize LOGGING 
-		initLogging(Level.INFO);
+		initLogging(Level.FINE);
 		
 		// initialize fonts
 		Fonts.initFonts();

@@ -334,9 +334,7 @@ public class GUIListener extends MouseInputAdapter {
 				
 				actionMap.put("page_up_pressed", new AbstractAction() {
 
-					/**
-					 * 
-					 */
+					/** The Constant serialVersionUID. */
 					private static final long serialVersionUID = 8L;
 
 					@Override
