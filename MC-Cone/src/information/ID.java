@@ -148,6 +148,7 @@ public class ID {
 	public static final int MENU_ITEM_USE_DEEPER_PRECOUNTING= 141;
 	public static final int MENU_ITEM_EDIT_COPY_MARKINGS= 142;
 	public static final int MENU_ITEM_EDIT_PASTE_MARKINGS= 143;
+	public static final int CURSOR_WAIT= 144;
 	
 	
 	

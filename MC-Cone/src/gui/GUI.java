@@ -59,6 +59,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -79,6 +80,7 @@ import managers.ProgramLogger;
 
 
 
+// TODO: Auto-generated Javadoc
 /**
  * Graphical user interface of program.
  * "author Antti Kurronen
@@ -123,13 +125,13 @@ public class GUI extends JFrame{
 	private JPanel rightPanel;
 	
 	
-	/** The JPAnel for lists of ImageLayerInfos */
+	/**  The JPAnel for lists of ImageLayerInfos. */
 	private JPanel layerInfoListJPanel;
 	
-	/** The JPAnel for button adding Images at rightPanel */
+	/**  The JPAnel for button adding Images at rightPanel. */
 	private JPanel addImageLayerJPanel;
 	
-	/** The JButton for precounting */
+	/**  The JButton for precounting. */
 	private JButton preCountButton;
 	
 	/** The menu_show_all_markings. */
@@ -231,6 +233,9 @@ public class GUI extends JFrame{
 	
 	/** The visible panel. */
 	private boolean visiblePanel=false;
+	
+	/** The add image worker. */
+	private SwingWorker<Boolean, Object> addImageWorker;
 
 
 	
@@ -681,10 +686,22 @@ public class GUI extends JFrame{
 	 * @param iLayerList Array of one or more ImageLayers.
 	 * @throws Exception the exception
 	 */
-	public void addImageLayerList(final ArrayList<ImageLayer> iLayerList) throws Exception{
+	public void addImagesLayerList(final ArrayList<ImageLayer> iLayerList) throws Exception{
+				// run in SwingWorker
+				this.addImageWorker = new AddImagesWorker(iLayerList);
+				this.addImageWorker.execute();						
+	}
+	
+	/*
+	 * Adds imported ImageLayers to InformationCenter. Updates the selected layers and GUI
+	 *
+	 * @param iLayerList Array of one or more ImageLayers.
+	 * @throws Exception the exception
+	
+	public void addImageLayerListOLD(final ArrayList<ImageLayer> iLayerList) throws Exception{
 			
 				// set the ImageLayers through TaskManager -> InformationCenter.imageLayerList	(finalizes the layers -> gives ids)			
-
+			//	setCursorOverFrame(ID.CURSOR_WAIT);
 				this.taskManager.addImageLayers(iLayerList);
 								
 				//updates the selected Layers and Refreshes GUI
@@ -693,9 +710,10 @@ public class GUI extends JFrame{
 
 				// refresh precouting components
 				cleanPreCountingIfNecessary();	
+				setCursorOverFrame(ID.CURSOR_DEFAULT);
 		
 	}
-	
+	*/
 
 	/**
 	 * Adds a single marking to Point p, if no any marking found too close. 
@@ -818,7 +836,7 @@ public class GUI extends JFrame{
 	}
 
 	/**
-	 *  Closes the program after verifying from user should unsaved information be saved
+	 *  Closes the program after verifying from user should unsaved information be saved.
 	 */
 	private void closeProgram(){
 		try {
@@ -1203,6 +1221,7 @@ public class GUI extends JFrame{
 	/**
 	 * Returns the folder name which is previously used.
 	 *
+	 * @param id the id
 	 * @return String folder name which is previously used.
 	 * @throws Exception the exception
 	 */
@@ -1333,7 +1352,8 @@ public class GUI extends JFrame{
 
 	/**
 	 * Initializes the JPanel and it's AddImage -JButton.
-	 * @throws Exception
+	 *
+	 * @throws Exception the exception
 	 */
 	private void initAddImageLayerButton() throws Exception{
 		addImageLayerJPanel = new JPanel();
@@ -1380,7 +1400,8 @@ public class GUI extends JFrame{
 
 	/**
 	 * Initializes dimension of all panels in main window.
-	 * @throws Exception
+	 *
+	 * @throws Exception the exception
 	 */
 	private void initializeSizes() throws Exception{
 
@@ -1416,6 +1437,8 @@ public class GUI extends JFrame{
 
 	/**
 	 *  Initializes the Logging system.
+	 *
+	 * @param level the level
 	 */
 	private void initLogging(Level level){
 		try {
@@ -1779,7 +1802,8 @@ public class GUI extends JFrame{
 
 	/**
 	 * Initializes GUI JFrame size, style and listeners.
-	 * @throws Exception
+	 *
+	 * @throws Exception the exception
 	 */
 	private void initWindowPropertiesAndListeners() throws Exception{
 
@@ -1894,6 +1918,15 @@ public class GUI extends JFrame{
 			throw new Exception();
 		}
 
+	}
+	
+	/**
+	 * Inits the worker.
+	 */
+	private void initWorker(){
+		
+		
+		
 	}
 
 	/**
@@ -2282,7 +2315,7 @@ public class GUI extends JFrame{
 	}
 
 	/**
-	 * Resizes components of graphical interface
+	 * Resizes components of graphical interface.
 	 */
 	protected void resizeLayerComponents(){
 		try{
@@ -2385,6 +2418,65 @@ public class GUI extends JFrame{
 					else	
 						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));			
 				break;
+				
+			case ID.CURSOR_WAIT:
+				
+				this.imagePanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					else	
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));			
+				break;
+				
+		}
+		
+	}
+	
+	/**
+	 * Sets Cursor type when hovering over whole Frame.
+	 *
+	 * @param typeOfCursor int ID of type of Cursor
+	 * @throws Exception the exception
+	 */
+	public void setCursorOverFrame(int typeOfCursor) throws Exception{
+		switch(typeOfCursor){
+			case ID.CURSOR_DEFAULT:
+				this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		/*		if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					else
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		*/		break;
+			case ID.CURSOR_HAND:
+				
+				this.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					else
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));			
+				break;
+			case ID.CURSOR_CROSS_HAIR:
+								
+				this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+				if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+					else	
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));			
+				break;
+				
+			case ID.CURSOR_WAIT:
+				
+				this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			/*	if(this.taskManager != null && this.taskManager.getSelectedMarkingLayer() != null && this.taskManager.getSelectedMarkingLayer().getLayerID()>0)
+					if(this.guiListener.isCellPickingON()) // is precounting on -> then set cursor of glasspane
+						this.glassPane.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					else	
+						getMarkingPanelByLayerID(this.taskManager.getSelectedMarkingLayer().getLayerID()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));			
+			*/	break;
 				
 		}
 		
@@ -2548,6 +2640,7 @@ public class GUI extends JFrame{
  * Sets the folder name which is previously used.
  *
  * @param folder String folder name which is previously used.
+ * @param id the id
  * @throws Exception the exception
  */
 public void setPresentFolder(String folder, int id) throws Exception{
@@ -3265,7 +3358,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 				ImageLayer l = new ImageLayer(path);
 				ArrayList<ImageLayer> list = new ArrayList<ImageLayer>();
 				list.add(l);
-				addImageLayerList(list);
+				addImagesLayerList(list);
 		} catch (Exception e1) {
 			LOGGER.severe("Error in testing!");
 			e1.printStackTrace();
@@ -3456,6 +3549,83 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	
 	
 	}
+	
+	/**
+	 * The Class AddImagesWorker. Adds images by doing hard work background and then updates the gui components.
+	 */
+	class AddImagesWorker extends SwingWorker<Boolean, Object> {
+			
+			/** The i list. */
+			private ArrayList<ImageLayer> iList;
+			
+			/**
+			 * Instantiates a new adds the images worker.
+			 *
+			 * @param list the list
+			 */
+			public AddImagesWorker(ArrayList<ImageLayer> list) {
+				this.iList=list;
+			}
+	       
+       	/* (non-Javadoc)
+       	 * @see javax.swing.SwingWorker#doInBackground()
+       	 */
+       	@Override
+	       public Boolean doInBackground() {
+	    	   try {
+	    		   // set cursor to wait
+	    		   setCursorOverFrame(ID.CURSOR_WAIT);
+	    		   taskManager.addImageLayers(iList);
+	    		   // check the selected ImageLayer and if no one selected -> select the first one in list
+	    		   taskManager.setSelectedImageLayerIfNotExist();
+	    		   // update the BufferedImage of LayerVisualManager
+	    		   taskManager.updateImageOfSelectedImageLayer();
+					
+			} catch (Exception e) {
+				// set cursor to default
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				e.printStackTrace();
+				return false;
+			}
+	    	   
+	    	   
+	           return true;
+	       }
+
+	       /* (non-Javadoc)
+       	 * @see javax.swing.SwingWorker#done()
+       	 */
+       	@Override
+	       protected void done() {
+	           try {
+	        	   if(get()){
+	        		// Update GUI: ImageLayerInfos
+	   				updateImageLayerInfos();
+	   				// update markings of Highlightlayer
+	   				setMarkingsOfHighlightLayer();
+
+	   				// update the BufferedImage of ImagePanel
+	   				imagePanel.setImage(taskManager.getRefreshedImage());
+	   				imagePanel.repaint();
+
+	   				// update markingLayers
+	   				refreshMarkingPanels();
+	   				// enable menu items if ImageLayers are present	
+	   				setMenuItemsEnabled(ID.IMAGELAYERS); 
+	   				
+	   				// refresh precouting components
+					cleanPreCountingIfNecessary();	
+	   				// set cursor default
+	   				setCursorOverFrame(ID.CURSOR_DEFAULT);
+	        	   }
+	              
+	           } catch (Exception ex) {
+	        	   // set cursor to default
+	        	   setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	        	   ex.printStackTrace();
+	           }
+	       }
+	   }
 
 
 }

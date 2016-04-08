@@ -490,7 +490,6 @@ public class GUIListener extends MouseInputAdapter {
 									try {
 										gui.saveMarkings();
 									} catch (Exception ex) {
-										// TODO Auto-generated catch block
 										ex.printStackTrace();
 									}	
 								}

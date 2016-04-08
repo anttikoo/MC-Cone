@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import gui.saving.SaveMarkings;
 import gui.saving.SaverDialog;
 import gui.saving.ImageSet.ImageSetCreator;
 
@@ -146,7 +147,7 @@ private final static Logger LOGGER = Logger.getLogger("MCCLogger");
 							if(childDialog instanceof ImageSetCreator)
 								((ImageSetCreator)childDialog).setPanelPosition();
 							
-							if(childDialog instanceof SaverDialog)
+							if(childDialog instanceof SaveMarkings)
 								((SaverDialog)childDialog).setPanelPosition();
 							
 //		if(childDialog instanceof ShadyMessageDialog)

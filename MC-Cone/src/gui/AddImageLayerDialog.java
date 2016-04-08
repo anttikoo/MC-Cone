@@ -9,6 +9,7 @@ import gui.graphics.MediumCloseIcon;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -33,15 +34,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+
 import information.*;
 
+// TODO: Auto-generated Javadoc
 /**
  * Class AddImageLayerDialog is a window where user can import image files as ImageLayers and import previously saved MarkingLayers.
  * Also deleting ImageLayers is possible in this window.
- * @author Antti Kurronen
- *
- */
-/**
  * @author Antti Kurronen
  *
  */
@@ -92,11 +92,15 @@ public class AddImageLayerDialog extends JDialog{
 	/** The present path for XML-file. */
 	private String presentXMLpath=null;
 	
+	/** The add images SwingWorker. */
+	private SwingWorker<Boolean, Object> addImagesWorker;
+	
 
 
 
 	/**
-	 * Class constructor for only creating new ImageLayers and importing markings
+	 * Class constructor for only creating new ImageLayers and importing markings.
+	 *
 	 * @param frame Owner JFrame
 	 * @param gui GUI object where from this class is called.
 	 */
@@ -190,7 +194,6 @@ public class AddImageLayerDialog extends JDialog{
 	private void addImagesToImageLayerList(File[] imageFiles){
 		try{
 		if(imageFiles !=null && imageFiles.length>0)
-
 		for(int i=0; i<imageFiles.length;i++){
 			if(imageFiles[i] != null && imageFiles[i].exists() && imageFiles[i].getAbsolutePath().length() >3){
 				if(isImageFile(imageFiles[i])){
@@ -276,7 +279,9 @@ public class AddImageLayerDialog extends JDialog{
 
 
 
-	/** Adds markings from XML-file to wanted ImageLayer
+	/**
+	 *  Adds markings from XML-file to wanted ImageLayer.
+	 *
 	 * @param xmlFile External file containing markings for selected imageLayer
 	 * @param imageLayerPath The absolute filepath of selected ImageLayer
 	 */
@@ -359,8 +364,9 @@ public class AddImageLayerDialog extends JDialog{
 	 */
 	private void continueCreatingImageLayers(){
 		try {
+			
 			this.setVisible(false);
-			this.gui.addImageLayerList(this.dialogImageLayerList);
+			this.gui.addImagesLayerList(this.dialogImageLayerList);
 
 			this.dispose();
 
@@ -464,7 +470,15 @@ public class AddImageLayerDialog extends JDialog{
 	}
 
 
-
+	/**
+	 * Returns this AddImageLayerDialog object.
+	 *
+	 * @return the adds the image layer dialog
+	 * @throws Exception the exception
+	 */
+	public AddImageLayerDialog getAddImageLayerDialog() throws Exception{
+		return this;
+	}
 
 
 
@@ -519,7 +533,6 @@ private int getHeightOfAllImageAndMarkingPanels(){
  *
  * @param path the path
  * @return the image layer
- * @throws Exception the exception
  */
 /*
  * Creates ImageIcon from given image path.
@@ -589,7 +602,8 @@ public String getPresentXMLpath() throws Exception{
 
 
 /**
- *  Method for checking is image path already in an ImageLayer
+ *  Method for checking is image path already in an ImageLayer.
+ *
  * @param item a path String which is searched from imageLayerList
  * @return boolean value true if path is already in an ImageLayer of imageLayerList
  */
@@ -614,9 +628,10 @@ private boolean imageNameAlreadyInList(String item){
 
 /**
  * Sets an action for a JButton.
+ *
  * @param button JButton where the action is added
  * @param typeOfItem int type of action  @see information.ID
- * @throws Exception
+ * @throws Exception the exception
  */
 private void initActionsToButtons(JButton button, int typeOfItem) throws Exception{
 	// deleting ImageLayer
@@ -1061,8 +1076,12 @@ private JPanel initImageViewPanel(){
 	//	set present folder for images
 		gui.setPresentFolder(((OpenImageFilesDialog)visibleDialog).getPresentFolder(), ID.FOLDER_IMAGES);
 		File[] imagefiles = ((OpenImageFilesDialog)visibleDialog).getSelectedFiles();
-		if(imagefiles != null && imagefiles.length>0)
-		addImagesToImageLayerList(imagefiles);
+		if(imagefiles != null && imagefiles.length>0){
+			this.addImagesWorker = new AddImagesWorker(imagefiles);
+			this.addImagesWorker.execute();
+		}
+					
+	//	addImagesToImageLayerList(imagefiles);
 		visibleDialog=null;
 	}
 
@@ -1135,6 +1154,7 @@ private JPanel initImageViewPanel(){
 	 * Sets the folder that is previously used.
 	 *
 	 * @param folder String path of used folder
+	 * @param id the id
 	 * @throws Exception the exception
 	 */
 	public void setPresentFolder(String folder, int id) throws Exception{
@@ -1178,9 +1198,10 @@ private JPanel initImageViewPanel(){
 		shadyMessageDialog.showDialog();
 		shadyMessageDialog=null;
 	}
+	
 	/**
 	 *  Refreshes the imageLayerList by going throw array of ImageLayers (+ MarkingLayer) -> creating JPanels and adding
-	 *  them on imageScrollPanel (IMAGE LIST)
+	 *  them on imageScrollPanel (IMAGE LIST).
 	 */
 	private void updateImageList(){
 		try {
@@ -1262,13 +1283,30 @@ private JPanel initImageViewPanel(){
 		
 		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -3486848797936767446L;
+		
+		/** The path. */
 		private String path; // image path
+		
+		/** The marking layer list. */
 		private ArrayList<MarkingLayer> markingLayerList;
+		
+		/** The close j button. */
 		private JButton closeJButton;
+		
+		/** The browse j button. */
 		private JButton browseJButton;
+		
+		/** The one image title height. */
 		private int oneImageTitleHeight=45;
+		
+		/** The one marking height. */
 		private int oneMarkingHeight=40;
 
+		/**
+		 * Instantiates a new image and marking panel.
+		 *
+		 * @param imageLayer the image layer
+		 */
 		private ImageAndMarkingPanel(ImageLayer imageLayer){
 
 			try {
@@ -1384,6 +1422,11 @@ private JPanel initImageViewPanel(){
 			}
 		}
 
+		/**
+		 * Returns the path.
+		 *
+		 * @return the path
+		 */
 		public String getPath() {
 			return path;
 		}
@@ -1401,9 +1444,19 @@ private JPanel initImageViewPanel(){
 		
 		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -4350091943683475060L;
+		
+		/** The marking name. */
 		private String markingName;
+		
+		/** The image layer path. */
 		private String imageLayerPath;
 
+		/**
+		 * Instantiates a new single marking.
+		 *
+		 * @param imageLayerPath the image layer path
+		 * @param markingName the marking name
+		 */
 		private SingleMarking(String imageLayerPath, String markingName){		
 			try {
 				this.setMarkingName(markingName);
@@ -1505,5 +1558,91 @@ private JPanel initImageViewPanel(){
 
 
 	}
+	
+	/**
+	 * The Class AddImagesWorker. Does hard work at background and then updates the gui.
+	 */
+	class AddImagesWorker extends SwingWorker<Boolean, Object> {
+		
+		/** The image files. */
+		private File[] imageFiles;
+		
+		/**
+		 * Instantiates a new adds the images worker.
+		 *
+		 * @param images the images
+		 */
+		public AddImagesWorker(File[] images) {
+			this.imageFiles=images;
+		}
+       
+       /* (non-Javadoc)
+        * @see javax.swing.SwingWorker#doInBackground()
+        */
+       @Override
+       public Boolean doInBackground() {
+    	   try {
+    		   setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    		   // go through files, check them and add paths to new ImageLayers if all ok.
+    		   if(imageFiles !=null && imageFiles.length>0)
+    				for(int i=0; i<imageFiles.length;i++){
+    					if(imageFiles[i] != null && imageFiles[i].exists() && imageFiles[i].getAbsolutePath().length() >3){
+    						if(isImageFile(imageFiles[i])){
+    							if(!imageNameAlreadyInList(imageFiles[i].getName()) && !gui.imageNameAlreadyUsed(imageFiles[i].getName())){
+    								dialogImageLayerList.add(new ImageLayer(imageFiles[i].getAbsolutePath())); // create new ImageLayer by giving the path of image
+    							}
+    							else{
+    								
+    								// inform user that image with same name is already used
+    								shadyMessageDialog = new ShadyMessageDialog((JDialog)getAddImageLayerDialog(), "Refused opening image", " Image name:  "+imageFiles[i].getName() + " is already open", ID.OK, (JDialog)getAddImageLayerDialog());	
+    								shadyMessageDialog.showDialog();									
+    							}
+    						} // if file is wrong format of the dimensio is wrong -> informed in isImageFile -method
+
+    					}else{
+    						// inform user that image with same name is already used
+    						shadyMessageDialog = new ShadyMessageDialog((JDialog)getAddImageLayerDialog(), "Refused opening image", " Image name:  "+imageFiles[i].getName() + " doesn't exist!", ID.OK, (JDialog)getAddImageLayerDialog());
+    						shadyMessageDialog.showDialog();
+
+    					}
+    				}
+    				
+	
+				
+		} catch (Exception e) {
+			// set cursor to default
+     	   	setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			shadyMessageDialog=null;
+			imageFiles=null;
+			e.printStackTrace();
+			return false;
+		}
+    	   
+    	   
+           return true;
+       }
+
+       /* (non-Javadoc)
+        * @see javax.swing.SwingWorker#done()
+        */
+       @Override
+       protected void done() {
+           try {
+        	   if(get()){
+        		   	updateImageList();
+   					shadyMessageDialog=null;
+   					imageFiles=null;
+   					
+   			
+        	   }
+        	   setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+              
+           } catch (Exception ex) {
+        	   // set cursor to default
+        	   setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        	   ex.printStackTrace();
+           }
+       }
+   }
 
 }
