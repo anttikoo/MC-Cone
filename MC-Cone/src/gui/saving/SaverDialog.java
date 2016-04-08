@@ -501,8 +501,7 @@ private Component parentComponent=null;
 	 */
 	private void initComponents() throws Exception{
 		
-	//	this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
-		this.setBounds(gui.getBounds());
+		this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
 		this.setUndecorated(true);
 		this.setBackground(new Color(0,0,0,0)); // transparent color
 		this.setContentPane(new ContentPane()); // set contentpane to get dimming
