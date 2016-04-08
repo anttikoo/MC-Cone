@@ -1920,14 +1920,6 @@ public class GUI extends JFrame{
 
 	}
 	
-	/**
-	 * Inits the worker.
-	 */
-	private void initWorker(){
-		
-		
-		
-	}
 
 	/**
 	 * Checks that given image file dimension is same as the dimension of previously used images. ONLY ONE IMAGE DIMENSION IS ALLOWED.
