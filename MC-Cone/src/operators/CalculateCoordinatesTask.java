@@ -262,7 +262,8 @@ public class CalculateCoordinatesTask implements Runnable{
 	 */
 	private void createWeightedPointGroup(ArrayList<Point> pointGroups) throws Exception{
 		// create initial weighted list
-		ArrayList<WeightPoint> weightPointList = createWeightPointListRandom(pointGroups);
+	//	ArrayList<WeightPoint> weightPointList = createWeightPointListRandom(pointGroups);
+		ArrayList<WeightPoint> weightPointList = createWeightPointListPeakedRandom(pointGroups);
 
 		if(weightPointList.size()>= SharedVariables.GLOBAL_MIN_COORDINATE_NUMBER_IN_CELL){
 			int rounds =0;
@@ -298,6 +299,12 @@ public class CalculateCoordinatesTask implements Runnable{
 		}
 	}
 	
+	/**
+	 * Separate clustered cells method B. Tries to form cells from given coordinates. 
+	 *
+	 * @param weightPointList the weight point list
+	 * @throws Exception the exception
+	 */
 	private void separateClusteredCellsMethodB(ArrayList<WeightPoint> weightPointList) throws Exception{
 		if(weightPointList != null && weightPointList.size()>0){
 			// get randomly a point from list and find the local maximum of distance -> do it 100 rounds
@@ -522,7 +529,7 @@ public class CalculateCoordinatesTask implements Runnable{
 		
 	}
 
-	/**
+/*
 	 * Creates the weighted points from given list of points. 
 	 * The weight of point is calculated by amount of neighbor points and how far they are. 
 	 * The weight of point is proportional to distance to other points. Lot of points close -> big weight.
@@ -530,7 +537,7 @@ public class CalculateCoordinatesTask implements Runnable{
 	 *
 	 * @param pointGroups the point groups
 	 * @return the array list
-	 */
+	 
 	@SuppressWarnings("unused")
 	private ArrayList<WeightPoint> createWeightPointList(ArrayList<Point> pointGroups){
 		try {
@@ -562,16 +569,18 @@ public class CalculateCoordinatesTask implements Runnable{
 			return null;
 		}
 	}
+*/	
 	
-	
-	/**
+/*
 	 * Creates the weighted points from given list of points. 
 	 * The weight of point is calculated by amount of neighbor points and how far they are. 
 	 * The weight of point is proportional to distance to other points. Lot of points close -> big weight.
+	 * This method is unused - replaced with
 	 *
 	 * @param pointGroups the point groups
 	 * @return the array list
-	 */
+	 
+	@SuppressWarnings("unused")
 	private ArrayList<WeightPoint> createWeightPointListRandom(ArrayList<Point> pointGroups){
 		try {
 			ArrayList<WeightPoint> weightPointList = new ArrayList<WeightPoint>();
@@ -599,8 +608,65 @@ public class CalculateCoordinatesTask implements Runnable{
 							for (int i = bounds[0]; i <= bounds[1]; i++) {
 								// calculate distance
 								double distance = wpoint.getPoint().distance((Point) pointGroups.get(i));
+								
 								if (distance < this.current_max_cell_size / 2 && distance > 0) {
 									wpoint.increaseWeight(1 / distance); // increase weight by distance
+								}
+							}
+						}
+					} 
+			}
+			return weightPointList;
+		} catch (Exception e) {
+			LOGGER.severe("Error in creating weightPoint list in precounting!");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+*/
+	
+	/**
+	 * Creates the weighted points from given list of points. 
+	 * The weight of point is calculated by amount of neighbor points and how far they are. 
+	 * The weight of point is proportional to distance to other points. Lot of points close -> big weight.
+	 *
+	 * @param pointGroups the point groups
+	 * @return the array list of WeightPoints
+	 */
+	private ArrayList<WeightPoint> createWeightPointListPeakedRandom(ArrayList<Point> pointGroups){
+		try {
+			ArrayList<WeightPoint> weightPointList = new ArrayList<WeightPoint>();
+			ArrayList<WeightPoint> orderedWeightPointList = new ArrayList<WeightPoint>();
+			// create list if Weightpoints from Points
+			Iterator<Point> pointsIterator = pointGroups.iterator();
+			while(pointsIterator.hasNext()){
+				WeightPoint wpoint = new WeightPoint(pointsIterator.next());
+				weightPointList.add(wpoint);
+				orderedWeightPointList.add(wpoint);
+			}
+			Collections.sort(orderedWeightPointList,new WeightPointComparator());
+			
+			for (int repeats = 0; repeats < 20; repeats++) {
+				// randomize the list
+				long seed = System.nanoTime();
+				Collections.shuffle(weightPointList, new Random(seed));
+				if (pointGroups != null && pointGroups.size() > 0 && weightPointList != null && weightPointList.size() > 0)
+					for (int j = 0; j < weightPointList.size() - 1; j++) {
+
+						WeightPoint wpoint = weightPointList.get(j);
+						// set boundaries for binary search
+						int lowerBoundValue = Math.max(0, (int) wpoint.getPoint().x - this.current_max_cell_size / 2);
+						int upperBoundValue = (int) (wpoint.getPoint().x + this.current_max_cell_size / 2);
+						// find first and last index of points in pointGroups which are close to wpoint in horizontal level
+						int[] bounds = startEndBinarySearchWithWeightPoints(orderedWeightPointList, lowerBoundValue, upperBoundValue);
+						if (bounds != null && bounds[0] >= 0 && bounds[1] < pointGroups.size() && bounds[0] <= bounds[1]) {
+							for (int i = bounds[0]; i <= bounds[1]; i++) {
+								// calculate distance
+								double distance = wpoint.getPoint().distance((Point) pointGroups.get(i));
+								double weightOfPoint = orderedWeightPointList.get(i).getWeight();
+								if (distance < this.current_max_cell_size / 2 && distance > 0) {
+									wpoint.increaseWeight(weightOfPoint / distance); // increase weight by weight of neighbour
 								}
 							}
 						}
@@ -809,6 +875,7 @@ public class CalculateCoordinatesTask implements Runnable{
 					maxWeightPoint = weightPoint;
 			}
 		}
+		// if not found -> increase distance
 		if(maxWeightPoint == null)
 			return getWeightPointWithBiggestWeightAtDistance(midPoint, weightPointList, (int)(distance*2));
 		return maxWeightPoint;

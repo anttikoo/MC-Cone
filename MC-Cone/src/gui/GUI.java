@@ -234,7 +234,7 @@ public class GUI extends JFrame{
 	/** The visible panel. */
 	private boolean visiblePanel=false;
 	
-	/** The add image worker. */
+	/** The add image worker. Used for importing images in background. */
 	private SwingWorker<Boolean, Object> addImageWorker;
 
 
