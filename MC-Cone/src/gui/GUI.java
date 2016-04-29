@@ -80,7 +80,7 @@ import managers.ProgramLogger;
 
 
 
-// TODO: Auto-generated Javadoc
+
 /**
  * Graphical user interface of program.
  * "author Antti Kurronen
