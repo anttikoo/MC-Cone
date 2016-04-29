@@ -310,7 +310,7 @@ public class CalculateCoordinatesTask implements Runnable{
 			// get randomly a point from list and find the local maximum of distance -> do it 100 rounds
 			ArrayList<WeightPoint> foundLocalMaximumList = new ArrayList<WeightPoint>();
 			
-			// iterate 100 runs to get
+			// iterate 100 runs to get points with local maximum weights
 			for(int i=0; i<100;i++){
 				
 				// get random WeightPoint
@@ -319,6 +319,7 @@ public class CalculateCoordinatesTask implements Runnable{
 				 WeightPoint wp = weightPointList.get(index);
 				 WeightPoint foundWP=null;
 				 int counter=0;
+				 
 				 // start iteration to find WeightPoint with local maximum weight
 				 do{
 					 counter++;
@@ -333,7 +334,10 @@ public class CalculateCoordinatesTask implements Runnable{
 									 break;
 								 }
 									 
-							 }			 
+							 }
+							 // if reached here - not found possibly match
+							 foundLocalMaximumList.add(foundWP); // found a new point with local maximum -> add to list
+							 break;
 						 }
 						 else{ // add to empty list
 							 foundLocalMaximumList.add(foundWP); // found local maximum -> add to list
@@ -345,7 +349,8 @@ public class CalculateCoordinatesTask implements Runnable{
 					 // continue do loop to find local maximum
 					 wp=foundWP;
 		 
-				 }while(counter<100);			
+				 }while(counter<100);
+			
 			}
 			
 			
