@@ -2183,7 +2183,7 @@ public void setProgressBallDialog(ProgressBallsDialog pbd) throws Exception{
 	private void setUpMultiThreading() throws Exception{
 		int processors = Runtime.getRuntime().availableProcessors();
 		SharedVariables.setAvailableProcessors(processors);
-		LOGGER.fine("available processors: " +processors);
+		LOGGER.info("using available processors: " +processors);
 		
 	}
 
