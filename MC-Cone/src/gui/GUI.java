@@ -3168,6 +3168,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	private void showInfo(Point p) throws Exception{
 		InfoDialog iDialog = new InfoDialog(this, this,p);
 		this.guiComponentListener.setChildDialog(iDialog);
+
 		iDialog.showDialog();
 		this.guiComponentListener.setChildDialog(null);
 	}
