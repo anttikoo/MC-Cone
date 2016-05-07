@@ -22,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 
 
@@ -468,8 +469,15 @@ public int showDialog(){
 		this.validate();
 		this.repaint();
 
-	
-		this.setVisible(true);
+	SwingUtilities.invokeLater(new Runnable() {
+		
+		@Override
+		public void run() {
+			setVisible(true);
+			
+		}
+	});
+		//this.setVisible(true);
 
 	//	this.repaint();
 		return returnValue;
