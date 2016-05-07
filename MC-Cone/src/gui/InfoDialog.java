@@ -5,7 +5,6 @@ import information.Fonts;
 import information.ID;
 import information.InformationCenter;
 import information.SharedVariables;
-
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
@@ -37,9 +36,19 @@ public class InfoDialog extends PropertiesDialog{
 	/** The Constant LOGGER. */
 	protected final static Logger LOGGER = Logger.getLogger("MCCLogger");
 	
+	
+	/**
+	 * Instantiates a new info dialog.
+	 *
+	 * @param frame the frame
+	 * @param gui the gui
+	 * @param point the point
+	 */
 	public InfoDialog(JFrame frame, GUI gui, Point point) {
 		super(frame, gui, point);
 		initDialog();
+		this.revalidate();
+		
 	}
 
 	/**
@@ -188,6 +197,7 @@ public class InfoDialog extends PropertiesDialog{
 			return null;
 		}
 	}
-	
+
+
 
 }

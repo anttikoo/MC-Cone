@@ -50,7 +50,7 @@ public class ShadyMessageDialog extends JDialog{
 	private int typeOfButtons;
 	
 	/** The return value. */
-	private int returnValue=-1;
+	protected int returnValue=-1;
 	
 	/** The parent component. */
 	protected Component parentComponent;
@@ -85,6 +85,7 @@ public class ShadyMessageDialog extends JDialog{
 			this.message=message;
 			this.typeOfButtons=typeOfButtons;	
 			initDialog();
+			this.validate();
 		} catch (Exception e) {
 			LOGGER.severe("Error in initializing message dialog!");
 			e.printStackTrace();
@@ -112,6 +113,7 @@ public class ShadyMessageDialog extends JDialog{
 			this.message=message;
 			this.typeOfButtons=typeOfButtons;	
 			initDialog();
+			this.validate();
 		} catch (Exception e) {
 			LOGGER.severe("Error in initializing message dialog!");
 			e.printStackTrace();
@@ -468,18 +470,7 @@ public int showDialog(){
 	try {
 		this.validate();
 		this.repaint();
-
-	SwingUtilities.invokeLater(new Runnable() {
-		
-		@Override
-		public void run() {
-			setVisible(true);
-			
-		}
-	});
-		//this.setVisible(true);
-
-	//	this.repaint();
+		this.setVisible(true);		
 		return returnValue;
 	} catch (Exception e) {
 		LOGGER.severe("Error in showing message dialog!");

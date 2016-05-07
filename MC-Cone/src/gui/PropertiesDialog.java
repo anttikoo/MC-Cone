@@ -3,6 +3,7 @@ package gui;
 import gui.graphics.SmallCloseIcon;
 import information.Fonts;
 import information.ID;
+import information.SharedVariables;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -135,8 +136,10 @@ public class PropertiesDialog extends JDialog {
 			this.setBounds(this.gui.getVisibleWindowBounds()); // sets the size of this dialog same as the GUI (the parent)
 			this.setUndecorated(true); // no titlebar or buttons
 			this.setBackground(new Color(0,0,0,0)); // transparent color
+			
 			ContentPane cone = new ContentPane(new GridBagLayout());
 			this.setContentPane(cone); // makes dimming over GUI	
+			
 			backPanel = new JPanel();
 			backPanel.setLayout(new BorderLayout());
 			backPanel.setBorder(BorderFactory.createLineBorder(Color_schema.button_light_border, 3));

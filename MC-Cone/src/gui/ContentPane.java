@@ -1,7 +1,9 @@
 package gui;
 
+import information.ID;
 import information.SharedVariables;
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -41,6 +43,7 @@ public class ContentPane extends JPanel{
 		try {
 			this.setLayout(layout);
 			setOpaque(false);
+		
 		//	this.setBackground(Color_schema.dark_30);
 		} catch (Exception e) {
 			LOGGER.severe("ERROR in initializing ContentPane");
@@ -73,7 +76,8 @@ public class ContentPane extends JPanel{
 				Composite com = AlphaComposite.getInstance(SharedVariables.usedDimmingMode, 0.8f);
 
 				g2d.setComposite(com);
-		
+				
+
 							
 				g2d.setColor(this.getBackground());
 			
