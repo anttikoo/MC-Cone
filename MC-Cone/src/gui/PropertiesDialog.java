@@ -138,8 +138,7 @@ public class PropertiesDialog extends JDialog {
 			this.setResizable(false);
 			this.setBounds(this.gui.getVisibleWindowBounds()); // sets the size of this dialog same as the GUI (the parent)
 			this.setUndecorated(true); // no titlebar or buttons
-		//	this.setBackground(new Color(0,0,0,0)); // transparent color
-			this.setBackground(new Color(0,0,0,50));
+			this.setBackground(new Color(0,0,0,60)); // transparent color
 			ContentPane cone = new ContentPane(new GridBagLayout());
 			this.setContentPane(cone); // makes dimming over GUI	
 			

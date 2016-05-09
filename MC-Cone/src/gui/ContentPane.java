@@ -1,7 +1,5 @@
 package gui;
 
-import information.ID;
-import information.SharedVariables;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
@@ -11,6 +9,8 @@ import java.awt.GridBagLayout;
 import java.awt.RenderingHints;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import information.ID;
+import information.SharedVariables;
 
 /**
  * Class ContentPane is used as ContentPane for dialogs to get black dimming outside of window.
@@ -21,9 +21,9 @@ public class ContentPane extends JPanel{
 	
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 2680468042227015564L;
+	
 	/** The Constant LOGGER. for Logging purposes */
 	private final static Logger LOGGER = Logger.getLogger("MCCLogger");
-	
 	
 
 	 /**
@@ -56,36 +56,28 @@ public class ContentPane extends JPanel{
 	    @Override
 	    protected void paintComponent(Graphics g) {
 
-	        try {
-	        	
+	        try {	        	
 	       
 				// Allow super to paint
 				super.paintComponent(g);
-	
 				
 				// Apply our own painting effect
-				Graphics2D g2d = (Graphics2D) g.create();
+				Graphics2D g2d = (Graphics2D) g.create();					
 				
-//		        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-				
-				
-				// 70% transparent Alpha
-			
-//				Composite com = AlphaComposite.getInstance(SharedVariables.usedDimmingMode, 0.8f);
+				// 70% transparent Alpha for linux and unix. In windows and OS X the color value with alpha will work ok.
+				if(SharedVariables.operationSystem == ID.OS_LINUX_UNIX){
+			        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+					Composite com = AlphaComposite.getInstance(SharedVariables.usedDimmingMode, 0.6f);
+					g2d.setComposite(com);
+					g2d.setColor(new Color(0,0,0));
+				}
+				else{
+					g2d.setColor(new Color(0,0,0,60));
+				}
 
-//				g2d.setComposite(com);
-				
-				g2d.setColor(new Color(0,0,0,50));
-							
-			//	g2d.setColor(this.getBackground());
-			
-		
-				g2d.fill(getBounds());
-		
-				
+				g2d.fill(getBounds());				
 				g2d.dispose();
-			
-				
+						
 			} catch (Exception e) {
 				LOGGER.severe("Error in painting black background of Dialog" + e.getClass().toString() + " : " +e.getMessage());
 			}
