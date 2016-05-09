@@ -290,6 +290,7 @@ public class GUI extends JFrame{
 			setMenuItemsEnabled(ID.IMAGELAYERS); // sets items unenabled, cos ImageLayers and MarkingLayers not found at startup
 			
 			LOGGER.info("Started MC-Cone! Wellcome!");	
+			LOGGER.info("Using JAVA version: "+SharedVariables.javaVersion);
 			
 			//refresh window
 			this.repaint();
@@ -2813,7 +2814,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 			
 			try {
 				version = getVersion();
-				LOGGER.fine("JAVA version: "+version);
+				LOGGER.fine("using JAVA version: "+version);
 				SharedVariables.setJavaVersion(version);
 			} catch (Exception e) {
 				LOGGER.severe("Error in analyzing used java version!");

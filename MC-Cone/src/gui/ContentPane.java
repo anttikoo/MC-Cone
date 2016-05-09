@@ -75,7 +75,7 @@ public class ContentPane extends JPanel{
 
 //				g2d.setComposite(com);
 				
-				g2d.setColor(new Color(0,0,0,40));
+				g2d.setColor(new Color(0,0,0,50));
 							
 			//	g2d.setColor(this.getBackground());
 			
