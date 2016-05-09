@@ -38,7 +38,6 @@ import javax.swing.SwingWorker;
 
 import information.*;
 
-// TODO: Auto-generated Javadoc
 /**
  * Class AddImageLayerDialog is a window where user can import image files as ImageLayers and import previously saved MarkingLayers.
  * Also deleting ImageLayers is possible in this window.
@@ -744,10 +743,10 @@ private void initComponents(){
 		//init whole window to dim it
 		this.setBounds(gui.getBounds());
 		this.setUndecorated(true);
-		this.setBackground(new Color(0,0,0,50));
-		this.setContentPane(new ContentPane());
-		this.getContentPane().setBackground(Color_schema.dark_30);
-		this.getContentPane().setLayout(new GridBagLayout());
+		this.setBackground(new Color(0,0,0,60));
+		this.setContentPane(new ContentPane(new GridBagLayout()));
+	//	this.getContentPane().setBackground(Color_schema.dark_30);
+	//	this.getContentPane().setLayout(new GridBagLayout());
 		//init backpanel where all funtions are shown.
 		backPanel = new JPanel();
 		backPanel.setBackground(new Color(0,0,0));
