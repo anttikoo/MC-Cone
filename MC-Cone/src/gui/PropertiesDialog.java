@@ -3,8 +3,6 @@ package gui;
 import gui.graphics.SmallCloseIcon;
 import information.Fonts;
 import information.ID;
-import information.SharedVariables;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

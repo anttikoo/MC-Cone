@@ -1,9 +1,6 @@
 package information;
 
 import java.awt.AlphaComposite;
-import java.awt.GridBagLayout;
-import javax.swing.JPanel;
-import gui.ContentPane;
 
 /**
  * The Class SharedVariables. Contains static variables.
