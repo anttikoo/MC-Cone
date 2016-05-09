@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 
@@ -64,6 +65,8 @@ public class PropertiesDialog extends JDialog {
 
 	/** The made_changes. */
 	protected boolean made_changes=false;
+	
+	private JLayeredPane layeredPane;
 	
 	
 	
@@ -135,11 +138,14 @@ public class PropertiesDialog extends JDialog {
 			this.setResizable(false);
 			this.setBounds(this.gui.getVisibleWindowBounds()); // sets the size of this dialog same as the GUI (the parent)
 			this.setUndecorated(true); // no titlebar or buttons
-			this.setBackground(new Color(0,0,0,0)); // transparent color
-			
+		//	this.setBackground(new Color(0,0,0,0)); // transparent color
+			this.setBackground(new Color(0,0,0,50));
 			ContentPane cone = new ContentPane(new GridBagLayout());
 			this.setContentPane(cone); // makes dimming over GUI	
 			
+			layeredPane = new JLayeredPane();
+			layeredPane.setLayout(null);
+			layeredPane.add(new ContentPane(new GridBagLayout()), JLayeredPane.DEFAULT_LAYER);
 			backPanel = new JPanel();
 			backPanel.setLayout(new BorderLayout());
 			backPanel.setBorder(BorderFactory.createLineBorder(Color_schema.button_light_border, 3));
@@ -149,8 +155,9 @@ public class PropertiesDialog extends JDialog {
 			backPanel.add(initUPPanels(), BorderLayout.PAGE_START);
 			backPanel.add(initCenterPanels(), BorderLayout.CENTER);
 			backPanel.add(initDownPanel(),BorderLayout.PAGE_END);
-		
-			this.add(backPanel);
+		layeredPane.add(backPanel, JLayeredPane.DRAG_LAYER);
+	this.add(backPanel);
+//			this.add(layeredPane);
 			LOGGER.fine("called propertiesDialog");
 			
 

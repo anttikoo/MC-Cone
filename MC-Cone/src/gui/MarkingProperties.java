@@ -430,7 +430,7 @@ protected void initDialog(){
 		this.setResizable(false);
 		this.setBounds(gui.getVisibleWindowBounds()); // sets the size of this dialog same as the GUI (the parent)
 		this.setUndecorated(true); // no titlebar or buttons
-		this.setBackground(new Color(0,0,0,0)); // transparent color
+		this.setBackground(new Color(0,0,0,50)); // transparent color
 		this.setContentPane(new ContentPane()); // makes dimming over GUI
 		this.getContentPane().setBackground(Color_schema.dark_30);
 		this.setLayout(null); // backpanel position is determined with setBounds(..)

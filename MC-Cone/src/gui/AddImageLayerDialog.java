@@ -744,7 +744,7 @@ private void initComponents(){
 		//init whole window to dim it
 		this.setBounds(gui.getBounds());
 		this.setUndecorated(true);
-		this.setBackground(new Color(0,0,0,0));
+		this.setBackground(new Color(0,0,0,50));
 		this.setContentPane(new ContentPane());
 		this.getContentPane().setBackground(Color_schema.dark_30);
 		this.getContentPane().setLayout(new GridBagLayout());

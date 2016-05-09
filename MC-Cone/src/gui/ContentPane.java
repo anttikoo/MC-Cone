@@ -66,20 +66,18 @@ public class ContentPane extends JPanel{
 				// Apply our own painting effect
 				Graphics2D g2d = (Graphics2D) g.create();
 				
-		        g2d.setRenderingHint(
-		                RenderingHints.KEY_ANTIALIASING,
-		                RenderingHints.VALUE_ANTIALIAS_ON);
+//		        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 				
 				
 				// 70% transparent Alpha
 			
-				Composite com = AlphaComposite.getInstance(SharedVariables.usedDimmingMode, 0.8f);
+//				Composite com = AlphaComposite.getInstance(SharedVariables.usedDimmingMode, 0.8f);
 
-				g2d.setComposite(com);
+//				g2d.setComposite(com);
 				
-
+				g2d.setColor(new Color(0,0,0,40));
 							
-				g2d.setColor(this.getBackground());
+			//	g2d.setColor(this.getBackground());
 			
 		
 				g2d.fill(getBounds());
