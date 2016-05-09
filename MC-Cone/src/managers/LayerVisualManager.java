@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import org.imgscalr.Scalr;
@@ -806,12 +807,16 @@ public class LayerVisualManager {
 	public BufferedImage readImageFile(File file) throws Exception{
 
 		if(Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff)){
+			
 			PlanarImage pim=null;
 			pim= JAI.create("fileload", file.getAbsolutePath());
 			if(pim != null)
 				return pim.getAsBufferedImage();
 			else
 				throw new Exception();
+				
+				
+			
 		}
 		else{
 		//	return ImageIO.read(file);
