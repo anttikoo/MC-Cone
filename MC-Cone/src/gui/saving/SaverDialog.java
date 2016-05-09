@@ -503,10 +503,9 @@ private Component parentComponent=null;
 		
 		this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
 		this.setUndecorated(true);
-		this.setBackground(new Color(0,0,0,0)); // transparent color
-		this.setContentPane(new ContentPane()); // set contentpane to get dimming
-		this.getContentPane().setBackground(Color_schema.dark_30);
-		this.getContentPane().setLayout(new GridBagLayout());
+		this.setBackground(new Color(0,0,0,60)); // transparent color
+		this.setContentPane(new ContentPane(new GridBagLayout())); // set contentpane to get dimming
+
 		//init backpanel where all funtions are shown.
 		backPanel = new JPanel();
 		backPanel.setBackground(Color_schema.dark_30);

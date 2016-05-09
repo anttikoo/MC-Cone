@@ -407,11 +407,10 @@ import javax.swing.SwingUtilities;
 
 			this.setBounds(this.parentComponentBounds); //sets the size of window same as the parent window size
 			this.setUndecorated(true); // no titlebar or buttons
-			this.setBackground(new Color(0,0,0,0)); // transparent color
-			this.setContentPane(new ContentPane());
-			this.getContentPane().setBackground(Color_schema.dark_30);
-			this.getContentPane().setLayout(new GridBagLayout());
-
+			this.setBackground(new Color(0,0,0,60)); // transparent color
+			this.setContentPane(new ContentPane(new GridBagLayout())); // dimming of panel
+		
+			// set sizes of visible panel
 			openDialogBackPanel = new JPanel();
 			openDialogBackPanel.setBackground(new Color(0,0,0));
 			openDialogBackPanel.setLayout(new BorderLayout());

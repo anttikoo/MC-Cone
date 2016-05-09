@@ -655,10 +655,9 @@ private void initFileDialog() throws Exception{
 
 		this.setBounds(ownerFrame.getBounds());
 		this.setUndecorated(true); // no titlebar or buttons
-		this.setBackground(new Color(0,0,0,0)); // transparent color
-		this.setContentPane(new ContentPane());
-		this.getContentPane().setBackground(Color_schema.dark_30);
-		this.getContentPane().setLayout(new GridBagLayout());
+		this.setBackground(new Color(0,0,0,60)); // transparent color
+		this.setContentPane(new ContentPane(new GridBagLayout()));
+
 
 		selectFileDialogBackPanel = new JPanel();
 		selectFileDialogBackPanel.setBackground(new Color(0,0,0));

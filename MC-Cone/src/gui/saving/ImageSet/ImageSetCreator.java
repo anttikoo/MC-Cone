@@ -922,10 +922,8 @@ public class ImageSetCreator extends JDialog implements MouseListener, Runnable{
 	private void initComponents() throws Exception{	
 			this.setBounds(WindowLocator.getVisibleWindowBounds(this.parentComponent));
 			this.setUndecorated(true);
-			this.setBackground(new Color(0,0,0,0));
-			this.setContentPane(new ContentPane());
-			this.getContentPane().setBackground(Color_schema.dark_30);
-			this.getContentPane().setLayout(new GridBagLayout());
+			this.setBackground(new Color(0,0,0,60));
+			this.setContentPane(new ContentPane(new GridBagLayout()));
 			
 			GridBagConstraints c = new GridBagConstraints();
 			backPanel = new JPanel();
