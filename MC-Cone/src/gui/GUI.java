@@ -41,6 +41,8 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -1871,7 +1873,9 @@ public class GUI extends JFrame{
 			UIManager.put("ToolTip.background", Color_schema.tooltip_bg);
 			UIManager.put("ToolTip.font", Fonts.b14);
 			
-	
+			// init plugins for ImageIO
+			ImageIO.scanForPlugins();
+			
 			guiListener = new GUIListener(this);
 
 			guiComponentListener = new GUIcomponentListener(this);

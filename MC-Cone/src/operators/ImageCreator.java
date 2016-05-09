@@ -11,6 +11,8 @@ import information.Fonts;
 import information.ID;
 import information.ImageLayer;
 import information.MarkingLayer;
+import information.SharedVariables;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -204,6 +206,7 @@ public class ImageCreator implements Runnable {
 			return null;
 		} catch (IOException e) {
 			e.printStackTrace();
+			LOGGER.severe("Error in creating image! "+e.getMessage());
 			return null;
 		}
 	}
@@ -622,9 +625,17 @@ public class ImageCreator implements Runnable {
 	private boolean  writeToTIff(BufferedImage bi, String path) throws Exception{
 
 		try {
-			TIFFEncodeParam params = new TIFFEncodeParam();
 			FileOutputStream fos = new FileOutputStream(path);
-			JAI.create("encode", bi, fos, "TIFF",params);
+			// Windows and Unix
+			if(SharedVariables.operationSystem != ID.OS_MAC){
+				TIFFEncodeParam params = new TIFFEncodeParam();			
+				JAI.create("encode", bi, fos, "TIFF",params);
+			}
+			else{ // mac
+				ImageIO.scanForPlugins();
+				if(ImageIO.write(bi, "TIFF", fos));			
+			}
+			
 			return true;
 		} catch (FileNotFoundException e) {
 			LOGGER.severe("Error in creating tif-file. Could not produce the file!");

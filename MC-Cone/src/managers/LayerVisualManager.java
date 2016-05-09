@@ -15,16 +15,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
+import com.twelvemonkeys.*;
 import javax.imageio.ImageIO;
+//import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import org.imgscalr.Scalr;
 import gui.file.Utils;
 import information.GridProperties;
+import information.ID;
 import information.MarkingLayer;
 import information.PositionedImage;
 import information.PositionedRectangle;
 import information.ScreenCoordinatesOfMarkingLayer;
+import information.SharedVariables;
 
 
 /**
@@ -804,21 +808,20 @@ public class LayerVisualManager {
 	 * @throws Exception the exception
 	 */
 	public BufferedImage readImageFile(File file) throws Exception{
-
-		if(Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff)){
-			
+		// use JAI for window and linux to open tiff
+		if(Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff) &&
+			SharedVariables.operationSystem != ID.OS_MAC){
+						
 			PlanarImage pim=null;
 			pim= JAI.create("fileload", file.getAbsolutePath());
 			if(pim != null)
 				return pim.getAsBufferedImage();
 			else
 				throw new Exception();
-				
-				
-			
+		
 		}
 		else{
-		//	return ImageIO.read(file);
+		
 			BufferedImage in = ImageIO.read(file);
 			BufferedImage newImage = new BufferedImage(in.getWidth(), in.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
