@@ -944,7 +944,7 @@ public class GUI extends JFrame{
 	 *
 	 * @throws Exception the exception
 	 */
-	private void diminishGrid() throws Exception{
+	public void diminishGrid() throws Exception{
 		this.gridPanel.setExtraDimTransparency();
 		this.gridPanel.repaint();
 	}
@@ -1572,10 +1572,12 @@ public class GUI extends JFrame{
 			menu_show = new JMenu("Show");
 			menu_show.setMnemonic(KeyEvent.VK_S);
 			menu_show_all_markings = new JMenuItem("Show all markings");
+			menu_show_all_markings.setToolTipText("Shift + S");
 			addActionsToMenuItems(menu_show_all_markings, ID.MENU_ITEM_SHOW_ALL_MARKINGS);
 
 			menu_show_all_markings.setMnemonic(KeyEvent.VK_A);
 			menu_hide_all_markings = new JMenuItem("Hide all markings");
+			menu_hide_all_markings.setToolTipText("Shift + H");
 			addActionsToMenuItems(menu_hide_all_markings,ID.MENU_ITEM_HIDE_ALL_MARKINGS);
 
 			menu_show.add(menu_show_all_markings);
@@ -1590,9 +1592,11 @@ public class GUI extends JFrame{
 			menu_grid_hide = new JMenuItem("Fade");
 			menu_grid_hide.setMnemonic(KeyEvent.VK_F);
 			addActionsToMenuItems(menu_grid_hide, ID.FADE_GRID);
+			menu_grid_hide.setToolTipText("Shift + F");
 			menu_grid_show = new JMenuItem("Set Opaque");
 			menu_grid_show.setMnemonic(KeyEvent.VK_O);
 			addActionsToMenuItems(menu_grid_show, ID.SHOW_GRID_OPAQUE);
+			menu_grid_show.setToolTipText("Shift + O");
 			menu_grid.add(menu_grid_show);
 			menu_grid.add(menu_grid_hide);
 
@@ -3048,7 +3052,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 	 *
 	 * @throws Exception the exception
 	 */
-	private void showGrid() throws Exception{
+	public void showGrid() throws Exception{
 
 		this.gridPanel.setBasicTransparency();
 		this.gridPanel.repaint();

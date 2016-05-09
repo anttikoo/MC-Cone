@@ -434,6 +434,8 @@ public class GUIListener extends MouseInputAdapter {
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_DOWN_MASK), "export_clip_pressed");		
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK), "show_all_markings_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.SHIFT_DOWN_MASK ), "hide_all_markings_pressed");
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.SHIFT_DOWN_MASK), "grid_fade_pressed");
+				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.SHIFT_DOWN_MASK ), "grid_opaque_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_DOWN_MASK), "zoom_out_pressed");
 				inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_DOWN_MASK), "zoom_in_pressed");
 
@@ -639,6 +641,48 @@ public class GUIListener extends MouseInputAdapter {
 						public void actionPerformed(ActionEvent e) {
 							try {
 								gui.setVisibilityOfAllMarkingLayers(true);
+							} catch (Exception e1) {
+								LOGGER.severe("Error in changing MarkingLayer visible!");
+								e1.printStackTrace();
+							}
+
+						}
+					});
+					
+					// hiding grid
+					actionMap.put("grid_fade_pressed", new AbstractAction() {
+
+						/** The Constant serialVersionUID. */
+						private static final long serialVersionUID = 4048551957780600448L;
+
+						/** The Constant serialVersionUID. */
+						
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								gui.diminishGrid();
+							} catch (Exception e1) {
+								LOGGER.severe("Error in changing MarkingLayer visible!");
+								e1.printStackTrace();
+							}
+
+						}
+					});
+					
+					// showin grid
+					actionMap.put("grid_opaque_pressed", new AbstractAction() {
+
+						/** The Constant serialVersionUID. */
+						private static final long serialVersionUID = 3179234471747328065L;
+
+						/** The Constant serialVersionUID. */
+						
+
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								gui.showGrid();
 							} catch (Exception e1) {
 								LOGGER.severe("Error in changing MarkingLayer visible!");
 								e1.printStackTrace();
