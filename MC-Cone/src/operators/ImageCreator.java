@@ -627,6 +627,7 @@ public class ImageCreator implements Runnable {
 			JAI.create("encode", bi, fos, "TIFF",params);
 			return true;
 		} catch (FileNotFoundException e) {
+			LOGGER.severe("Error in creating tif-file. Could not produce the file!");
 			e.printStackTrace();
 			return false;
 		}
