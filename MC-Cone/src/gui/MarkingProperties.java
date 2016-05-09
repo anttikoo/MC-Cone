@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -430,10 +431,9 @@ protected void initDialog(){
 		this.setResizable(false);
 		this.setBounds(gui.getVisibleWindowBounds()); // sets the size of this dialog same as the GUI (the parent)
 		this.setUndecorated(true); // no titlebar or buttons
-		this.setBackground(new Color(0,0,0,50)); // transparent color
-		this.setContentPane(new ContentPane()); // makes dimming over GUI
-		this.getContentPane().setBackground(Color_schema.dark_30);
-		this.setLayout(null); // backpanel position is determined with setBounds(..)
+		this.setBackground(new Color(0,0,0,60)); // transparent color
+		this.setContentPane(new ContentPane(new GridBagLayout())); // makes dimming over GUI
+//		this.setLayout(null); // backpanel position is determined with setBounds(..)
 		
 		// the window showing components -> left panel for preview, right panel for modification
 		backPanel = new JPanel();
@@ -443,7 +443,7 @@ protected void initDialog(){
 		backPanel.setMinimumSize(new Dimension(panelWidth,panelHeight));
 		backPanel.setPreferredSize(new Dimension(panelWidth,panelHeight));
 		
-		setPanelPosition();
+	//	setPanelPosition();
 		
 		JPanel backRightPanel = new JPanel();
 		backRightPanel.setLayout(new BorderLayout());
@@ -492,8 +492,7 @@ protected void initDialog(){
 protected void initMarkingPropertiesPanel() throws Exception{
 	
 	initDialog();
-	//this.revalidate();
-	//this.repaint();
+
 }
 
 

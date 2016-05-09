@@ -745,8 +745,7 @@ private void initComponents(){
 		this.setUndecorated(true);
 		this.setBackground(new Color(0,0,0,60));
 		this.setContentPane(new ContentPane(new GridBagLayout()));
-	//	this.getContentPane().setBackground(Color_schema.dark_30);
-	//	this.getContentPane().setLayout(new GridBagLayout());
+
 		//init backpanel where all funtions are shown.
 		backPanel = new JPanel();
 		backPanel.setBackground(new Color(0,0,0));
