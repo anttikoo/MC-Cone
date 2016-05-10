@@ -1873,8 +1873,6 @@ public class GUI extends JFrame{
 			UIManager.put("ToolTip.background", Color_schema.tooltip_bg);
 			UIManager.put("ToolTip.font", Fonts.b14);
 			
-			// init plugins for ImageIO
-			ImageIO.scanForPlugins();
 			
 			guiListener = new GUIListener(this);
 

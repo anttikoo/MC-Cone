@@ -822,12 +822,13 @@ public class LayerVisualManager {
 		
 		}
 		else{
-			ImageIO.scanForPlugins();
-			LOGGER.info("Reading Tiff file");
+			//ImageIO.scanForPlugins();
+		/*	LOGGER.info("Reading Tiff file");
 			Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("TIFF");
 			while (readers.hasNext()) {
 			    LOGGER.info("reader: " + readers.next());
 			}
+		*/	
 			BufferedImage in = ImageIO.read(file);
 			BufferedImage newImage = new BufferedImage(in.getWidth(), in.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
