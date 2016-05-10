@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import org.imgscalr.Scalr;
@@ -806,8 +807,10 @@ public class LayerVisualManager {
 	 * @throws Exception the exception
 	 */
 	public BufferedImage readImageFile(File file) throws Exception{
+		
+		
 		// use JAI for window and linux to open tiff
-		if(Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff) &&
+		if((Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff) ) &&
 			SharedVariables.operationSystem != ID.OS_MAC){
 						
 			PlanarImage pim=null;
@@ -819,7 +822,12 @@ public class LayerVisualManager {
 		
 		}
 		else{
-		
+			ImageIO.scanForPlugins();
+			LOGGER.info("Reading Tiff file");
+			Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("TIFF");
+			while (readers.hasNext()) {
+			    LOGGER.info("reader: " + readers.next());
+			}
 			BufferedImage in = ImageIO.read(file);
 			BufferedImage newImage = new BufferedImage(in.getWidth(), in.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
