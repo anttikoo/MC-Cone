@@ -149,6 +149,23 @@ public class FileManager {
 		}
 	}
 	
-	
-	
+	public static String getFolderString(File file){
+		
+		try {
+			if(file != null){
+				File f = getFolder(file.getAbsolutePath());
+				if(f != null)
+					return f.getAbsolutePath();
+				return null;
+				
+			}
+			return null;
+		} catch (Exception e) {
+			LOGGER.severe("Error in getting folder");
+			e.printStackTrace();
+			return null;
+		}	
+			
+	}
+		
 }

@@ -799,6 +799,7 @@ public class TaskManager {
 	 * Sets the present folder.
 	 *
 	 * @param folder the new present folder
+	 * @param id the id
 	 * @throws Exception the exception
 	 */
 	public void setPresentFolder(String folder, int id) throws Exception{

@@ -41,8 +41,6 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -238,6 +236,8 @@ public class GUI extends JFrame{
 	
 	/** The add image worker. Used for importing images in background. */
 	private SwingWorker<Boolean, Object> addImageWorker;
+	
+	private File[] droppedFiles=null;
 
 
 	
@@ -250,7 +250,7 @@ public class GUI extends JFrame{
 	public GUI()
 {		super("gui");
 		//initialize LOGGING 
-		initLogging(Level.INFO);
+		initLogging(Level.FINE);
 		
 		// initialize fonts
 		Fonts.initFonts();
@@ -1759,9 +1759,26 @@ public class GUI extends JFrame{
 			  new  FileDrop( rightPanel, new FileDrop.Listener()
 			  {   public void  filesDropped( java.io.File[] files )
 			      {
-			          // handle file drop: open images
-			         LOGGER.fine("File(s) dropped on GUI");
-			         openAddImageLayerDialog(files); // open dialog with no given imagefiles
+				  droppedFiles = files;
+				  SwingUtilities.invokeLater(new Runnable() {
+					
+					@Override
+					public void run() {
+						   // handle file drop: open images
+				         LOGGER.fine("File(s) dropped on GUI");
+				         
+				         
+				         try {
+				        	 if(droppedFiles != null)
+							openAddImageLayerDialog(droppedFiles); // open dialog with no given imagefiles
+						} catch (Exception e) {
+							LOGGER.severe("Error dropping images!");
+							e.printStackTrace();
+						}
+						
+					}
+				});
+			       
 			      }   // end filesDropped
 			  }); // end FileDrop.Listener
 
@@ -1975,7 +1992,7 @@ public class GUI extends JFrame{
 	}
 
 	/**
-	 *  Starts the progress to add one ImageLayer: User gives the image and possible markings from file in new Dialog window.
+	 *  Starts the progress to add ImageLayers: User selects the images and possible markings from file in new Dialog window.
 	 * ImageLayer(s) are created and when done, GUI layers, ImagePanel and ImageLayerInfo is updated
 	 *
 	 * @param fileList the list of files
@@ -1984,8 +2001,11 @@ public class GUI extends JFrame{
 		try {
 			if(fileList != null){
 				if(addImage == null){
-					addImage = new AddImageLayerDialog(this, getGUI(), fileList);							
+					addImage = new AddImageLayerDialog(this, this, fileList);	
+					this.guiComponentListener.setChildDialog(addImage);
+					addImage.showDialog();
 					addImage=null;		
+					this.guiComponentListener.setChildDialog(null);
 				}
 			}
 			else{
@@ -2636,10 +2656,10 @@ public class GUI extends JFrame{
 	}
 
 /**
- * Sets the folder name which is previously used.
+ * Sets the folder name which is previously used. Two types of folders: for images ID.FOLDER_IMAGES and for xml-files ID.FOLDER_XML_FILES.
  *
  * @param folder String folder name which is previously used.
- * @param id the id
+ * @param id the id type of file for folder
  * @throws Exception the exception
  */
 public void setPresentFolder(String folder, int id) throws Exception{

@@ -807,12 +807,10 @@ public class LayerVisualManager {
 	 * @throws Exception the exception
 	 */
 	public BufferedImage readImageFile(File file) throws Exception{
-		
-		
-		// use JAI for window and linux to open tiff
-		if((Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff) ) &&
-			SharedVariables.operationSystem != ID.OS_MAC){
-						
+			
+		// use JAI to open tiff
+		if((Utils.getExtension(file).equals(Utils.tif) || Utils.getExtension(file).equals(Utils.tiff) ) ){
+								
 			PlanarImage pim=null;
 			pim= JAI.create("fileload", file.getAbsolutePath());
 			if(pim != null)
@@ -822,13 +820,7 @@ public class LayerVisualManager {
 		
 		}
 		else{
-			//ImageIO.scanForPlugins();
-		/*	LOGGER.info("Reading Tiff file");
-			Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("TIFF");
-			while (readers.hasNext()) {
-			    LOGGER.info("reader: " + readers.next());
-			}
-		*/	
+			ImageIO.scanForPlugins();						
 			BufferedImage in = ImageIO.read(file);
 			BufferedImage newImage = new BufferedImage(in.getWidth(), in.getHeight(), BufferedImage.TYPE_INT_ARGB);
 

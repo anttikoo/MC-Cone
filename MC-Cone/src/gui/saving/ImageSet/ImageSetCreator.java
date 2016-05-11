@@ -747,7 +747,7 @@ public class ImageSetCreator extends JDialog implements MouseListener, Runnable{
 		} catch (HeadlessException e) {	
 			e.printStackTrace();
 		} catch (Exception e) {
-			LOGGER.severe("Could not import all images from files");
+			LOGGER.severe("Could not import all images from files: "+e.getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -1,5 +1,6 @@
 package gui;
 
+import gui.file.FileManager;
 import gui.file.ImageFilter;
 import gui.file.OpenImageFilesDialog;
 import gui.file.OpenMarkingFileDialog;
@@ -94,6 +95,9 @@ public class AddImageLayerDialog extends JDialog{
 	/** The add images SwingWorker. */
 	private SwingWorker<Boolean, Object> addImagesWorker;
 	
+	/** The dropped image files. */
+	private File[] droppedImageFiles=null;
+	
 
 
 
@@ -108,6 +112,7 @@ public class AddImageLayerDialog extends JDialog{
 			super(frame, true);
 			try{
 				this.setResizable(false);
+				this.droppedImageFiles=null;
 				typeOfDialog=ID.CREATE_NEW_IMAGELAYERS;
 				dialogImageLayerList = new ArrayList<ImageLayer>();
 				this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -145,7 +150,8 @@ public class AddImageLayerDialog extends JDialog{
 
 			super(frame, true);
 			try{
-				
+				this.droppedImageFiles=null;
+				this.setResizable(false);
 				this.typeOfDialog=ID.MANAGE_IMAGE_LAYERS;
 				this.dialogImageLayerList =   makeCopyOfList(iList);
 				this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -170,14 +176,24 @@ public class AddImageLayerDialog extends JDialog{
 
 			super(frame, true);
 			try{
+				this.setResizable(false);
+				this.droppedImageFiles=imageFiles;
 				typeOfDialog=ID.CREATE_NEW_IMAGELAYERS;
 				dialogImageLayerList = new ArrayList<ImageLayer>();
 				this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 				this.gui=gui;
 				initComponents();
-				if(imageFiles != null && imageFiles.length>0)
-					addImagesToImageLayerList(imageFiles);
-				this.setVisible(true);
+		
+						if(droppedImageFiles != null && droppedImageFiles.length >0)
+							try {
+								addImageFilesToImageLayerList(droppedImageFiles);
+							} catch (Exception e) {
+								LOGGER.severe("Error in importing images! "+e.getMessage());
+								e.printStackTrace();
+							}
+				
+				
+			//	this.setVisible(true);
 
 
 		} catch (Exception e) {
@@ -222,6 +238,25 @@ public class AddImageLayerDialog extends JDialog{
 			shadyMessageDialog=null;
 		}
 
+	}
+	
+	/**
+	 * Adds the image files to image layer list. The process is made in SwingWorker.
+	 *
+	 * @param imagefiles the imagefiles
+	 */
+	private void addImageFilesToImageLayerList(File[] imagefiles) throws Exception{
+		if(imagefiles != null && imagefiles.length>0){
+			if(imagefiles[0] !=null){
+				String folderPath = FileManager.getFolderString(imagefiles[0]);
+				LOGGER.fine("Folder: "+folderPath);
+				if(folderPath == null || folderPath.length()<3)
+					folderPath=System.getProperty("user.home");
+				gui.setPresentFolder(folderPath,ID.FOLDER_IMAGES);
+			}
+			this.addImagesWorker = new AddImagesWorker(imagefiles);
+			this.addImagesWorker.execute();
+		}	
 	}
 
 
@@ -1062,7 +1097,7 @@ private JPanel initImageViewPanel(){
 	}
 
 	/**
-	 * Opens a file dialog, which type depends on which file type will be opened.
+	 * Opens a file dialog for opening images and adds the images files to importing list of dialog.
 	 *
 	 * @throws Exception the exception
 	 */
@@ -1176,9 +1211,14 @@ private JPanel initImageViewPanel(){
 	 * @throws Exception the exception
 	 */
 	public void showDialog() throws Exception{
+		
 		this.setVisible(true);
+		
 		this.repaint();
+		
 	
+		
+		
 		
 	}
 	
@@ -1264,6 +1304,7 @@ private JPanel initImageViewPanel(){
 			imageScrollPanel.revalidate();
 			imageScrollingPane.revalidate();
 			imageScrollingPane.repaint();
+			
 
 		} catch (Exception e) {
 			LOGGER.severe("Error in updating IMAGE LIST " +e.getClass().toString() + " :" +e.getMessage());
@@ -1566,7 +1607,7 @@ private JPanel initImageViewPanel(){
 		private File[] imageFiles;
 		
 		/**
-		 * Instantiates a new adds the images worker.
+		 * Instantiates a new AddImageWorker for importing image and adding to list.
 		 *
 		 * @param images the images
 		 */
@@ -1590,7 +1631,7 @@ private JPanel initImageViewPanel(){
     								dialogImageLayerList.add(new ImageLayer(imageFiles[i].getAbsolutePath())); // create new ImageLayer by giving the path of image
     							}
     							else{
-    								
+    								LOGGER.warning("Refused opening image. Already opened!");
     								// inform user that image with same name is already used
     								shadyMessageDialog = new ShadyMessageDialog((JDialog)getAddImageLayerDialog(), "Refused opening image", " Image name:  "+imageFiles[i].getName() + " is already open", ID.OK, (JDialog)getAddImageLayerDialog());	
     								shadyMessageDialog.showDialog();									
@@ -1598,7 +1639,9 @@ private JPanel initImageViewPanel(){
     						} // if file is wrong format of the dimensio is wrong -> informed in isImageFile -method
 
     					}else{
+    						
     						// inform user that image with same name is already used
+    						LOGGER.warning("Refused opening image");
     						shadyMessageDialog = new ShadyMessageDialog((JDialog)getAddImageLayerDialog(), "Refused opening image", " Image name:  "+imageFiles[i].getName() + " doesn't exist!", ID.OK, (JDialog)getAddImageLayerDialog());
     						shadyMessageDialog.showDialog();
 
