@@ -9,43 +9,6 @@
 		<jdk.version>1.7</jdk.version>
 	</properties>
   
-  <dependencies>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>FileDrop</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>ImgScalr</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>Jai_codec</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>Jai_core</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>JavaGeom</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>ClibWrapper</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>Jai_imageio</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  </dependencies>
   <build>
 	<finalName>MC-Cone</finalName>
 	  <sourceDirectory>src</sourceDirectory>
@@ -115,4 +78,41 @@
 		</plugin>
 		</plugins>
   </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>FileDrop</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>ImgScalr</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>Jai_codec</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>Jai_core</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>Jai_imageio</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>JavaGeom</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
+  		<artifactId>ClibWrapper</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
