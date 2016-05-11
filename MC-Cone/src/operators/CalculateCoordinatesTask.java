@@ -77,6 +77,7 @@ public class CalculateCoordinatesTask implements Runnable{
 	 * @param currentMinCellSize the current min cell size
 	 * @param maxCellNumberInCellGroup the max cell number in cell group
 	 * @param minDinstanceBetweenCellBoundaries the min dinstance between cell boundaries
+	 * @param threadNumber the number of threads
 	 */
 	public CalculateCoordinatesTask(PreCounterThread pct, ArrayList<Point> coordinates, int currentGap, int currentMaxCellSize, int currentMaxCoordinateNumberInCell, 
 			int currentMinCellSize, int maxCellNumberInCellGroup, int minDinstanceBetweenCellBoundaries, int threadNumber){

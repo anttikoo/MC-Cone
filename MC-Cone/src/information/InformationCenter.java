@@ -220,6 +220,7 @@ public class InformationCenter {
 	/**
 	 * Copy selected MarkingLayer markings temporary.
 	 *
+	 * @return true, if successful
 	 * @throws Exception the exception
 	 */
 	public boolean copySelectedMarkingLayerMarkingsTemporary() throws Exception{
@@ -1111,9 +1112,11 @@ public class InformationCenter {
 	}
 
 	/**
-	 * Sets new list of ImageLayers: replaces the older one after checking correctness of new ImageLayers by method addImageLayers.
+	 * Sets new list of ImageLayers: replaces the older one after checking correctness of new ImageLayers with method addImageLayers.
 	 * If null parameter is given: creates new empty list
+	 *
 	 * @param iLayerList ArrayList containing the ImageLayer objects
+	 * @param isUpdate the is updating the list
 	 */
 	public void setImageLayerList(ArrayList<ImageLayer> iLayerList, boolean isUpdate)  {
 		try {

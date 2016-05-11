@@ -136,6 +136,7 @@ public class TaskManager {
 	/**
 	 * Copy selected MarkingLayer markings temporary.
 	 *
+	 * @return true, if successful
 	 * @throws Exception the exception
 	 */
 	public boolean copySelectedMarkingLayerMarkingsTemporary() throws Exception{
@@ -316,6 +317,7 @@ public class TaskManager {
 	/**
 	 * Returns the present folder.
 	 *
+	 * @param id the id
 	 * @return the present folder
 	 * @throws Exception the exception
 	 */

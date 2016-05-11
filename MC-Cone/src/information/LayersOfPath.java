@@ -24,10 +24,11 @@ public class LayersOfPath {
 	final static Logger LOGGER = Logger.getLogger("MCCLogger");
 	
 	/**
-	 * Instantiates a new LayersOfPath
+	 * Instantiates a new LayersOfPath.
 	 *
-	 * @param path the path
-	 * @param state the state
+	 * @param path the file path
+	 * @param state the state of file
+	 * @param overwrite the boolean allowing to overwrite
 	 */
 	public LayersOfPath(String path, int state, boolean overwrite){
 		try {
