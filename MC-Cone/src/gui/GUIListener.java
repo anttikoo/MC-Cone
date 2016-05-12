@@ -3,6 +3,8 @@ package gui;
 
 import gui.panels.ImagePanel;
 import information.ID;
+import information.SharedVariables;
+
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.KeyboardFocusManager;
@@ -933,7 +935,7 @@ public class GUIListener extends MouseInputAdapter {
 	 * @throws Exception the exception
 	 */
 	private void initZoomTimer() throws Exception{
-		this.zoomTimer=new Timer(100, new ActionListener() {
+		this.zoomTimer=new Timer(SharedVariables.scrollingTimerDelay, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1131,7 +1133,7 @@ public class GUIListener extends MouseInputAdapter {
 	}
 
 	/**
-	 * Mediates the mouseWheelMoved Event to wanted procedure. Events of PrecountGlassPane are forwarded to forwardGlassPaneEvent(..).
+	 * Mediates the mouseWheelMoved Event to wanted procedure. Events of PrecountGlassPane are forwarded to forwardGlassPaneEvent.
 	 * Single wheel movement zooms 25% in or out depending wheel movement direction.
 	 * @see java.awt.event.MouseAdapter#mouseWheelMoved(java.awt.event.MouseWheelEvent)
 	 */

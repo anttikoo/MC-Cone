@@ -81,6 +81,11 @@
   <dependencies>
   	<dependency>
   		<groupId>MC-Cone</groupId>
+  		<artifactId>ClibWrapper</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>MC-Cone</groupId>
   		<artifactId>FileDrop</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
@@ -107,11 +112,6 @@
   	<dependency>
   		<groupId>MC-Cone</groupId>
   		<artifactId>JavaGeom</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>MC-Cone</groupId>
-  		<artifactId>ClibWrapper</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
   </dependencies>

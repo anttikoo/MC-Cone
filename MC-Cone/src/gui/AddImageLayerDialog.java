@@ -201,6 +201,7 @@ public class AddImageLayerDialog extends JDialog{
 		}
 	}
 
+	
 	/**
 	 * Adds the image files to image layer list. The process is made in SwingWorker.
 	 *

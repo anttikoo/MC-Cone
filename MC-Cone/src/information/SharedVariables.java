@@ -5,6 +5,10 @@ import java.awt.AlphaComposite;
 /**
  * The Class SharedVariables. Contains static variables.
  */
+/**
+ * @author User
+ *
+ */
 public class SharedVariables {
 	
 	
@@ -108,8 +112,10 @@ public class SharedVariables {
 	public static final String widthUp = "WIDTH_UP";
 	
 	
-	/**
-	 * Returns the java version.
+	/** The scrolling timer. */
+	public static int scrollingTimerDelay = 100; /**
+	 
+	 ** Returns the java version.
 	 *
 	 * @return the java version
 	 */
@@ -169,6 +175,9 @@ public class SharedVariables {
 	 */
 	public static void setOS(int osID){
 		operationSystem=osID;
+		// in Windows the scrolling delay is set smaller
+		if(operationSystem == ID.OS_WINDOWS)
+			setScrollingDelay(50);
 	}
 
 	/**
@@ -180,6 +189,15 @@ public class SharedVariables {
 		SharedVariables.remember_answer_pc_ow = remember_answer_pc_value;
 	}
 	
+	
+	/**
+	 * Sets the scrolling delay.
+	 *
+	 * @param delay the new scrolling delay
+	 */
+	public static void setScrollingDelay(int delay) {
+		SharedVariables.scrollingTimerDelay = delay;
+	}
 
 	/**
 	 * Sets the transparencyIN.
