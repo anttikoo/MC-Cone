@@ -201,44 +201,7 @@ public class AddImageLayerDialog extends JDialog{
 		}
 	}
 
-	/**
-	 * Creates ImageLayer objects to imageLayerList by inserting paths of parameter file(s).
-	 * If path is already used in an imageLayer object, no new ImageLayer is created.
-	 * @param imageFiles List of files, which path are used in creating  ImageLayer objects
-	 */
-	private void addImagesToImageLayerList(File[] imageFiles){
-		try{
-		if(imageFiles !=null && imageFiles.length>0)
-		for(int i=0; i<imageFiles.length;i++){
-			if(imageFiles[i] != null && imageFiles[i].exists() && imageFiles[i].getAbsolutePath().length() >3){
-				if(isImageFile(imageFiles[i])){
-					if(!imageNameAlreadyInList(imageFiles[i].getName()) && !gui.imageNameAlreadyUsed(imageFiles[i].getName())){
-						dialogImageLayerList.add(new ImageLayer(imageFiles[i].getAbsolutePath())); // create new ImageLayer by giving the path of image
-					}
-					else{
-						
-						// inform user that image with same name is already used
-						shadyMessageDialog = new ShadyMessageDialog(this, "Refused opening image", " Image name:  "+imageFiles[i].getName() + " is already open", ID.OK, this);	
-						shadyMessageDialog.showDialog();									
-					}
-				} // if file is wrong format of the dimensio is wrong -> informed in isImageFile -method
-
-			}else{
-				// inform user that image with same name is already used
-				shadyMessageDialog = new ShadyMessageDialog(this, "Refused opening image", " Image name:  "+imageFiles[i].getName() + " doesn't exist!", ID.OK, this);
-				shadyMessageDialog.showDialog();
-
-			}
-		}
-		updateImageList();
-		shadyMessageDialog=null;
-		imageFiles=null;
-		}catch(Exception e){
-			LOGGER.severe("Problems in adding images to list: "+e.getMessage());
-			shadyMessageDialog=null;
-		}
-
-	}
+	
 	
 	/**
 	 * Adds the image files to image layer list. The process is made in SwingWorker.
