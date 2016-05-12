@@ -16,18 +16,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import org.imgscalr.Scalr;
 import gui.file.Utils;
 import information.GridProperties;
-import information.ID;
 import information.MarkingLayer;
 import information.PositionedImage;
 import information.PositionedRectangle;
 import information.ScreenCoordinatesOfMarkingLayer;
-import information.SharedVariables;
 
 
 /**
