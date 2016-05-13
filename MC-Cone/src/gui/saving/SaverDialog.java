@@ -528,8 +528,8 @@ private Component parentComponent=null;
 		backPanel.add(initDownPanel(),BorderLayout.PAGE_END);
 
 		this.add(backPanel);
-		this.validate();
-		this.repaint();
+	//	this.validate();
+	//	this.repaint();
 	}
 
 
@@ -927,7 +927,7 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 			}
 			
 			
-			this.repaint();
+		//	this.repaint();
 
 		} catch (Exception e) {
 			LOGGER.severe("Error in updating IMAGE LIST " +e.getClass().toString() + " :" +e.getMessage());
@@ -1034,7 +1034,7 @@ protected JPanel initImageViewPanelWithTitle() throws Exception{
 	
 	public void showDialog(){
 		this.setVisible(true);
-		this.repaint();
+	//	this.repaint();
 	}
 
 	/**

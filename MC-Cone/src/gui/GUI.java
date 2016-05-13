@@ -1340,7 +1340,32 @@ public class GUI extends JFrame{
 		}
 	}
 	
+	/**
+	 * Checks for marking panels. If found return true, false otherwise.
+	 *
+	 * @return true, if successful
+	 * @throws Exception the exception
+	 */
+	public boolean hasMarkingPanels() throws Exception{
+		if(this.layerInfoListJPanel != null && this.layers.getComponents() != null &&  this.layers.getComponents().length >0){
 	
+			Component[] mPanels=this.layers.getComponents();
+	
+			// ImageLayer is the first panel and array length is at least 1 + number of markingpanels
+			if(mPanels != null && mPanels.length>0){
+	
+	
+				// go trough panels
+				for(int i=0;i<mPanels.length;i++){ // ImagePanel is the first layer
+					if(mPanels[i] instanceof MarkingPanel){
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+			
+	}
 	
 	/**
 	 * Checks is given image name already in use.
@@ -2373,14 +2398,13 @@ public class GUI extends JFrame{
 	 * @throws Exception the exception
 	 */
 	public void saveMarkings() throws Exception{
-
 		if(taskManager.getImageLayerList() != null && taskManager.getImageLayerList().size()>0){
 				if(saveMarkingsDialog == null && !visiblePanel){
 					visiblePanel=true;
 					
 						
 							try {
-								saveMarkingsDialog = new SaveMarkings(getGUI(), getGUI(), taskManager.getImageLayerList());
+								saveMarkingsDialog = new SaveMarkings(this, this, taskManager.getImageLayerList());
 								
 								this.guiComponentListener.setChildDialog(saveMarkingsDialog);
 								saveMarkingsDialog.showDialog();

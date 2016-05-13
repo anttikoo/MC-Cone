@@ -64,12 +64,14 @@ public class ContentPane extends JPanel{
 				// Apply our own painting effect
 				Graphics2D g2d = (Graphics2D) g.create();					
 				
-				// 70% transparent Alpha for linux and unix. In windows and OS X the color value with alpha will work ok.
-				if(SharedVariables.operationSystem == ID.OS_LINUX_UNIX){
+				// 70% transparent Alpha for linux and unix when java 1.7. In windows and OS X the color value with alpha will work ok.
+				if(SharedVariables.operationSystem == ID.OS_LINUX_UNIX && SharedVariables.getJavaVersion() < 1.8){
+					
 			        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 					Composite com = AlphaComposite.getInstance(SharedVariables.usedDimmingMode, 0.6f);
 					g2d.setComposite(com);
 					g2d.setColor(new Color(0,0,0));
+					
 				}
 				else{
 					g2d.setColor(new Color(0,0,0,60));

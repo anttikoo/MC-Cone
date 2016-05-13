@@ -1068,41 +1068,43 @@ public class GUIListener extends MouseInputAdapter {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		try {
-			if(e.getSource() instanceof ImagePanel){
-			if(!is_CTRL_pressed){
-					// started dragging
-				if(previousDraggingPoint==null && timerSPACEactivate.isRunning()){
-					previousDraggingPoint = new Point(e.getPoint().x, e.getPoint().y);
-				}
-				else{
-
-						if(taskManager.isSelectedMarkingLayerVisible()){
-
-							if(is_SHIFT_pressed){
-								// setting selected Grids
-								gui.setGridSelectedRectangle(e.getPoint());
-							}
-							else{
-								// adding or deleting single marking
-								if(e.getButton() == MouseEvent.BUTTON1){ // left button -> add marking
-									if(gui.addSingleMarking(e.getPoint()))
-										gui.updateCoordinatesOfSelectedMarkingPanel();
+			if(e != null && gui.hasMarkingPanels()){
+				if(e.getSource() instanceof ImagePanel){
+				if(!is_CTRL_pressed){
+						// started dragging
+					if(previousDraggingPoint==null && timerSPACEactivate.isRunning()){
+						previousDraggingPoint = new Point(e.getPoint().x, e.getPoint().y);
+					}
+					else{
+	
+							if(taskManager.isSelectedMarkingLayerVisible()){
+	
+								if(is_SHIFT_pressed){
+									// setting selected Grids
+									gui.setGridSelectedRectangle(e.getPoint());
 								}
-								else { // right button -> remove marking
-
-									if(gui.removeSingleMarking(e.getPoint())){
-									gui.removeHighLightPoint();
-
-									// update selectedMarkingPanel
-									gui.updateCoordinatesOfSelectedMarkingPanel();
+								else{
+									// adding or deleting single marking
+									if(e.getButton() == MouseEvent.BUTTON1){ // left button -> add marking
+										if(gui.addSingleMarking(e.getPoint()))
+											gui.updateCoordinatesOfSelectedMarkingPanel();
+									}
+									else { // right button -> remove marking
+	
+										if(gui.removeSingleMarking(e.getPoint())){
+										gui.removeHighLightPoint();
+	
+										// update selectedMarkingPanel
+										gui.updateCoordinatesOfSelectedMarkingPanel();
+										}
 									}
 								}
 							}
-						}
+					}
 				}
-			}
-			}else if(e.getSource() instanceof PrecountGlassPane){
-				forwardGlassPaneEvent(e);
+				}else if(e.getSource() instanceof PrecountGlassPane){
+					forwardGlassPaneEvent(e);
+				}
 			}
 		} catch (Exception e1) {
 			LOGGER.severe("Error in pressing mouse!");
