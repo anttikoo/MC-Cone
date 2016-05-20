@@ -2161,6 +2161,9 @@ public class GUI extends JFrame{
 				this.layers.add(p, JLayeredPane.DRAG_LAYER);
 				// if ImageLayer of MarkingPanel is selected -> set the new MarkingPanel front of panels
 			}
+			// update MarkingLayer of highlightLayer
+			this.highlightPanel.setLayer(this.taskManager.getSelectedMarkingLayer());
+			
 			this.highlightPanel.setBounds(this.imagePanel.getBounds());
 			this.gridPanel.setBounds(this.imagePanel.getBounds());
 			updateGridPanel();
@@ -3123,6 +3126,7 @@ public void setSelectedMarkingLayer(int mLayerID) throws Exception{
 						// set selected
 						this.taskManager.setMarkingLayerSelected(mLayerID);
 						this.taskManager.setMarkingLayerVisibility(mLayerID,true);
+						
 					}
 					
 					
